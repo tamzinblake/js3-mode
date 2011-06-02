@@ -1847,8 +1847,8 @@ nil."
 	  (current-column))))
 
      ((and (js2-node-at-point)
-	   (js2-node-parent (js2-node-at-point))
-	   (js2-node-type (js2-node-parent (js2-node-at-point)))
+;	   (js2-node-parent (js2-node-at-point))
+;	   (js2-node-type (js2-node-parent (js2-node-at-point)))
 	   (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
       (save-excursion
 	(message "var special special case")
