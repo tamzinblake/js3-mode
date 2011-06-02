@@ -1820,47 +1820,47 @@ nil."
 	(re-search-backward "\\<var\\>" (point-min) t)
 	(+ (current-column) 4)))
 
-    ((nth 4 parse-status)
-           (js--get-c-offset 'c (nth 8 parse-status)))
-          ((nth 8 parse-status) 0) ; inside string
-          ((js--ctrl-statement-indentation))
-          ((eq (char-after) ?#) 0)
-          ((save-excursion (js--beginning-of-macro)) 4)
-          ((nth 1 parse-status)
-	   ;; A single closing paren/bracket should be indented at the
-	   ;; same level as the opening statement. Same goes for
-	   ;; "case" and "default".
-           (let ((same-indent-p (looking-at
-                                 "[]})]\\|\\_<case\\_>\\|\\_<default\\_>"))
-                 (continued-expr-p (js--continued-expression-p)))
-             (goto-char (nth 1 parse-status)) ; go to the opening char
-             (if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
-                 (progn ; nothing following the opening paren/bracket
-                   (skip-syntax-backward " ")
-                   (when (eq (char-before) ?\)) (backward-list))
-                   (back-to-indentation)
-                   (cond (same-indent-p
-                          (current-column))
-                         (continued-expr-p
-                          (+ (current-column) (* 2 js-indent-level)
-                             js-expr-indent-offset))
-                         (t
-                          (+ (current-column) js-indent-level
-                             (case (char-after (nth 1 parse-status))
-                               (?\( js-paren-indent-offset)
-                               (?\[ js-square-indent-offset)
-                               (?\{ js-curly-indent-offset))))))
-               ;; If there is something following the opening
-               ;; paren/bracket, everything else should be indented at
-               ;; the same level.
-               (unless same-indent-p
-                 (forward-char)
-                 (skip-chars-forward " \t"))
-               (current-column))))
+     ((nth 4 parse-status)
+      (js--get-c-offset 'c (nth 8 parse-status)))
+     ((nth 8 parse-status) 0) ; inside string
+     ((js--ctrl-statement-indentation))
+     ((eq (char-after) ?#) 0)
+     ((save-excursion (js--beginning-of-macro)) 4)
+     ((nth 1 parse-status)
+      ;; A single closing paren/bracket should be indented at the
+      ;; same level as the opening statement. Same goes for
+      ;; "case" and "default".
+      (let ((same-indent-p (looking-at
+			    "[]})]\\|\\_<case\\_>\\|\\_<default\\_>"))
+	    (continued-expr-p (js--continued-expression-p)))
+	(goto-char (nth 1 parse-status)) ; go to the opening char
+	(if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
+	    (progn ; nothing following the opening paren/bracket
+	      (skip-syntax-backward " ")
+	      (when (eq (char-before) ?\)) (backward-list))
+	      (back-to-indentation)
+	      (cond (same-indent-p
+		     (current-column))
+		    (continued-expr-p
+		     (+ (current-column) (* 2 js-indent-level)
+			js-expr-indent-offset))
+		    (t
+		     (+ (current-column) js-indent-level
+			(case (char-after (nth 1 parse-status))
+			      (?\( js-paren-indent-offset)
+			      (?\[ js-square-indent-offset)
+			      (?\{ js-curly-indent-offset))))))
+	  ;; If there is something following the opening
+	  ;; paren/bracket, everything else should be indented at
+	  ;; the same level.
+	  (unless same-indent-p
+	    (forward-char)
+	    (skip-chars-forward " \t"))
+	  (current-column))))
 
-          ((js--continued-expression-p)
-           (+ js-indent-level js-expr-indent-offset))
-          (t 0))))
+     ((js--continued-expression-p)
+      (+ js-indent-level js-expr-indent-offset))
+     (t 0))))
 
 (defun js-indent-line ()
   "Indent the current line as JavaScript."
