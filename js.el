@@ -1770,7 +1770,7 @@ nil."
      ((looking-at ",")
       (let ((spos
 	     (save-excursion
-	       (while (looking-back "\\(}\\|]\\|\"\\|)\\)[\t\n ]*")
+	       (while (looking-back "\\(}\\|]\\|\"\\|)\\|'\\)[\t\n ]*")
 		 (backward-sexp))
 
 	       (cond
@@ -1794,7 +1794,7 @@ nil."
      ((looking-at "\\(+\\|/[^/]\\|*\\|-\\)")
       (let ((spos
 	     (save-excursion
-	       (while (looking-back "\\(}\\|]\\|\"\\|)\\)[\t\n ]*")
+	       (while (looking-back "\\(}\\|]\\|\"\\|)\\|'\\)[\t\n ]*")
 		 (backward-sexp))
 
 	       (cond
