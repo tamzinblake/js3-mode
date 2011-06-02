@@ -1814,6 +1814,7 @@ nil."
      ((js--ctrl-statement-indentation))
      ((eq (char-after) ?#) 0)
      ((save-excursion (js--beginning-of-macro)) 4)
+
      ((nth 1 parse-status)
       ;; A single closing paren/bracket should be indented at the
       ;; same level as the opening statement. Same goes for
@@ -1824,6 +1825,7 @@ nil."
 	(goto-char (nth 1 parse-status)) ; go to the opening char
 	(if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
 	    (progn ; nothing following the opening paren/bracket
+	      (message "looking-at open brace")
 	      (skip-syntax-backward " ")
 	      (when (eq (char-before) ?\)) (backward-list))
 	      (back-to-indentation)
@@ -1842,11 +1844,11 @@ nil."
 	  ;; paren/bracket, everything else should be indented at
 	  ;; the same level.
 	  (unless same-indent-p
+	    (message "unless same-indent-p")
 	    (forward-char)
 	    (skip-chars-forward " \t"))
 	  (current-column))))
 
-     (t (message "got past big code block") 0)
      ((looking-back "\\<var\\>.*[ \t\n]*")
       (save-excursion
 	(message "var special special case")
