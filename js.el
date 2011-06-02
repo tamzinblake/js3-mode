@@ -1818,13 +1818,6 @@ nil."
 	(re-search-backward "\\<var\\>" (point-min) t)
 	(+ (current-column) 4)))
 
-;     ((and (looking-back "\\<var\\>.*[ \t\n]*")
-;	   (looking-at "[^]})]"))
-;      (save-excursion
-;	(message "var special special case")
-;	(re-search-backward "\\<var\\>" (point-min) t)
-;	(+ (current-column) 4)))
-
      ((nth 4 parse-status)
       (js--get-c-offset 'c (nth 8 parse-status)))
      ((nth 8 parse-status) 0) ; inside string
