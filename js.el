@@ -1812,14 +1812,6 @@ nil."
 	    spos
 	  (+ js-indent-level js-expr-indent-offset))))
 
-     ((and (js2-node-at-point)
-;                (= js2-NAME (js2-node-type (js2-node-at-point)))
-	   (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
-      (save-excursion
-	(message "Doing special var check")
-	(re-search-backward "\\<var\\>" (point-min) t)
-	(+ (current-column) 4)))
-
      ((nth 4 parse-status)
       (js--get-c-offset 'c (nth 8 parse-status)))
      ((nth 8 parse-status) 0) ; inside string
@@ -1857,6 +1849,14 @@ nil."
 	    (forward-char)
 	    (skip-chars-forward " \t"))
 	  (current-column))))
+
+     ((and (js2-node-at-point)
+;                (= js2-NAME (js2-node-type (js2-node-at-point)))
+	   (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
+      (save-excursion
+	(message "Doing special var check")
+	(re-search-backward "\\<var\\>" (point-min) t)
+	(+ (current-column) 4)))
 
      ((js--continued-expression-p)
       (+ js-indent-level js-expr-indent-offset))
