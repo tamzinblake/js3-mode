@@ -1847,10 +1847,6 @@ nil."
 	  (current-column))))
 
      ((looking-back "\\<var\\>.*[ \t\n]*")
-;(and (js2-node-at-point)
-;	   (js2-node-parent (js2-node-at-point))
-;	   (js2-node-type (js2-node-parent (js2-node-at-point)))
-;	   (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
       (save-excursion
 	(message "var special special case")
 	(re-search-backward "\\<var\\>" (point-min) t)
