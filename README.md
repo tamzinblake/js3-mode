@@ -4,8 +4,6 @@ An improved chimeric fork of js-mode and js2-mode that supports comma-first styl
 
 The goal of this project was to get a javascript mode working that supports [npm style](https://github.com/isaacs/npm/blob/master/doc/coding-style.md), but it turns out this mode is compatible with other styles as well. Most of the credit for the indentation goes to js-mode, with some handy special cases put in by yours truly.
 
-----
-
 ## Credits ##
 
 Created by [Thom Blake](https://github.com/thomblake).
@@ -20,15 +18,11 @@ The js2-mode included here is basically Steve Yegge's js2-mode version 20090723 
 
 The js-mode included here is the one included with emacs version 23.3, with some modifications to the way it indents in certain cases.
 
-----
-
 ## Installation ##
 
 Both js.el and js2.el should be placed in your emacs include path. You'll need to byte-compile js2-mode before using it - in emacs, M-x byte-compile-file RET <path-to-js2.el> RET.  If you want, js2-mode can be configured using M-x customize-group RET js2-mode RET.  See [here](http://code.google.com/p/js2-mode/wiki/InstallationInstructions) for detailed installation instructions on js2-mode.
 
 The .emacs file included contains what you need to stick the 2 modes together.
-
-----
 
 ## Notes ##
 
@@ -39,8 +33,6 @@ If your JS is in error, the indentation might look wrong.  I tend to regard this
 I expect that there are still some bugs; if you see any, please report them.  I have a sneaking suspicion that I'm not handling lines with comments very well.
 
 Remember - if you start a line with `(`, `[`, `+`, or `-`, strongly consider preceding it with a semicolon (`;`).
-
-----
 
 ## License ##
 
