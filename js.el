@@ -422,7 +422,7 @@ Match group 1 is the name of the macro.")
   :tag "JavaScript"
   :group 'languages)
 
-(defcustom js-indent-level 4
+(defcustom js-indent-level 2
   "Number of spaces for each indentation step in `js-mode'."
   :type 'integer
   :group 'js)
