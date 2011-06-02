@@ -1770,12 +1770,12 @@ nil."
      ((looking-at ",")
       (let ((spos
 	     (save-excursion
-	       (while (looking-back "\\(}\\|]\\|\"\\|)\\|'\\)[\t\n ]*")
+	       (while (looking-back "[]})\"'][\t\n ]*")
 		 (backward-sexp))
 
 	       (cond
-		((looking-back "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*")
-		 (re-search-backward "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*" (point-min) t)
+		((looking-back "[,([{].*[ \t\n]*")
+		 (re-search-backward "[,([{].*[ \t\n]*" (point-min) t)
 		 (current-column))
 
 		((looking-back "\\<var\\>.*[ \t\n]*")
@@ -1791,15 +1791,15 @@ nil."
 	    spos
 	  (+ js-indent-level js-expr-indent-offset))))
 
-     ((looking-at "\\(+\\|/[^/]\\|*\\|-\\)")
+     ((looking-at "\\([-+*]\\|/[^/*]\\)")
       (let ((spos
 	     (save-excursion
-	       (while (looking-back "\\(}\\|]\\|\"\\|)\\|'\\)[\t\n ]*")
+	       (while (looking-back "[]})\"'][\t\n ]*")
 		 (backward-sexp))
 
 	       (cond
-		((looking-back "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\).*[ \t\n]*")
-		 (re-search-backward "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\).*[ \t\n]*" (point-min) t)
+		((looking-back "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*")
+		 (re-search-backward "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*" (point-min) t)
 		 (current-column))
 
 		(t
