@@ -1808,6 +1808,13 @@ nil."
 	    spos
 	  (+ js-indent-level js-expr-indent-offset))))
 
+     ((and (looking-back "\\<var\\>.*[ \t\n]*")
+	   (looking-at "[^]})]"))
+      (save-excursion
+	(message "var special special case")
+	(re-search-backward "\\<var\\>" (point-min) t)
+	(+ (current-column) 4)))
+
      ((nth 4 parse-status)
       (js--get-c-offset 'c (nth 8 parse-status)))
      ((nth 8 parse-status) 0) ; inside string
@@ -1825,7 +1832,6 @@ nil."
 	(goto-char (nth 1 parse-status)) ; go to the opening char
 	(if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
 	    (progn ; nothing following the opening paren/bracket
-	      (message "looking-at open brace")
 	      (skip-syntax-backward " ")
 	      (when (eq (char-before) ?\)) (backward-list))
 	      (back-to-indentation)
@@ -1844,16 +1850,9 @@ nil."
 	  ;; paren/bracket, everything else should be indented at
 	  ;; the same level.
 	  (unless same-indent-p
-	    (message "unless same-indent-p")
 	    (forward-char)
 	    (skip-chars-forward " \t"))
 	  (current-column))))
-
-     ((looking-back "\\<var\\>.*[ \t\n]*")
-      (save-excursion
-	(message "var special special case")
-	(re-search-backward "\\<var\\>" (point-min) t)
-	(+ (current-column) 4)))
 
      ((js--continued-expression-p)
       (+ js-indent-level js-expr-indent-offset))
