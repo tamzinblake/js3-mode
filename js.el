@@ -1771,9 +1771,10 @@ nil."
       (let ((spos
 	     (save-excursion
 	       (while (looking-back "\\(}\\|]\\|\"\\)[\t\n ]*")
+		 (looking-back "\\(.*\\)")
+		 (message "first loop:")
+		 (message (match-string 0))
 		 (backward-sexp))
-	       (looking-back "\\(.*\\)")
-	       (message (match-string 0))
 
 	       (cond
 		((looking-back "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*")
