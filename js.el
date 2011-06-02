@@ -1816,8 +1816,9 @@ nil."
 ;                (= js2-NAME (js2-node-type (js2-node-at-point)))
                 (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
 	   (save-excursion
-		    (re-search-backward "\\<var\\>" (point-min) t)
-		    (+ (current-column) 4)))
+	     (message "Doing special var check")
+	     (re-search-backward "\\<var\\>" (point-min) t)
+	     (+ (current-column) 4)))
 
     ((nth 4 parse-status)
            (js--get-c-offset 'c (nth 8 parse-status)))
