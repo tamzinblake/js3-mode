@@ -1814,7 +1814,6 @@ nil."
      ((js--ctrl-statement-indentation))
      ((eq (char-after) ?#) 0)
      ((save-excursion (js--beginning-of-macro)) 4)
-     (t (message "got past js--beginning-of-macro") 0)
      ((nth 1 parse-status)
       ;; A single closing paren/bracket should be indented at the
       ;; same level as the opening statement. Same goes for
@@ -1847,6 +1846,7 @@ nil."
 	    (skip-chars-forward " \t"))
 	  (current-column))))
 
+     (t (message "got past big code block") 0)
      ((looking-back "\\<var\\>.*[ \t\n]*")
       (save-excursion
 	(message "var special special case")
