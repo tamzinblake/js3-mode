@@ -20,7 +20,7 @@ The js-mode included here is the one included with emacs version 23.3, with some
 
 ## Installation ##
 
-Both js.el and js2.el should be placed in your emacs include path. You'll need to byte-compile js2-mode before using it - in emacs, M-x byte-compile-file RET <path-to-js2.el> RET.  If you want, js2-mode can be configured using M-x customize-group RET js2-mode RET.  See [here](http://code.google.com/p/js2-mode/wiki/InstallationInstructions) for detailed installation instructions on js2-mode.
+Both js.el and js2.el should be placed in your emacs include path. You'll need to byte-compile js2-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js2.el> RET`.  If you want, js2-mode can be configured using `M-x customize-group RET js2-mode RET`.  See [here](http://code.google.com/p/js2-mode/wiki/InstallationInstructions) for detailed installation instructions on js2-mode.
 
 The .emacs file included contains what you need to stick the 2 modes together.
 
