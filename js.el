@@ -1774,7 +1774,10 @@ nil."
 		 (looking-back "\\(.*\\)")
 		 (message "first loop:")
 		 (message (match-string 0))
-		 (backward-sexp))
+		 (backward-sexp)
+		 (looking-back "\\(.*\\)")
+		 (message "first loop:")
+		 (message (match-string 0)))
 
 	       (cond
 		((looking-back "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*")
