@@ -513,7 +513,7 @@ big exception, and can produce bugs if you have trailing commas."
   :type 'boolean
   :group 'js2-mode)
 
-(defcustom js2-strict-missing-semi-warning t
+(defcustom js2-strict-missing-semi-warning nil
   "Non-nil to warn about semicolon auto-insertion after statement.
 Technically this is legal per Ecma-262, but some style guides disallow
 depending on it."
