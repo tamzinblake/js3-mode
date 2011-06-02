@@ -1767,58 +1767,58 @@ nil."
     (back-to-indentation)
     (cond
 
-          ((looking-at ",")
-           (let ((spos
-                  (save-excursion
-                    (while (looking-back "}[\t\n ]*")
-                      (backward-sexp))
+     ((looking-at ",")
+      (let ((spos
+	     (save-excursion
+	       (while (looking-back "}[\t\n ]*")
+		 (backward-sexp))
 
-                    (cond
-                     ((looking-back "\\(,\\|(\\|\\[\\|{\\)[ \t]*\\<[^ \t\n].*[ \t\n]*")
-                      (message "Reached comma-paren-brace check!")
-                      (re-search-backward "\\(,\\|(\\|\\[\\|{\\)[ \t]*\\<[^ \t\n].*[ \t\n]*" (point-min) t)
-                      (current-column))
+	       (cond
+		((looking-back "\\(,\\|(\\|\\[\\|{\\)[ \t]*\\<[^ \t\n].*[ \t\n]*")
+		 (message "Reached comma-paren-brace check!")
+		 (re-search-backward "\\(,\\|(\\|\\[\\|{\\)[ \t]*\\<[^ \t\n].*[ \t\n]*" (point-min) t)
+		 (current-column))
 
-                     ((looking-back "\\<var\\>.*[ \t\n]*")
-                      (re-search-backward "\\<var\\>.*[ \t\n]*" (point-min) t)
-                      (message "Reached var check!")
-                      (+ (current-column) 2))
+		((looking-back "\\<var\\>.*[ \t\n]*")
+		 (re-search-backward "\\<var\\>.*[ \t\n]*" (point-min) t)
+		 (message "Reached var check!")
+		 (+ (current-column) 2))
 
-                     ((looking-back "\\<return\\>.*[ \t\n]*")
-                      (message "Reached return check!")
-                      (re-search-backward "\\<return\\>.*[ \t\n]*" (point-min) t)
-                      (+ (current-column) 5))
-                     (t
-                      nil)))))
-             (if spos
-                 spos
-               (+ js-indent-level js-expr-indent-offset))))
+		((looking-back "\\<return\\>.*[ \t\n]*")
+		 (message "Reached return check!")
+		 (re-search-backward "\\<return\\>.*[ \t\n]*" (point-min) t)
+		 (+ (current-column) 5))
+		(t
+		 nil)))))
+	(if spos
+	    spos
+	  (+ js-indent-level js-expr-indent-offset))))
 
-          ((looking-at "\\(+\\|/[^/]\\|*\\|-\\)")
-           (let ((spos
-                  (save-excursion
-                    (while (looking-back "}[\t\n ]*")
-                      (backward-sexp))
+     ((looking-at "\\(+\\|/[^/]\\|*\\|-\\)")
+      (let ((spos
+	     (save-excursion
+	       (while (looking-back "}[\t\n ]*")
+		 (backward-sexp))
 
-                    (cond
-                     ((looking-back "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\)[ \t]*\\<[^ \t\n].*[ \t\n]*")
-                      (message "Reached equals-plus-paren check!")
-                      (re-search-backward "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\)[ \t]*\\<[^ \t\n].*[ \t\n]*" (point-min) t)
-                      (current-column))
+	       (cond
+		((looking-back "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\)[ \t]*\\<[^ \t\n].*[ \t\n]*")
+		 (message "Reached equals-plus-paren check!")
+		 (re-search-backward "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\)[ \t]*\\<[^ \t\n].*[ \t\n]*" (point-min) t)
+		 (current-column))
 
-                     (t
-                      nil)))))
-             (if spos
-                 spos
-               (+ js-indent-level js-expr-indent-offset))))
+		(t
+		 nil)))))
+	(if spos
+	    spos
+	  (+ js-indent-level js-expr-indent-offset))))
 
-          ((and (js2-node-at-point)
+     ((and (js2-node-at-point)
 ;                (= js2-NAME (js2-node-type (js2-node-at-point)))
-                (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
-	   (save-excursion
-	     (message "Doing special var check")
-	     (re-search-backward "\\<var\\>" (point-min) t)
-	     (+ (current-column) 4)))
+	   (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
+      (save-excursion
+	(message "Doing special var check")
+	(re-search-backward "\\<var\\>" (point-min) t)
+	(+ (current-column) 4)))
 
     ((nth 4 parse-status)
            (js--get-c-offset 'c (nth 8 parse-status)))
