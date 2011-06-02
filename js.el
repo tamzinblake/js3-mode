@@ -1774,9 +1774,9 @@ nil."
 		 (backward-sexp))
 
 	       (cond
-		((looking-back "\\(,\\|(\\|\\[\\|{\\)[ \t]*\\<[^ \t\n].*[ \t\n]*")
+		((looking-back "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*")
 		 (message "Reached comma-paren-brace check!")
-		 (re-search-backward "\\(,\\|(\\|\\[\\|{\\)[ \t]*\\<[^ \t\n].*[ \t\n]*" (point-min) t)
+		 (re-search-backward "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*" (point-min) t)
 		 (current-column))
 
 		((looking-back "\\<var\\>.*[ \t\n]*")
