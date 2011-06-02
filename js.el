@@ -1772,7 +1772,8 @@ nil."
 	     (save-excursion
 	       (while (looking-back "\\(}\\|]\\|\"\\)[\t\n ]*")
 		 (backward-sexp))
-	       (message ((looking-back "\\(.*\\)") (match-string 0)))
+	       (looking-back "\\(.*\\)")
+	       (message (match-string 0))
 
 	       (cond
 		((looking-back "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*")
