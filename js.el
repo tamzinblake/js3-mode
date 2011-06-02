@@ -1798,8 +1798,8 @@ nil."
 		 (backward-sexp))
 
 	       (cond
-		((looking-back "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\)[ \t]*\\<[^ \t\n].*[ \t\n]*")
-		 (re-search-backward "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\)[ \t]*\\<[^ \t\n].*[ \t\n]*" (point-min) t)
+		((looking-back "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\).*[ \t\n]*")
+		 (re-search-backward "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\).*[ \t\n]*" (point-min) t)
 		 (current-column))
 
 		(t
