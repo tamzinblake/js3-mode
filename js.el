@@ -1771,27 +1771,18 @@ nil."
       (let ((spos
 	     (save-excursion
 	       (while (looking-back "\\(}\\|]\\|\"\\)[\t\n ]*")
-		 (looking-back "\\(.*\\)")
-		 (message "first loop:")
-		 (message (match-string 0))
-		 (backward-sexp)
-		 (looking-back "\\(.*\\)")
-		 (message "first loop:")
-		 (message (match-string 0)))
+		 (backward-sexp))
 
 	       (cond
 		((looking-back "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*")
-		 (message "Reached comma-paren-brace check!")
 		 (re-search-backward "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*" (point-min) t)
 		 (current-column))
 
 		((looking-back "\\<var\\>.*[ \t\n]*")
 		 (re-search-backward "\\<var\\>.*[ \t\n]*" (point-min) t)
-		 (message "Reached var check!")
 		 (+ (current-column) 2))
 
 		((looking-back "\\<return\\>.*[ \t\n]*")
-		 (message "Reached return check!")
 		 (re-search-backward "\\<return\\>.*[ \t\n]*" (point-min) t)
 		 (+ (current-column) 5))
 		(t
@@ -1808,7 +1799,6 @@ nil."
 
 	       (cond
 		((looking-back "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\)[ \t]*\\<[^ \t\n].*[ \t\n]*")
-		 (message "Reached equals-plus-paren check!")
 		 (re-search-backward "\\(=\\|+\\|/[^/]\\|*\\|-\\|(\\)[ \t]*\\<[^ \t\n].*[ \t\n]*" (point-min) t)
 		 (current-column))
 
