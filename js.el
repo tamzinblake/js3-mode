@@ -1772,6 +1772,7 @@ nil."
 	     (save-excursion
 	       (while (looking-back "\\(}\\|]\\|\"\\)[\t\n ]*")
 		 (backward-sexp))
+	       (message (point-min))
 
 	       (cond
 		((looking-back "\\(,\\|(\\|\\[\\|{\\).*[ \t\n]*")
