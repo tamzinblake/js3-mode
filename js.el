@@ -1812,7 +1812,7 @@ nil."
       (js--get-c-offset 'c (nth 8 parse-status)))
      ((nth 8 parse-status) 0) ; inside string
      ((js--ctrl-statement-indentation))
-     ((1) (message "got past js--ctrl-statement-indentation"))
+     (1 (message "got past js--ctrl-statement-indentation"))
      ((eq (char-after) ?#) 0)
      ((save-excursion (js--beginning-of-macro)) 4)
      ((nth 1 parse-status)
