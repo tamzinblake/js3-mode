@@ -1736,6 +1736,51 @@ the same column as the current line."
 		     (= (current-indentation) saved-indent)))))))))
 
 
+(defun js--backward-sexp ()
+  "Helper function for `js--proper-indentation'.
+Go backwards over matched braces, rather than whole expressions.
+Functionality does not exactly match backward-sexp."
+  (let ((brackets 0))
+    (while (looking-back "[]})\"'][\t\n ]*")
+      (re-search-backward "[]})\"'][\t\n ]*" (point-min) t)
+      (cond
+       ((looking-at "\"")
+	(re-search-backward "[^\\]\"" (point-min) t))
+
+       ((looking-at "'")
+	(re-search-backward "[^\\]'" (point-min) t))
+
+       ((looking-at "]")
+	(setq brackets (1+ brackets))
+	(while (/= brackets 0)
+	  (re-search-backward "[][]" (point-min) t)
+	  (cond
+	   ((looking-at "]")
+	    (setq brackets (1+ brackets)))
+	   ((looking-at "[[]")
+	    (setq brackets (1- brackets))))))
+
+       ((looking-at "}")
+	(setq brackets (1+ brackets))
+	(while (/= brackets 0)
+	  (re-search-backward "[}{]" (point-min) t)
+	  (cond
+	   ((looking-at "}")
+	    (setq brackets (1+ brackets)))
+	   ((looking-at "{")
+	    (setq brackets (1- brackets))))))
+
+       ((looking-at ")")
+	(setq brackets (1+ brackets))
+	(while (/= brackets 0)
+	  (re-search-backward "[)(]" (point-min) t)
+	  (cond
+	   ((looking-at ")")
+	    (setq brackets (1+ brackets)))
+	   ((looking-at "(")
+	    (setq brackets (1- brackets))))))))))
+
+
 (defun js--ctrl-statement-indentation ()
   "Helper function for `js--proper-indentation'.
 Return the proper indentation of the current line if it starts
@@ -1769,6 +1814,7 @@ nil."
     (back-to-indentation)
     (cond
 
+     ;;comma-first
      ((looking-at ",")
       (let ((spos
 	     (save-excursion
@@ -1793,6 +1839,7 @@ nil."
 	    spos
 	  (+ js-indent-level js-expr-indent-offset))))
 
+     ;;operator-first
      ((looking-at "\\([-+*]\\|/[^/*]\\)")
       (let ((spos
 	     (save-excursion
@@ -1810,11 +1857,15 @@ nil."
 	    spos
 	  (+ js-indent-level js-expr-indent-offset))))
 
+     ;;dot-first
      ((looking-at "\\.")
       (save-excursion
+	(when (looking-back "[]})\"'][\t\n ]*")
+	  (js--backward-sexp))
         (re-search-backward "\\..*[ \t\n]*" (point-min) t)
         (current-column)))
 
+     ;;var special case for non-comma-first continued var statements
      ((and (looking-at "[^]})]")
 	   (js2-node-at-point)
 	   (js2-node-parent (js2-node-at-point))
