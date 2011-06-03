@@ -1811,6 +1811,23 @@ nil."
 	    spos
 	  (+ js-indent-level js-expr-indent-offset))))
 
+     ((looking-at "\\.")
+      (let ((spos
+	     (save-excursion
+	       (while (looking-back "[]})\"'][\t\n ]*")
+		 (backward-sexp))
+
+	       (cond
+		((looking-back "\\..*[ \t\n]*")
+		 (re-search-backward "\\..*[ \t\n]*" (point-min) t)
+		 (current-column))
+
+		(t
+		 nil)))))
+	(if spos
+	    spos
+	  (+ js-indent-level js-expr-indent-offset))))
+
      ((and (looking-at "[^]})]")
 	   (js2-node-at-point)
 	   (js2-node-parent (js2-node-at-point))
