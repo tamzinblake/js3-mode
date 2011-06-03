@@ -16,7 +16,7 @@ With help from [Cheeso on StackOverflow](http://stackoverflow.com/questions/6144
 
 The js2-mode included here is basically Steve Yegge's js2-mode version 20090723 findable [here](http://code.google.com/p/js2-mode/) with some reasonable defaults set.
 
-The js-mode included here is the one included with emacs version 23.3, with some modifications to the way it indents in certain cases.
+The js-mode included here is the one included with emacs version 24, with some modifications to the way it indents in certain cases and added backwards-compatibility for emacs version 23.2.
 
 ## Installation ##
 
