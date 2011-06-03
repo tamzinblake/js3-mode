@@ -14,7 +14,7 @@ Inspired by [A better coding convention for lists and object literals in Javascr
 
 With help from [Cheeso on StackOverflow](http://stackoverflow.com/questions/6144930/emacs-js-mode-for-npm-style) and [Mihai Bazon](http://mihai.bazon.net/projects/editing-javascript-with-emacs-js2-mode)
 
-The js2-mode included here is basically Steve Yegge's js2-mode version 20090723 findable [here](http://code.google.com/p/js2-mode/) with "tell me to insert unneccesary semicolons everywhere" turned off by default.
+The js2-mode included here is basically Steve Yegge's js2-mode version 20090723 findable [here](http://code.google.com/p/js2-mode/) with some reasonable defaults set.
 
 The js-mode included here is the one included with emacs version 23.3, with some modifications to the way it indents in certain cases.
 
