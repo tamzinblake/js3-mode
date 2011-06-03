@@ -1,5 +1,8 @@
 ;;; js.el --- Major mode for editing JavaScript
 
+;; Significantly modified by Thom Blake - see
+;; https://github.com/thomblake/js-mode
+
 ;; Copyright (C) 2008-2011 Free Software Foundation, Inc.
 
 ;; Author: Karl Landstrom <karl.landstrom@brgeight.se>
