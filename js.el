@@ -1860,6 +1860,8 @@ nil."
      ;;dot-first
      ((looking-at "\\.")
       (save-excursion
+	(when (looking-back "[]})\"'][\t\n ]*")
+	  (js--backward-sexp))
 	(if (not (looking-back "^[ \t]*\\([]})]+\\|.*\\..*\\)[ \t\n]*"))
 	    (progn
 	      (re-search-backward "\\<[^ \t]+[ \t\n]*" (point-min) t)
@@ -1867,8 +1869,6 @@ nil."
 	      (back-to-indentation)
 	      (+ (current-column) js-indent-level))
 	  (progn
-	    (when (looking-back "[]})\"'][\t\n ]*")
-	      (js--backward-sexp))
 	    (re-search-backward "\\..*[ \t\n]*" (point-min) t)
 	    (current-column)))))
 
