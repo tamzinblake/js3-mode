@@ -1860,10 +1860,17 @@ nil."
      ;;dot-first
      ((looking-at "\\.")
       (save-excursion
-	(when (looking-back "[]})\"'][\t\n ]*")
-	  (js--backward-sexp))
-        (re-search-backward "\\..*[ \t\n]*" (point-min) t)
-        (current-column)))
+	(if (not (looking-back "^[ \t]*\\([]})]+\\|.*\\..*\\)[ \t\n]*"))
+	    (progn
+	      (re-search-backward "\\<[^ \t]+[ \t\n]*" (point-min) t)
+	      (re-search-backward "^" (point-min) t)
+	      (back-to-indentation)
+	      (+ (current-column) js-indent-level))
+	  (progn
+	    (when (looking-back "[]})\"'][\t\n ]*")
+	      (js--backward-sexp))
+	    (re-search-backward "\\..*[ \t\n]*" (point-min) t)
+	    (current-column)))))
 
      ;;var special case for non-comma-first continued var statements
      ((and (looking-at "[^]})]")
