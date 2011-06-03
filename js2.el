@@ -400,7 +400,7 @@ Similar to `c-basic-offset'."
   :type 'integer)
 (make-variable-buffer-local 'js2-basic-offset)
 
-(defcustom js2-cleanup-whitespace nil
+(defcustom js2-cleanup-whitespace t
   "Non-nil to invoke `delete-trailing-whitespace' before saves."
   :type 'boolean
   :group 'js2-mode)
