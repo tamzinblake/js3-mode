@@ -1666,11 +1666,10 @@ This performs fontification according to `js--class-styles'."
 Match groups 1 and 2 are the characters forming the beginning and
 end of the literal."))
 
-(defconst js-syntax-propertize-function
-  (syntax-propertize-rules
-   ;; We want to match regular expressions only at the beginning of
-   ;; expressions.
-   (js--regexp-literal (1 "\"") (2 "\""))))
+(defconst js-font-lock-syntactic-keywords
+  `((,js--regexp-literal (1 "|") (2 "|")))
+  "Syntactic font lock keywords matching regexps in JavaScript.
+See `font-lock-keywords'.")
 
 ;;; Indentation
 
@@ -3357,9 +3356,10 @@ If one hasn't been set, or if it's stale, prompt for a new one."
 
   (set (make-local-variable 'open-paren-in-column-0-is-defun-start) nil)
   (set (make-local-variable 'font-lock-defaults)
-       (list js--font-lock-keywords))
-  (set (make-local-variable 'syntax-propertize-function)
-       js-syntax-propertize-function)
+       (list js--font-lock-keywords
+	     nil nil nil nil
+	     '(font-lock-syntactic-keywords
+               . js-font-lock-syntactic-keywords)))
 
   (set (make-local-variable 'parse-sexp-ignore-comments) t)
   (set (make-local-variable 'parse-sexp-lookup-properties) t)
@@ -3413,9 +3413,10 @@ If one hasn't been set, or if it's stale, prompt for a new one."
   ;; the buffer containing the problem, JIT-lock will apply the
   ;; correct syntax to the regular expresion literal and the problem
   ;; will mysteriously disappear.
-  ;; FIXME: We should actually do this fontification lazily by adding
-  ;; calls to syntax-propertize wherever it's really needed.
-  (syntax-propertize (point-max)))
+  (font-lock-set-defaults)
+
+  (let (font-lock-keywords) ; leaves syntactic keywords intact
+    (font-lock-fontify-buffer)))
 
 ;;;###autoload
 (defalias 'javascript-mode 'js-mode)
