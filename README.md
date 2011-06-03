@@ -24,7 +24,7 @@ Both js.el and js2.el should be placed in your emacs include path. You'll need t
 
 The .emacs file included contains what you need to stick the 2 modes together.
 
-I know this is compatible with emacs 23.2 on freebsd and 23.4 on ubuntu, but I welcome feedback on compatibility/incompatibility with your version of emacs.
+I know this is compatible with emacs 23.2, but welcome feedback on compatibility/incompatibility with your version of emacs.
 
 ## Notes ##
 
@@ -32,7 +32,7 @@ Using this will entail having 2 separate JS parsers running, so sometimes it tak
 
 If your JS is in error, the indentation might look wrong.  I tend to regard this as a feature.
 
-I expect that there are still some bugs; if you see any, please report them.  I have a sneaking suspicion that I'm not handling lines with comments very well. Feel free to file issue reports on github for things like "this doesn't indent [code block] how I want it to".
+I expect that there are still some bugs; if you see any, please report them.  I have a sneaking suspicion that I'm not handling lines with comments very well. Feel free to file issue reports on github for things like "it indented like [code block] but I want it to be [code block]".
 
 Remember - if you start a line with `(`, `[`, `+`, or `-`, strongly consider preceding it with a semicolon (`;`).
 
