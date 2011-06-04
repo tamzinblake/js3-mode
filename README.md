@@ -24,7 +24,7 @@ Both js.el and js2.el should be placed in your emacs include path. You'll need t
 
 The .emacs file included contains what you need to stick the 2 modes together.
 
-I know this is compatible with emacs 23.2, but welcome feedback on compatibility/incompatibility with your version of emacs.
+For known compatible/incompatible versions of emacs, see compat.md - feel free to let me know if it is compatible or incompatible with your version of emacs.
 
 ## Notes ##
 
