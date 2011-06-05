@@ -166,59 +166,59 @@ An example of this is \"Class.prototype = { method1: ...}\".")
 
 (defconst js--class-styles
   `((:name            "Plain"
-     :class-decl      ,js--plain-class-re
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       javascript)
+                      :class-decl      ,js--plain-class-re
+                      :prototype       t
+                      :contexts        (toplevel)
+                      :framework       javascript)
 
     (:name            "MochiKit"
-     :class-decl      ,js--mochikit-class-re
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       mochikit)
+                      :class-decl      ,js--mochikit-class-re
+                      :prototype       t
+                      :contexts        (toplevel)
+                      :framework       mochikit)
 
     (:name            "Prototype (Obsolete)"
-     :class-decl      ,js--prototype-obsolete-class-decl-re
-     :contexts        (toplevel)
-     :framework       prototype)
+                      :class-decl      ,js--prototype-obsolete-class-decl-re
+                      :contexts        (toplevel)
+                      :framework       prototype)
 
     (:name            "Prototype (Modern)"
-     :class-decl      ,js--prototype-class-decl-re
-     :contexts        (toplevel)
-     :framework       prototype)
+                      :class-decl      ,js--prototype-class-decl-re
+                      :contexts        (toplevel)
+                      :framework       prototype)
 
     (:name            "Prototype (Object.extend)"
-     :class-decl      ,js--prototype-objextend-class-decl-re-1
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       prototype)
+                      :class-decl      ,js--prototype-objextend-class-decl-re-1
+                      :prototype       t
+                      :contexts        (toplevel)
+                      :framework       prototype)
 
     (:name            "Prototype (Object.extend) 2"
-     :class-decl      ,js--prototype-objextend-class-decl-re-2
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       prototype)
+                      :class-decl      ,js--prototype-objextend-class-decl-re-2
+                      :prototype       t
+                      :contexts        (toplevel)
+                      :framework       prototype)
 
     (:name            "Dojo"
-     :class-decl      ,js--dojo-class-decl-re
-     :contexts        (toplevel)
-     :framework       dojo)
+                      :class-decl      ,js--dojo-class-decl-re
+                      :contexts        (toplevel)
+                      :framework       dojo)
 
     (:name            "ExtJS (style 1)"
-     :class-decl      ,js--extjs-class-decl-re-1
-     :prototype       t
-     :contexts        (toplevel)
-     :framework       extjs)
+                      :class-decl      ,js--extjs-class-decl-re-1
+                      :prototype       t
+                      :contexts        (toplevel)
+                      :framework       extjs)
 
     (:name            "ExtJS (style 2)"
-     :class-decl      ,js--extjs-class-decl-re-2
-     :contexts        (toplevel)
-     :framework       extjs)
+                      :class-decl      ,js--extjs-class-decl-re-2
+                      :contexts        (toplevel)
+                      :framework       extjs)
 
     (:name            "Merrill Press"
-     :class-decl      ,js--mp-class-decl-re
-     :contexts        (toplevel)
-     :framework       merrillpress))
+                      :class-decl      ,js--mp-class-decl-re
+                      :contexts        (toplevel)
+                      :framework       merrillpress))
 
   "List of JavaScript class definition styles.
 
@@ -299,8 +299,8 @@ Match group 1 is the name of the macro.")
 
 (defconst js--constant-re
   (js--regexp-opt-symbol '("false" "null" "undefined"
-                                 "Infinity" "NaN"
-                                 "true" "arguments" "this"))
+                           "Infinity" "NaN"
+                           "true" "arguments" "this"))
   "Regular expression matching any future reserved words in JavaScript.")
 
 
@@ -511,8 +511,8 @@ getting timeout messages."
 (defvar js-mode-map
   (let ((keymap (make-sparse-keymap)))
     (mapc (lambda (key)
-	    (define-key keymap key #'js-insert-and-indent))
-	  '("{" "}" "(" ")" ":" ";" ","))
+            (define-key keymap key #'js-insert-and-indent))
+          '("{" "}" "(" ")" ":" ";" ","))
     (define-key keymap [(control ?c) (meta ?:)] #'js-eval)
     (define-key keymap [(control ?c) (control ?j)] #'js-set-js-context)
     (define-key keymap [(control meta ?x)] #'js-eval-defun)
@@ -607,14 +607,14 @@ enabled frameworks."
          (when (memq 'prototype js-enabled-frameworks)
            "Object\\.extend")
 
-          ;; var mumble = THING (
+         ;; var mumble = THING (
          (js--maybe-join
           "\\(?:var[ \t]+\\)?[a-zA-Z_$0-9.]+[ \t]*=[ \t]*\\(?:"
           "\\|"
           "\\)[ \t]*\("
 
           (when (memq 'prototype js-enabled-frameworks)
-                    "Class\\.create")
+            "Class\\.create")
 
           (when (memq 'extjs js-enabled-frameworks)
             "Ext\\.extend")
@@ -663,19 +663,19 @@ having that value; otherwise, return nil and leave point at EOB."
 If found, return that value and leave point just before the
 character that has that value, otherwise return nil and leave
 point at BOB."
-    (unless (bobp)
-      (let ((prev-value (get-text-property (1- (point)) propname)))
-        (if prev-value
-            (backward-char)
+  (unless (bobp)
+    (let ((prev-value (get-text-property (1- (point)) propname)))
+      (if prev-value
+          (backward-char)
 
-          (goto-char (previous-single-property-change
-                      (point) propname nil (point-min)))
+        (goto-char (previous-single-property-change
+                    (point) propname nil (point-min)))
 
-          (unless (bobp)
-            (backward-char)
-            (setq prev-value (get-text-property (point) propname))))
+        (unless (bobp)
+          (backward-char)
+          (setq prev-value (get-text-property (point) propname))))
 
-        prev-value)))
+      prev-value)))
 
 (defsubst js--forward-pstate ()
   (js--forward-text-property 'js--pstate))
@@ -976,13 +976,13 @@ the body of `js--ensure-cache'."
                            (js--pitem-paren-depth (car open-items))
                            nil parse))
 
-;;              (let ((overlay (make-overlay prev-parse-point (point))))
-;;                (overlay-put overlay 'face '(:background "red"))
-;;                (unwind-protect
-;;                     (progn
-;;                       (js--debug "parsed: %S" parse)
-;;                       (sit-for 1))
-;;                  (delete-overlay overlay)))
+              ;;              (let ((overlay (make-overlay prev-parse-point (point))))
+              ;;                (overlay-put overlay 'face '(:background "red"))
+              ;;                (unwind-protect
+              ;;                     (progn
+              ;;                       (js--debug "parsed: %S" parse)
+              ;;                       (sit-for 1))
+              ;;                  (delete-overlay overlay)))
 
               (setq prev-parse-point (point))
               (< (point) goal-point)))
@@ -1054,154 +1054,154 @@ LIMIT defaults to point."
   (when (< js--cache-end limit)
 
     (c-save-buffer-state
-        (open-items
-         orig-match-start
-         orig-match-end
-         orig-depth
-         parse
-         prev-parse-point
-         name
-         case-fold-search
-         filtered-class-styles
-         new-item
-         goal-point
-         end-prop)
+     (open-items
+      orig-match-start
+      orig-match-end
+      orig-depth
+      parse
+      prev-parse-point
+      name
+      case-fold-search
+      filtered-class-styles
+      new-item
+      goal-point
+      end-prop)
 
-      ;; Figure out which class styles we need to look for
-      (setq filtered-class-styles
-            (loop for style in js--class-styles
-                  if (memq (plist-get style :framework)
-                           js-enabled-frameworks)
-                  collect style))
+     ;; Figure out which class styles we need to look for
+     (setq filtered-class-styles
+           (loop for style in js--class-styles
+                 if (memq (plist-get style :framework)
+                          js-enabled-frameworks)
+                 collect style))
 
-      (save-excursion
-        (save-restriction
-          (widen)
+     (save-excursion
+       (save-restriction
+         (widen)
 
-          ;; Find last known good position
-          (goto-char js--cache-end)
-          (unless (bobp)
-            (setq open-items (get-text-property
-                              (1- (point)) 'js--pstate))
+         ;; Find last known good position
+         (goto-char js--cache-end)
+         (unless (bobp)
+           (setq open-items (get-text-property
+                             (1- (point)) 'js--pstate))
 
-            (unless open-items
-              (goto-char (previous-single-property-change
-                          (point) 'js--pstate nil (point-min)))
+           (unless open-items
+             (goto-char (previous-single-property-change
+                         (point) 'js--pstate nil (point-min)))
 
-              (unless (bobp)
-                (setq open-items (get-text-property (1- (point))
-                                                    'js--pstate))
-                (assert open-items))))
+             (unless (bobp)
+               (setq open-items (get-text-property (1- (point))
+                                                   'js--pstate))
+               (assert open-items))))
 
-          (unless open-items
-            ;; Make a placeholder for the top-level definition
-            (setq open-items (list js--initial-pitem)))
+         (unless open-items
+           ;; Make a placeholder for the top-level definition
+           (setq open-items (list js--initial-pitem)))
 
-          (setq parse (syntax-ppss))
-          (setq prev-parse-point (point))
+         (setq parse (syntax-ppss))
+         (setq prev-parse-point (point))
 
-          (js--clear-stale-cache)
+         (js--clear-stale-cache)
 
-          (narrow-to-region (point-min) limit)
+         (narrow-to-region (point-min) limit)
 
-          (loop while (re-search-forward js--quick-match-re-func nil t)
-                for orig-match-start = (goto-char (match-beginning 0))
-                for orig-match-end = (match-end 0)
-                do (js--ensure-cache--update-parse)
-                for orig-depth = (nth 0 parse)
+         (loop while (re-search-forward js--quick-match-re-func nil t)
+               for orig-match-start = (goto-char (match-beginning 0))
+               for orig-match-end = (match-end 0)
+               do (js--ensure-cache--update-parse)
+               for orig-depth = (nth 0 parse)
 
-                ;; Each of these conditions should return non-nil if
-                ;; we should add a new item and leave point at the end
-                ;; of the new item's header (h-end in the
-                ;; js--pitem diagram). This point is the one
-                ;; after the last character we need to unambiguously
-                ;; detect this construct. If one of these evaluates to
-                ;; nil, the location of the point is ignored.
-                if (cond
-                    ;; In comment or string
-                    ((nth 8 parse) nil)
+               ;; Each of these conditions should return non-nil if
+               ;; we should add a new item and leave point at the end
+               ;; of the new item's header (h-end in the
+               ;; js--pitem diagram). This point is the one
+               ;; after the last character we need to unambiguously
+               ;; detect this construct. If one of these evaluates to
+               ;; nil, the location of the point is ignored.
+               if (cond
+                   ;; In comment or string
+                   ((nth 8 parse) nil)
 
-                    ;; Regular function declaration
-                    ((and (looking-at "\\_<function\\_>")
-                          (setq name (js--forward-function-decl)))
+                   ;; Regular function declaration
+                   ((and (looking-at "\\_<function\\_>")
+                         (setq name (js--forward-function-decl)))
 
-                     (when (eq name t)
-                       (setq name (js--guess-function-name orig-match-end))
-                       (if name
-                           (when js--guess-function-name-start
-                             (setq orig-match-start
-                                   js--guess-function-name-start))
+                    (when (eq name t)
+                      (setq name (js--guess-function-name orig-match-end))
+                      (if name
+                          (when js--guess-function-name-start
+                            (setq orig-match-start
+                                  js--guess-function-name-start))
 
-                         (setq name t)))
+                        (setq name t)))
 
-                     (assert (eq (char-after) ?{))
-                     (forward-char)
-                     (make-js--pitem
-                      :paren-depth orig-depth
-                      :h-begin orig-match-start
-                      :type 'function
-                      :name (if (eq name t)
-                                name
-                              (js--split-name name))))
+                    (assert (eq (char-after) ?{))
+                    (forward-char)
+                    (make-js--pitem
+                     :paren-depth orig-depth
+                     :h-begin orig-match-start
+                     :type 'function
+                     :name (if (eq name t)
+                               name
+                             (js--split-name name))))
 
-                    ;; Macro
-                    ((looking-at js--macro-decl-re)
+                   ;; Macro
+                   ((looking-at js--macro-decl-re)
 
-                     ;; Macros often contain unbalanced parentheses.
-                     ;; Make sure that h-end is at the textual end of
-                     ;; the macro no matter what the parenthesis say.
-                     (c-end-of-macro)
-                     (js--ensure-cache--update-parse)
+                    ;; Macros often contain unbalanced parentheses.
+                    ;; Make sure that h-end is at the textual end of
+                    ;; the macro no matter what the parenthesis say.
+                    (c-end-of-macro)
+                    (js--ensure-cache--update-parse)
 
-                     (make-js--pitem
-                      :paren-depth (nth 0 parse)
-                      :h-begin orig-match-start
-                      :type 'macro
-                      :name (list (match-string-no-properties 1))))
+                    (make-js--pitem
+                     :paren-depth (nth 0 parse)
+                     :h-begin orig-match-start
+                     :type 'macro
+                     :name (list (match-string-no-properties 1))))
 
-                    ;; "Prototype function" declaration
-                    ((looking-at js--plain-method-re)
-                     (goto-char (match-beginning 3))
-                     (when (save-match-data
-                             (js--forward-function-decl))
-                       (forward-char)
-                       (make-js--pitem
-                        :paren-depth orig-depth
-                        :h-begin orig-match-start
-                        :type 'function
-                        :name (nconc (js--split-name
-                                      (match-string-no-properties 1))
-                                     (list (match-string-no-properties 2))))))
+                   ;; "Prototype function" declaration
+                   ((looking-at js--plain-method-re)
+                    (goto-char (match-beginning 3))
+                    (when (save-match-data
+                            (js--forward-function-decl))
+                      (forward-char)
+                      (make-js--pitem
+                       :paren-depth orig-depth
+                       :h-begin orig-match-start
+                       :type 'function
+                       :name (nconc (js--split-name
+                                     (match-string-no-properties 1))
+                                    (list (match-string-no-properties 2))))))
 
-                    ;; Class definition
-                    ((loop with syntactic-context =
-                           (js--syntactic-context-from-pstate open-items)
-                           for class-style in filtered-class-styles
-                           if (and (memq syntactic-context
-                                         (plist-get class-style :contexts))
-                                   (looking-at (plist-get class-style
-                                                          :class-decl)))
-                           do (goto-char (match-end 0))
-                           and return
-                           (make-js--pitem
-                            :paren-depth orig-depth
-                            :h-begin orig-match-start
-                            :type class-style
-                            :name (js--split-name
-                                   (match-string-no-properties 1))))))
+                   ;; Class definition
+                   ((loop with syntactic-context =
+                          (js--syntactic-context-from-pstate open-items)
+                          for class-style in filtered-class-styles
+                          if (and (memq syntactic-context
+                                        (plist-get class-style :contexts))
+                                  (looking-at (plist-get class-style
+                                                         :class-decl)))
+                          do (goto-char (match-end 0))
+                          and return
+                          (make-js--pitem
+                           :paren-depth orig-depth
+                           :h-begin orig-match-start
+                           :type class-style
+                           :name (js--split-name
+                                  (match-string-no-properties 1))))))
 
-                do (js--ensure-cache--update-parse)
-                and do (push it open-items)
-                and do (put-text-property
-                        (1- (point)) (point) 'js--pstate open-items)
-                else do (goto-char orig-match-end))
+               do (js--ensure-cache--update-parse)
+               and do (push it open-items)
+               and do (put-text-property
+                       (1- (point)) (point) 'js--pstate open-items)
+               else do (goto-char orig-match-end))
 
-          (goto-char limit)
-          (js--ensure-cache--update-parse)
-          (setq js--cache-end limit)
-          (setq js--last-parse-pos limit)
-          (setq js--state-at-last-parse-pos open-items)
-          )))))
+         (goto-char limit)
+         (js--ensure-cache--update-parse)
+         (setq js--cache-end limit)
+         (setq js--last-parse-pos limit)
+         (setq js--state-at-last-parse-pos open-items)
+         )))))
 
 (defun js--end-of-defun-flat ()
   "Helper function for `js-end-of-defun'."
@@ -1374,47 +1374,47 @@ If FUNC is supplied, call it with no arguments before every
 variable name in the spec.  Return true iff this was actually a
 spec.  FUNC must preserve the match data."
   (case (char-after)
-    (?\[
-     (forward-char)
-     (while
-         (progn
-           (forward-comment most-positive-fixnum)
-           (cond ((memq (char-after) '(?\[ ?\{))
-                  (js--forward-destructuring-spec func))
+        (?\[
+         (forward-char)
+         (while
+             (progn
+               (forward-comment most-positive-fixnum)
+               (cond ((memq (char-after) '(?\[ ?\{))
+                      (js--forward-destructuring-spec func))
 
-                 ((eq (char-after) ?,)
-                  (forward-char)
-                  t)
+                     ((eq (char-after) ?,)
+                      (forward-char)
+                      t)
 
-                 ((looking-at js--name-re)
-                  (and func (funcall func))
-                  (goto-char (match-end 0))
-                  t))))
-     (when (eq (char-after) ?\])
-       (forward-char)
-       t))
+                     ((looking-at js--name-re)
+                      (and func (funcall func))
+                      (goto-char (match-end 0))
+                      t))))
+         (when (eq (char-after) ?\])
+           (forward-char)
+           t))
 
-    (?\{
-     (forward-char)
-     (forward-comment most-positive-fixnum)
-     (while
-         (when (looking-at js--objfield-re)
-           (goto-char (match-end 0))
-           (forward-comment most-positive-fixnum)
-           (and (cond ((memq (char-after) '(?\[ ?\{))
-                       (js--forward-destructuring-spec func))
-                      ((looking-at js--name-re)
-                       (and func (funcall func))
-                       (goto-char (match-end 0))
-                       t))
-                (progn (forward-comment most-positive-fixnum)
-                       (when (eq (char-after) ?\,)
-                         (forward-char)
-                         (forward-comment most-positive-fixnum)
-                         t)))))
-     (when (eq (char-after) ?\})
-       (forward-char)
-       t))))
+        (?\{
+         (forward-char)
+         (forward-comment most-positive-fixnum)
+         (while
+             (when (looking-at js--objfield-re)
+               (goto-char (match-end 0))
+               (forward-comment most-positive-fixnum)
+               (and (cond ((memq (char-after) '(?\[ ?\{))
+                           (js--forward-destructuring-spec func))
+                          ((looking-at js--name-re)
+                           (and func (funcall func))
+                           (goto-char (match-end 0))
+                           t))
+                    (progn (forward-comment most-positive-fixnum)
+                           (when (eq (char-after) ?\,)
+                             (forward-char)
+                             (forward-comment most-positive-fixnum)
+                             t)))))
+         (when (eq (char-after) ?\})
+           (forward-char)
+           t))))
 
 (defun js--variable-decl-matcher (limit)
   "Font-lock matcher for variable names in a variable declaration.
@@ -1652,8 +1652,8 @@ This performs fontification according to `js--class-styles'."
 
 (defconst js--font-lock-keywords
   '(js--font-lock-keywords-3 js--font-lock-keywords-1
-                                   js--font-lock-keywords-2
-                                   js--font-lock-keywords-3)
+                             js--font-lock-keywords-2
+                             js--font-lock-keywords-3)
   "Font lock keywords for `js-mode'.  See `font-lock-keywords'.")
 
 ;; XXX: Javascript can continue a regexp literal across lines so long
@@ -1662,7 +1662,7 @@ This performs fontification according to `js--class-styles'."
 (eval-and-compile
   (defconst js--regexp-literal
     "[=(,:]\\(?:\\s-\\|\n\\)*\\(/\\)\\(?:\\\\.\\|[^/*\\]\\)\\(?:\\\\.\\|[^/\\]\\)*\\(/\\)"
-  "Regexp matching a JavaScript regular expression literal.
+    "Regexp matching a JavaScript regular expression literal.
 Match groups 1 and 2 are the characters forming the beginning and
 end of the literal."))
 
@@ -1701,14 +1701,14 @@ See `font-lock-keywords'.")
     (back-to-indentation)
     (or (js--looking-at-operator-p)
         (and (js--re-search-backward "\n" nil t)
-	     (progn
-	       (skip-chars-backward " \t")
-	       (or (bobp) (backward-char))
-	       (and (> (point) (point-min))
+             (progn
+               (skip-chars-backward " \t")
+               (or (bobp) (backward-char))
+               (and (> (point) (point-min))
                     (save-excursion (backward-char) (not (looking-at "[/*]/")))
                     (js--looking-at-operator-p)
-		    (and (progn (backward-char)
-				(not (looking-at "++\\|--\\|/[/*]"))))))))))
+                    (and (progn (backward-char)
+                                (not (looking-at "++\\|--\\|/[/*]"))))))))))
 
 
 (defun js--end-of-do-while-loop-p ()
@@ -1720,20 +1720,20 @@ the same column as the current line."
   (save-excursion
     (save-match-data
       (when (looking-at "\\s-*\\_<while\\_>")
-	(if (save-excursion
-	      (skip-chars-backward "[ \t\n]*}")
-	      (looking-at "[ \t\n]*}"))
-	    (save-excursion
-	      (backward-list) (forward-symbol -1) (looking-at "\\_<do\\_>"))
-	  (js--re-search-backward "\\_<do\\_>" (point-at-bol) t)
-	  (or (looking-at "\\_<do\\_>")
-	      (let ((saved-indent (current-indentation)))
-		(while (and (js--re-search-backward "^\\s-*\\_<" nil t)
-			    (/= (current-indentation) saved-indent)))
-		(and (looking-at "\\s-*\\_<do\\_>")
-		     (not (js--re-search-forward
-			   "\\_<while\\_>" (point-at-eol) t))
-		     (= (current-indentation) saved-indent)))))))))
+        (if (save-excursion
+              (skip-chars-backward "[ \t\n]*}")
+              (looking-at "[ \t\n]*}"))
+            (save-excursion
+              (backward-list) (forward-symbol -1) (looking-at "\\_<do\\_>"))
+          (js--re-search-backward "\\_<do\\_>" (point-at-bol) t)
+          (or (looking-at "\\_<do\\_>")
+              (let ((saved-indent (current-indentation)))
+                (while (and (js--re-search-backward "^\\s-*\\_<" nil t)
+                            (/= (current-indentation) saved-indent)))
+                (and (looking-at "\\s-*\\_<do\\_>")
+                     (not (js--re-search-forward
+                           "\\_<while\\_>" (point-at-eol) t))
+                     (= (current-indentation) saved-indent)))))))))
 
 
 (defun js--backward-sexp ()
@@ -1745,40 +1745,40 @@ Functionality does not exactly match backward-sexp."
       (re-search-backward "[]})\"'][\t\n ]*" (point-min) t)
       (cond
        ((looking-at "\"")
-	(re-search-backward "[^\\]\"" (point-min) t))
+        (re-search-backward "[^\\]\"" (point-min) t))
 
        ((looking-at "'")
-	(re-search-backward "[^\\]'" (point-min) t))
+        (re-search-backward "[^\\]'" (point-min) t))
 
        ((looking-at "]")
-	(setq brackets (1+ brackets))
-	(while (/= brackets 0)
-	  (re-search-backward "[][]" (point-min) t)
-	  (cond
-	   ((looking-at "]")
-	    (setq brackets (1+ brackets)))
-	   ((looking-at "[[]")
-	    (setq brackets (1- brackets))))))
+        (setq brackets (1+ brackets))
+        (while (/= brackets 0)
+          (re-search-backward "[][]" (point-min) t)
+          (cond
+           ((looking-at "]")
+            (setq brackets (1+ brackets)))
+           ((looking-at "[[]")
+            (setq brackets (1- brackets))))))
 
        ((looking-at "}")
-	(setq brackets (1+ brackets))
-	(while (/= brackets 0)
-	  (re-search-backward "[}{]" (point-min) t)
-	  (cond
-	   ((looking-at "}")
-	    (setq brackets (1+ brackets)))
-	   ((looking-at "{")
-	    (setq brackets (1- brackets))))))
+        (setq brackets (1+ brackets))
+        (while (/= brackets 0)
+          (re-search-backward "[}{]" (point-min) t)
+          (cond
+           ((looking-at "}")
+            (setq brackets (1+ brackets)))
+           ((looking-at "{")
+            (setq brackets (1- brackets))))))
 
        ((looking-at ")")
-	(setq brackets (1+ brackets))
-	(while (/= brackets 0)
-	  (re-search-backward "[)(]" (point-min) t)
-	  (cond
-	   ((looking-at ")")
-	    (setq brackets (1+ brackets)))
-	   ((looking-at "(")
-	    (setq brackets (1- brackets))))))))))
+        (setq brackets (1+ brackets))
+        (while (/= brackets 0)
+          (re-search-backward "[)(]" (point-min) t)
+          (cond
+           ((looking-at ")")
+            (setq brackets (1+ brackets)))
+           ((looking-at "(")
+            (setq brackets (1- brackets))))))))))
 
 
 (defun js--ctrl-statement-indentation ()
@@ -1817,70 +1817,70 @@ nil."
      ;;comma-first
      ((looking-at ",")
       (let ((spos
-	     (save-excursion
-	       (while (looking-back "[]})\"'][\t\n ]*")
-		 (backward-sexp))
+             (save-excursion
+               (while (looking-back "[]})\"'][\t\n ]*")
+                 (backward-sexp))
 
-	       (cond
-		((looking-back "[,([{].*[ \t\n]*")
-		 (re-search-backward "[,([{].*[ \t\n]*" (point-min) t)
-		 (current-column))
+               (cond
+                ((looking-back "[,([{].*[ \t\n]*")
+                 (re-search-backward "[,([{].*[ \t\n]*" (point-min) t)
+                 (current-column))
 
-		((looking-back "\\<var\\>.*[ \t\n]*")
-		 (re-search-backward "\\<var\\>.*[ \t\n]*" (point-min) t)
-		 (+ (current-column) 2))
+                ((looking-back "\\<var\\>.*[ \t\n]*")
+                 (re-search-backward "\\<var\\>.*[ \t\n]*" (point-min) t)
+                 (+ (current-column) 2))
 
-		((looking-back "\\<return\\>.*[ \t\n]*")
-		 (re-search-backward "\\<return\\>.*[ \t\n]*" (point-min) t)
-		 (+ (current-column) 5))
-		(t
-		 nil)))))
-	(if spos
-	    spos
-	  (+ js-indent-level js-expr-indent-offset))))
+                ((looking-back "\\<return\\>.*[ \t\n]*")
+                 (re-search-backward "\\<return\\>.*[ \t\n]*" (point-min) t)
+                 (+ (current-column) 5))
+                (t
+                 nil)))))
+        (if spos
+            spos
+          (+ js-indent-level js-expr-indent-offset))))
 
      ;;operator-first
      ((looking-at "\\([-+*]\\|/[^/*]\\)")
       (let ((spos
-	     (save-excursion
-	       (while (looking-back "[]})\"'][\t\n ]*")
-		 (backward-sexp))
+             (save-excursion
+               (while (looking-back "[]})\"'][\t\n ]*")
+                 (backward-sexp))
 
-	       (cond
-		((looking-back "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*")
-		 (re-search-backward "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*" (point-min) t)
-		 (current-column))
+               (cond
+                ((looking-back "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*")
+                 (re-search-backward "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*" (point-min) t)
+                 (current-column))
 
-		(t
-		 nil)))))
-	(if spos
-	    spos
-	  (+ js-indent-level js-expr-indent-offset))))
+                (t
+                 nil)))))
+        (if spos
+            spos
+          (+ js-indent-level js-expr-indent-offset))))
 
      ;;dot-first
      ((looking-at "\\.")
       (save-excursion
-	(when (looking-back "[]})\"'][\t\n ]*")
-	  (js--backward-sexp))
-	(if (not (looking-back "^[ \t]*\\([]})]+\\|.*\\..*\\)[ \t\n]*"))
-	    (progn
-	      (re-search-backward "\\<[^ \t]+[ \t\n]*" (point-min) t)
-	      (re-search-backward "^" (point-min) t)
-	      (back-to-indentation)
-	      (+ (current-column) js-indent-level))
-	  (progn
-	    (re-search-backward "\\..*[ \t\n]*" (point-min) t)
-	    (current-column)))))
+        (when (looking-back "[]})\"'][\t\n ]*")
+          (js--backward-sexp))
+        (if (not (looking-back "^[ \t]*\\([]})]+\\|.*\\..*\\)[ \t\n]*"))
+            (progn
+              (re-search-backward "\\<[^ \t]+[ \t\n]*" (point-min) t)
+              (re-search-backward "^" (point-min) t)
+              (back-to-indentation)
+              (+ (current-column) js-indent-level))
+          (progn
+            (re-search-backward "\\..*[ \t\n]*" (point-min) t)
+            (current-column)))))
 
      ;;var special case for non-comma-first continued var statements
      ((and (looking-at "[^]})]")
-	   (js2-node-at-point)
-	   (js2-node-parent (js2-node-at-point))
-	   (js2-node-type (js2-node-parent (js2-node-at-point)))
-	   (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
+           (js2-node-at-point)
+           (js2-node-parent (js2-node-at-point))
+           (js2-node-type (js2-node-parent (js2-node-at-point)))
+           (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
       (save-excursion
-	(re-search-backward "\\<var\\>" (point-min) t)
-	(+ (current-column) 4)))
+        (re-search-backward "\\<var\\>" (point-min) t)
+        (+ (current-column) 4)))
 
      ((nth 4 parse-status)
       (js--get-c-offset 'c (nth 8 parse-status)))
@@ -1894,32 +1894,32 @@ nil."
       ;; same level as the opening statement. Same goes for
       ;; "case" and "default".
       (let ((same-indent-p (looking-at
-			    "[]})]\\|\\_<case\\_>\\|\\_<default\\_>"))
-	    (continued-expr-p (js--continued-expression-p)))
-	(goto-char (nth 1 parse-status)) ; go to the opening char
-	(if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
-	    (progn ; nothing following the opening paren/bracket
-	      (skip-syntax-backward " ")
-	      (when (eq (char-before) ?\)) (backward-list))
-	      (back-to-indentation)
-	      (cond (same-indent-p
-		     (current-column))
-		    (continued-expr-p
-		     (+ (current-column) (* 2 js-indent-level)
-			js-expr-indent-offset))
-		    (t
-		     (+ (current-column) js-indent-level
-			(case (char-after (nth 1 parse-status))
-			      (?\( js-paren-indent-offset)
-			      (?\[ js-square-indent-offset)
-			      (?\{ js-curly-indent-offset))))))
-	  ;; If there is something following the opening
-	  ;; paren/bracket, everything else should be indented at
-	  ;; the same level.
-	  (unless same-indent-p
-	    (forward-char)
-	    (skip-chars-forward " \t"))
-	  (current-column))))
+                            "[]})]\\|\\_<case\\_>\\|\\_<default\\_>"))
+            (continued-expr-p (js--continued-expression-p)))
+        (goto-char (nth 1 parse-status)) ; go to the opening char
+        (if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
+            (progn ; nothing following the opening paren/bracket
+              (skip-syntax-backward " ")
+              (when (eq (char-before) ?\)) (backward-list))
+              (back-to-indentation)
+              (cond (same-indent-p
+                     (current-column))
+                    (continued-expr-p
+                     (+ (current-column) (* 2 js-indent-level)
+                        js-expr-indent-offset))
+                    (t
+                     (+ (current-column) js-indent-level
+                        (case (char-after (nth 1 parse-status))
+                              (?\( js-paren-indent-offset)
+                              (?\[ js-square-indent-offset)
+                              (?\{ js-curly-indent-offset))))))
+          ;; If there is something following the opening
+          ;; paren/bracket, everything else should be indented at
+          ;; the same level.
+          (unless same-indent-p
+            (forward-char)
+            (skip-chars-forward " \t"))
+          (current-column))))
 
      ((js--continued-expression-p)
       (+ js-indent-level js-expr-indent-offset))
@@ -1950,8 +1950,8 @@ nil."
          (c-beginning-of-macro
           (&optional limit)
           (js--beginning-of-macro limit)))
-    (let ((fill-paragraph-function 'c-fill-paragraph))
-      (c-fill-paragraph justify))))
+        (let ((fill-paragraph-function 'c-fill-paragraph))
+          (c-fill-paragraph justify))))
 
 ;;; Type database and Imenu
 
@@ -1984,8 +1984,8 @@ Return a new item that is the result of merging CHILD into
 ITEM.  NAME-PARTS is a list of parts of the name of CHILD
 that we haven't consumed yet."
   (js--debug "js--make-merged-item: {%s} into {%s}"
-                   (js--pitem-format child)
-                   (js--pitem-format item))
+             (js--pitem-format child)
+             (js--pitem-format item))
 
   ;; If the item we're merging into isn't a class, make it into one
   (unless (consp (js--pitem-type item))
@@ -1996,7 +1996,7 @@ that we haven't consumed yet."
                 ;; Use the child's class-style if it's available
                 :type (if (atom (js--pitem-type child))
                           js--dummy-class-style
-                  (js--pitem-type child))
+                        (js--pitem-type child))
 
                 :name (js--pitem-strname item))))
 
@@ -2008,7 +2008,7 @@ that we haven't consumed yet."
           ;; bottom of the class hierarchy, call the merger
           ;; recursively
           (js--splice-into-items (car item) child
-                                       (cdr name-parts)))
+                                 (cdr name-parts)))
 
          ((atom (js--pitem-type child))
           (js--debug "js--make-merged-item: straight merge")
@@ -2041,8 +2041,8 @@ the broken-down class name of the item to insert."
         new-items last-new-item new-cons)
 
     (js--debug "js--splice-into-items: name-parts: %S items:%S"
-             name-parts
-             (mapcar #'js--pitem-name items))
+               name-parts
+               (mapcar #'js--pitem-name items))
 
     (assert (stringp top-name))
     (assert (> (length top-name) 0))
@@ -2298,7 +2298,7 @@ current buffer.  Pushes a mark onto the tag ring just like
         (setq symbols (js--get-all-known-symbols))
       (setq symbols (make-hash-table :test 'equal))
       (js--imenu-to-flat (js--imenu-create-index)
-                               "" symbols))
+                         "" symbols))
 
     (setq marker (cdr (js--read-symbol
                        symbols "Jump to: "
@@ -2362,314 +2362,314 @@ Otherwise, use the current value of `process-mark'."
 (defconst js--moz-interactor
   (replace-regexp-in-string
    "[ \n]+" " "
-   ; */" Make Emacs happy
-"(function(repl) {
-  repl.defineInteractor('js', {
-    onStart: function onStart(repl) {
-      if(!repl._jsObjects) {
-        repl._jsObjects = {};
-        repl._jsLastID = 0;
-        repl._jsGC = this._jsGC;
-      }
-      this._input = '';
-    },
+                                        ; */" Make Emacs happy
+   "(function(repl) {
+repl.defineInteractor('js', {
+onStart: function onStart(repl) {
+if(!repl._jsObjects) {
+repl._jsObjects = {};
+repl._jsLastID = 0;
+repl._jsGC = this._jsGC;
+}
+this._input = '';
+},
 
-    _jsGC: function _jsGC(ids_in_use) {
-      var objects = this._jsObjects;
-      var keys = [];
-      var num_freed = 0;
+_jsGC: function _jsGC(ids_in_use) {
+var objects = this._jsObjects;
+var keys = [];
+var num_freed = 0;
 
-      for(var pn in objects) {
-        keys.push(Number(pn));
-      }
+for(var pn in objects) {
+keys.push(Number(pn));
+}
 
-      keys.sort(function(x, y) x - y);
-      ids_in_use.sort(function(x, y) x - y);
-      var i = 0;
-      var j = 0;
+keys.sort(function(x, y) x - y);
+ids_in_use.sort(function(x, y) x - y);
+var i = 0;
+var j = 0;
 
-      while(i < ids_in_use.length && j < keys.length) {
-        var id = ids_in_use[i++];
-        while(j < keys.length && keys[j] !== id) {
-          var k_id = keys[j++];
-          delete objects[k_id];
-          ++num_freed;
-        }
-        ++j;
-      }
+while(i < ids_in_use.length && j < keys.length) {
+var id = ids_in_use[i++];
+while(j < keys.length && keys[j] !== id) {
+var k_id = keys[j++];
+delete objects[k_id];
+++num_freed;
+}
+++j;
+}
 
-      while(j < keys.length) {
-        var k_id = keys[j++];
-        delete objects[k_id];
-        ++num_freed;
-      }
+while(j < keys.length) {
+var k_id = keys[j++];
+delete objects[k_id];
+++num_freed;
+}
 
-      return num_freed;
-    },
+return num_freed;
+},
 
-    _mkArray: function _mkArray() {
-      var result = [];
-      for(var i = 0; i < arguments.length; ++i) {
-        result.push(arguments[i]);
-      }
-      return result;
-    },
+_mkArray: function _mkArray() {
+var result = [];
+for(var i = 0; i < arguments.length; ++i) {
+result.push(arguments[i]);
+}
+return result;
+},
 
-    _parsePropDescriptor: function _parsePropDescriptor(parts) {
-      if(typeof parts === 'string') {
-        parts = [ parts ];
-      }
+_parsePropDescriptor: function _parsePropDescriptor(parts) {
+if(typeof parts === 'string') {
+parts = [ parts ];
+}
 
-      var obj = parts[0];
-      var start = 1;
+var obj = parts[0];
+var start = 1;
 
-      if(typeof obj === 'string') {
-        obj = window;
-        start = 0;
-      } else if(parts.length < 2) {
-        throw new Error('expected at least 2 arguments');
-      }
+if(typeof obj === 'string') {
+obj = window;
+start = 0;
+} else if(parts.length < 2) {
+throw new Error('expected at least 2 arguments');
+}
 
-      for(var i = start; i < parts.length - 1; ++i) {
-        obj = obj[parts[i]];
-      }
+for(var i = start; i < parts.length - 1; ++i) {
+obj = obj[parts[i]];
+}
 
-      return [obj, parts[parts.length - 1]];
-    },
+return [obj, parts[parts.length - 1]];
+},
 
-    _getProp: function _getProp(/*...*/) {
-      if(arguments.length === 0) {
-        throw new Error('no arguments supplied to getprop');
-      }
+_getProp: function _getProp(/*...*/) {
+if(arguments.length === 0) {
+throw new Error('no arguments supplied to getprop');
+}
 
-      if(arguments.length === 1 &&
-         (typeof arguments[0]) !== 'string')
-      {
-        return arguments[0];
-      }
+if(arguments.length === 1 &&
+(typeof arguments[0]) !== 'string')
+{
+return arguments[0];
+}
 
-      var [obj, propname] = this._parsePropDescriptor(arguments);
-      return obj[propname];
-    },
+var [obj, propname] = this._parsePropDescriptor(arguments);
+return obj[propname];
+},
 
-    _putProp: function _putProp(properties, value) {
-      var [obj, propname] = this._parsePropDescriptor(properties);
-      obj[propname] = value;
-    },
+_putProp: function _putProp(properties, value) {
+var [obj, propname] = this._parsePropDescriptor(properties);
+obj[propname] = value;
+},
 
-    _delProp: function _delProp(propname) {
-      var [obj, propname] = this._parsePropDescriptor(arguments);
-      delete obj[propname];
-    },
+_delProp: function _delProp(propname) {
+var [obj, propname] = this._parsePropDescriptor(arguments);
+delete obj[propname];
+},
 
-    _typeOf: function _typeOf(thing) {
-      return typeof thing;
-    },
+_typeOf: function _typeOf(thing) {
+return typeof thing;
+},
 
-    _callNew: function(constructor) {
-      if(typeof constructor === 'string')
-      {
-        constructor = window[constructor];
-      } else if(constructor.length === 1 &&
-                typeof constructor[0] !== 'string')
-      {
-        constructor = constructor[0];
-      } else {
-        var [obj,propname] = this._parsePropDescriptor(constructor);
-        constructor = obj[propname];
-      }
+_callNew: function(constructor) {
+if(typeof constructor === 'string')
+{
+constructor = window[constructor];
+} else if(constructor.length === 1 &&
+typeof constructor[0] !== 'string')
+{
+constructor = constructor[0];
+} else {
+var [obj,propname] = this._parsePropDescriptor(constructor);
+constructor = obj[propname];
+}
 
-      /* Hacky, but should be robust */
-      var s = 'new constructor(';
-      for(var i = 1; i < arguments.length; ++i) {
+/* Hacky, but should be robust */
+var s = 'new constructor(';
+for(var i = 1; i < arguments.length; ++i) {
         if(i != 1) {
-          s += ',';
+        s += ',';
         }
 
         s += 'arguments[' + i + ']';
-      }
-
-      s += ')';
-      return eval(s);
-    },
-
-    _callEval: function(thisobj, js) {
-      return eval.call(thisobj, js);
-    },
-
-    getPrompt: function getPrompt(repl) {
-      return 'EVAL>'
-    },
-
-    _lookupObject: function _lookupObject(repl, id) {
-      if(typeof id === 'string') {
-        switch(id) {
-        case 'global':
-          return window;
-        case 'nil':
-          return null;
-        case 't':
-          return true;
-        case 'false':
-          return false;
-        case 'undefined':
-          return undefined;
-        case 'repl':
-          return repl;
-        case 'interactor':
-          return this;
-        case 'NaN':
-          return NaN;
-        case 'Infinity':
-          return Infinity;
-        case '-Infinity':
-          return -Infinity;
-        default:
-          throw new Error('No object with special id:' + id);
         }
-      }
 
-      var ret = repl._jsObjects[id];
-      if(ret === undefined) {
-        throw new Error('No object with id:' + id + '(' + typeof id + ')');
-      }
-      return ret;
-    },
+        s += ')';
+return eval(s);
+},
 
-    _findOrAllocateObject: function _findOrAllocateObject(repl, value) {
-      if(typeof value !== 'object'  && typeof value !== 'function') {
-        throw new Error('_findOrAllocateObject called on non-object('
-                        + typeof(value) + '): '
-                        + value)
-      }
+_callEval: function(thisobj, js) {
+return eval.call(thisobj, js);
+},
 
-      for(var id in repl._jsObjects) {
-        id = Number(id);
-        var obj = repl._jsObjects[id];
-        if(obj === value) {
-          return id;
-        }
-      }
+getPrompt: function getPrompt(repl) {
+return 'EVAL>'
+},
 
-      var id = ++repl._jsLastID;
-      repl._jsObjects[id] = value;
-      return id;
-    },
+_lookupObject: function _lookupObject(repl, id) {
+if(typeof id === 'string') {
+switch(id) {
+case 'global':
+return window;
+case 'nil':
+return null;
+case 't':
+return true;
+case 'false':
+return false;
+case 'undefined':
+return undefined;
+case 'repl':
+return repl;
+case 'interactor':
+return this;
+case 'NaN':
+return NaN;
+case 'Infinity':
+return Infinity;
+case '-Infinity':
+return -Infinity;
+default:
+throw new Error('No object with special id:' + id);
+}
+}
 
-    _fixupList: function _fixupList(repl, list) {
-      for(var i = 0; i < list.length; ++i) {
+var ret = repl._jsObjects[id];
+if(ret === undefined) {
+throw new Error('No object with id:' + id + '(' + typeof id + ')');
+}
+return ret;
+},
+
+_findOrAllocateObject: function _findOrAllocateObject(repl, value) {
+if(typeof value !== 'object'  && typeof value !== 'function') {
+throw new Error('_findOrAllocateObject called on non-object('
+                                                            + typeof(value) + '): '
+                                                            + value)
+}
+
+for(var id in repl._jsObjects) {
+id = Number(id);
+var obj = repl._jsObjects[id];
+if(obj === value) {
+return id;
+}
+}
+
+var id = ++repl._jsLastID;
+repl._jsObjects[id] = value;
+return id;
+},
+
+_fixupList: function _fixupList(repl, list) {
+for(var i = 0; i < list.length; ++i) {
         if(list[i] instanceof Array) {
-          this._fixupList(repl, list[i]);
+        this._fixupList(repl, list[i]);
         } else if(typeof list[i] === 'object') {
-          var obj = list[i];
-          if(obj.funcall) {
-            var parts = obj.funcall;
-            this._fixupList(repl, parts);
-            var [thisobj, func] = this._parseFunc(parts[0]);
-            list[i] = func.apply(thisobj, parts.slice(1));
-          } else if(obj.objid) {
-            list[i] = this._lookupObject(repl, obj.objid);
-          } else {
-            throw new Error('Unknown object type: ' + obj.toSource());
-          }
+        var obj = list[i];
+        if(obj.funcall) {
+        var parts = obj.funcall;
+        this._fixupList(repl, parts);
+        var [thisobj, func] = this._parseFunc(parts[0]);
+        list[i] = func.apply(thisobj, parts.slice(1));
+        } else if(obj.objid) {
+        list[i] = this._lookupObject(repl, obj.objid);
+        } else {
+        throw new Error('Unknown object type: ' + obj.toSource());
         }
-      }
-    },
+        }
+        }
+        },
 
-    _parseFunc: function(func) {
-      var thisobj = null;
+        _parseFunc: function(func) {
+        var thisobj = null;
 
-      if(typeof func === 'string') {
+        if(typeof func === 'string') {
         func = window[func];
-      } else if(func instanceof Array) {
+        } else if(func instanceof Array) {
         if(func.length === 1 && typeof func[0] !== 'string') {
-          func = func[0];
+        func = func[0];
         } else {
-          [thisobj, func] = this._parsePropDescriptor(func);
-          func = thisobj[func];
+        [thisobj, func] = this._parsePropDescriptor(func);
+        func = thisobj[func];
         }
-      }
+        }
 
-      return [thisobj,func];
-    },
+        return [thisobj,func];
+        },
 
-    _encodeReturn: function(value, array_as_mv) {
-      var ret;
+        _encodeReturn: function(value, array_as_mv) {
+        var ret;
 
-      if(value === null) {
+        if(value === null) {
         ret = ['special', 'null'];
-      } else if(value === true) {
+        } else if(value === true) {
         ret = ['special', 'true'];
-      } else if(value === false) {
+        } else if(value === false) {
         ret = ['special', 'false'];
-      } else if(value === undefined) {
+        } else if(value === undefined) {
         ret = ['special', 'undefined'];
-      } else if(typeof value === 'number') {
+        } else if(typeof value === 'number') {
         if(isNaN(value)) {
-          ret = ['special', 'NaN'];
+        ret = ['special', 'NaN'];
         } else if(value === Infinity) {
-          ret = ['special', 'Infinity'];
+        ret = ['special', 'Infinity'];
         } else if(value === -Infinity) {
-          ret = ['special', '-Infinity'];
+        ret = ['special', '-Infinity'];
         } else {
-          ret = ['atom', value];
-        }
-      } else if(typeof value === 'string') {
         ret = ['atom', value];
-      } else if(array_as_mv && value instanceof Array) {
+        }
+        } else if(typeof value === 'string') {
+        ret = ['atom', value];
+        } else if(array_as_mv && value instanceof Array) {
         ret = ['array', value.map(this._encodeReturn, this)];
-      } else {
+        } else {
         ret = ['objid', this._findOrAllocateObject(repl, value)];
-      }
+        }
 
-      return ret;
-    },
+        return ret;
+        },
 
-    _handleInputLine: function _handleInputLine(repl, line) {
-      var ret;
-      var array_as_mv = false;
+        _handleInputLine: function _handleInputLine(repl, line) {
+        var ret;
+        var array_as_mv = false;
 
-      try {
+        try {
         if(line[0] === '*') {
-          array_as_mv = true;
-          line = line.substring(1);
+        array_as_mv = true;
+        line = line.substring(1);
         }
         var parts = eval(line);
         this._fixupList(repl, parts);
         var [thisobj, func] = this._parseFunc(parts[0]);
         ret = this._encodeReturn(
-          func.apply(thisobj, parts.slice(1)),
-          array_as_mv);
-      } catch(x) {
+                                 func.apply(thisobj, parts.slice(1)),
+                                           array_as_mv);
+        } catch(x) {
         ret = ['error', x.toString() ];
-      }
-
-      var JSON = Components.classes['@mozilla.org/dom/json;1'].createInstance(Components.interfaces.nsIJSON);
-      repl.print(JSON.encode(ret));
-      repl._prompt();
-    },
-
-    handleInput: function handleInput(repl, chunk) {
-      this._input += chunk;
-      var match, line;
-      while(match = this._input.match(/.*\\n/)) {
-        line = match[0];
-
-        if(line === 'EXIT\\n') {
-          repl.popInteractor();
-          repl._prompt();
-          return;
         }
 
-        this._input = this._input.substring(line.length);
-        this._handleInputLine(repl, line);
-      }
-    }
-  });
-})
+        var JSON = Components.classes['@mozilla.org/dom/json;1'].createInstance(Components.interfaces.nsIJSON);
+                                      repl.print(JSON.encode(ret));
+                                      repl._prompt();
+                                      },
+
+                                      handleInput: function handleInput(repl, chunk) {
+                                      this._input += chunk;
+                                      var match, line;
+                                      while(match = this._input.match(/.*\\n/)) {
+                                      line = match[0];
+
+                                      if(line === 'EXIT\\n') {
+                                      repl.popInteractor();
+                                      repl._prompt();
+                                      return;
+                                      }
+
+                                      this._input = this._input.substring(line.length);
+                                      this._handleInputLine(repl, line);
+                                      }
+                                      }
+                                      });
+        })
 ")
 
-  "String to set MozRepl up into a simple-minded evaluation mode.")
+"String to set MozRepl up into a simple-minded evaluation mode.")
 
 (defun js--js-encode-value (x)
   "Marshall the given value for JS.
@@ -2788,17 +2788,17 @@ with `js--js-encode-value'."
                           (js--optimize-arglist (cddr item)))
           else if (eq (car-safe item) 'js!)
           collect (destructuring-bind (ignored function &rest body) item
-                    (append (list 'list ''js--funcall
-                                  (if (consp function)
-                                      (cons 'list
-                                            (js--optimize-arglist function))
-                                    function))
-                            (js--optimize-arglist body)))
+                                      (append (list 'list ''js--funcall
+                                                    (if (consp function)
+                                                        (cons 'list
+                                                              (js--optimize-arglist function))
+                                                      function))
+                                              (js--optimize-arglist body)))
           else
           collect item)))
 
 (defmacro js--js-get-service (class-name interface-name)
-    `(js! ("Components" "classes" ,class-name "getService")
+  `(js! ("Components" "classes" ,class-name "getService")
         (js< "Components" "interfaces" ,interface-name)))
 
 (defmacro js--js-create-instance (class-name interface-name)
@@ -2836,9 +2836,9 @@ Inside the lexical scope of `with-js', `js?', `js!',
                               ,@body))
 
                     (js-eval (thisobj js)
-                            `(js--js-eval
-                              ,@(js--optimize-arglist
-                                 (list thisobj js))))
+                             `(js--js-eval
+                               ,@(js--optimize-arglist
+                                  (list thisobj js))))
 
                     (js-list (&rest args)
                              `(js--js-list
@@ -2868,7 +2868,7 @@ Inside the lexical scope of `with-js', `js?', `js!',
                            ,@(js--optimize-arglist (list value))
                            ))
                     (js-handle? (arg) `(js--js-handle-p ,arg)))
-           ,@forms)
+                   ,@forms)
        (js--js-leave-repl))))
 
 (defvar js--js-array-as-list nil
@@ -3000,67 +3000,67 @@ With argument, run even if no intervening GC has happened."
 (defun js--get-tabs ()
   "Enumerate all JavaScript contexts available.
 Each context is a list:
-   (TITLE URL BROWSER TAB TABBROWSER) for content documents
-   (TITLE URL WINDOW) for windows
+(TITLE URL BROWSER TAB TABBROWSER) for content documents
+(TITLE URL WINDOW) for windows
 
 All tabs of a given window are grouped together.  The most recent
 window is first.  Within each window, the tabs are returned
 left-to-right."
-  (with-js
-   (let (windows)
+(with-js
+ (let (windows)
 
-     (loop with window-mediator = (js! ("Components" "classes"
-                                        "@mozilla.org/appshell/window-mediator;1"
-                                        "getService")
-                                       (js< "Components" "interfaces"
-                                            "nsIWindowMediator"))
-           with enumerator = (js! (window-mediator "getEnumerator") nil)
+   (loop with window-mediator = (js! ("Components" "classes"
+                                      "@mozilla.org/appshell/window-mediator;1"
+                                      "getService")
+                                     (js< "Components" "interfaces"
+                                          "nsIWindowMediator"))
+         with enumerator = (js! (window-mediator "getEnumerator") nil)
 
-           while (js? (js! (enumerator "hasMoreElements")))
-           for window = (js! (enumerator "getNext"))
-           for window-info = (js-list window
-                                      (js< window "document" "title")
-                                      (js! (window "location" "toString"))
-                                      (js< window "closed")
-                                      (js< window "windowState"))
+         while (js? (js! (enumerator "hasMoreElements")))
+         for window = (js! (enumerator "getNext"))
+         for window-info = (js-list window
+                                    (js< window "document" "title")
+                                    (js! (window "location" "toString"))
+                                    (js< window "closed")
+                                    (js< window "windowState"))
 
-           unless (or (js? (fourth window-info))
-                      (eq (fifth window-info) 2))
-           do (push window-info windows))
+         unless (or (js? (fourth window-info))
+                    (eq (fifth window-info) 2))
+         do (push window-info windows))
 
-     (loop for window-info in windows
-           for window = (first window-info)
-           collect (list (second window-info)
-                         (third window-info)
-                         window)
+   (loop for window-info in windows
+         for window = (first window-info)
+         collect (list (second window-info)
+                       (third window-info)
+                       window)
 
-           for gbrowser = (js< window "gBrowser")
-           if (js-handle? gbrowser)
-           nconc (loop
-                  for x below (js< gbrowser "browsers" "length")
-                  collect (js-list (js< gbrowser
-                                        "browsers"
-                                        x
-                                        "contentDocument"
-                                        "title")
+         for gbrowser = (js< window "gBrowser")
+         if (js-handle? gbrowser)
+         nconc (loop
+                for x below (js< gbrowser "browsers" "length")
+                collect (js-list (js< gbrowser
+                                      "browsers"
+                                      x
+                                      "contentDocument"
+                                      "title")
 
-                                   (js! (gbrowser
-                                         "browsers"
-                                         x
-                                         "contentWindow"
-                                         "location"
-                                         "toString"))
-                                   (js< gbrowser
-                                        "browsers"
-                                        x)
+                                 (js! (gbrowser
+                                       "browsers"
+                                       x
+                                       "contentWindow"
+                                       "location"
+                                       "toString"))
+                                 (js< gbrowser
+                                      "browsers"
+                                      x)
 
-                                   (js! (gbrowser
-                                         "tabContainer"
-                                         "childNodes"
-                                         "item")
-                                        x)
+                                 (js! (gbrowser
+                                       "tabContainer"
+                                       "childNodes"
+                                       "item")
+                                      x)
 
-                                   gbrowser))))))
+                                 gbrowser))))))
 
 (defvar js-read-tab-history nil)
 
@@ -3079,133 +3079,133 @@ browser, respectively."
    (lexical-let ((tabs (js--get-tabs)) selected-tab-cname
                  selected-tab prev-hitab)
 
-     ;; Disambiguate names
-     (setq tabs (loop with tab-names = (make-hash-table :test 'equal)
-                      for tab in tabs
-                      for cname = (format "%s (%s)" (second tab) (first tab))
-                      for num = (incf (gethash cname tab-names -1))
-                      if (> num 0)
-                      do (setq cname (format "%s <%d>" cname num))
-                      collect (cons cname tab)))
+                ;; Disambiguate names
+                (setq tabs (loop with tab-names = (make-hash-table :test 'equal)
+                                 for tab in tabs
+                                 for cname = (format "%s (%s)" (second tab) (first tab))
+                                 for num = (incf (gethash cname tab-names -1))
+                                 if (> num 0)
+                                 do (setq cname (format "%s <%d>" cname num))
+                                 collect (cons cname tab)))
 
-     (labels ((find-tab-by-cname
-               (cname)
-               (loop for tab in tabs
-                     if (equal (car tab) cname)
-                     return (cdr tab)))
-
-              (mogrify-highlighting
-               (hitab unhitab)
-
-               ;; Hack to reduce the number of
-               ;; round-trips to mozilla
-               (let (cmds)
-                 (cond
-                  ;; Highlighting tab
-                  ((fourth hitab)
-                   (push '(js! ((fourth hitab) "setAttribute")
-                               "style"
-                               "color: red; font-weight: bold")
-                         cmds)
-
-                   ;; Highlight window proper
-                   (push '(js! ((third hitab)
-                                "setAttribute")
-                               "style"
-                               "border: 8px solid red")
-                         cmds)
-
-                   ;; Select tab, when appropriate
-                   (when js-js-switch-tabs
-                     (push
-                      '(js> ((fifth hitab) "selectedTab") (fourth hitab))
-                      cmds)))
-
-                  ;; Hilighting whole window
-                  ((third hitab)
-                   (push '(js! ((third hitab) "document"
-                                "documentElement" "setAttribute")
-                               "style"
-                               (concat "-moz-appearance: none;"
-                                       "border: 8px solid red;"))
-                         cmds)))
-
-                 (cond
-                  ;; Unhighlighting tab
-                  ((fourth unhitab)
-                   (push '(js! ((fourth unhitab) "setAttribute") "style" "")
-                         cmds)
-                   (push '(js! ((third unhitab) "setAttribute") "style" "")
-                         cmds))
-
-                  ;; Unhighlighting window
-                  ((third unhitab)
-                   (push '(js! ((third unhitab) "document"
-                                "documentElement" "setAttribute")
-                               "style" "")
-                         cmds)))
-
-                 (eval (list 'with-js
-                             (cons 'js-list (nreverse cmds))))))
-
-              (command-hook
-               ()
-               (let* ((tab (find-tab-by-cname (car ido-matches))))
-                 (mogrify-highlighting tab prev-hitab)
-                 (setq prev-hitab tab)))
-
-              (setup-hook
-               ()
-               ;; Fiddle with the match list a bit: if our first match
-               ;; is a tabbrowser window, rotate the match list until
-               ;; the active tab comes up
-               (let ((matched-tab (find-tab-by-cname (car ido-matches))))
-                 (when (and matched-tab
-                            (null (fourth matched-tab))
-                            (equal "navigator:browser"
-                                   (js! ((third matched-tab)
-                                         "document"
-                                         "documentElement"
-                                         "getAttribute")
-                                        "windowtype")))
-
-                   (loop with tab-to-match = (js< (third matched-tab)
-                                                  "gBrowser"
-                                                  "selectedTab")
-
-                         with index = 0
-                         for match in ido-matches
-                         for candidate-tab = (find-tab-by-cname match)
-                         if (eq (fourth candidate-tab) tab-to-match)
-                         do (setq ido-cur-list (ido-chop ido-cur-list match))
-                         and return t)))
-
-               (add-hook 'post-command-hook #'command-hook t t)))
-
-
-       (unwind-protect
-           (setq selected-tab-cname
-                 (let ((ido-minibuffer-setup-hook
-                        (cons #'setup-hook ido-minibuffer-setup-hook)))
-                   (ido-completing-read
-                    prompt
-                    (mapcar #'car tabs)
-                    nil t nil
-                    'js-read-tab-history)))
-
-         (when prev-hitab
-           (mogrify-highlighting nil prev-hitab)
-           (setq prev-hitab nil)))
-
-       (add-to-history 'js-read-tab-history selected-tab-cname)
-
-       (setq selected-tab (loop for tab in tabs
-                                if (equal (car tab) selected-tab-cname)
+                (labels ((find-tab-by-cname
+                          (cname)
+                          (loop for tab in tabs
+                                if (equal (car tab) cname)
                                 return (cdr tab)))
 
-       (if (fourth selected-tab)
-           (cons 'browser (third selected-tab))
-         (cons 'window (third selected-tab)))))))
+                         (mogrify-highlighting
+                          (hitab unhitab)
+
+                          ;; Hack to reduce the number of
+                          ;; round-trips to mozilla
+                          (let (cmds)
+                            (cond
+                             ;; Highlighting tab
+                             ((fourth hitab)
+                              (push '(js! ((fourth hitab) "setAttribute")
+                                          "style"
+                                          "color: red; font-weight: bold")
+                                    cmds)
+
+                              ;; Highlight window proper
+                              (push '(js! ((third hitab)
+                                           "setAttribute")
+                                          "style"
+                                          "border: 8px solid red")
+                                    cmds)
+
+                              ;; Select tab, when appropriate
+                              (when js-js-switch-tabs
+                                (push
+                                 '(js> ((fifth hitab) "selectedTab") (fourth hitab))
+                                 cmds)))
+
+                             ;; Hilighting whole window
+                             ((third hitab)
+                              (push '(js! ((third hitab) "document"
+                                           "documentElement" "setAttribute")
+                                          "style"
+                                          (concat "-moz-appearance: none;"
+                                                  "border: 8px solid red;"))
+                                    cmds)))
+
+                            (cond
+                             ;; Unhighlighting tab
+                             ((fourth unhitab)
+                              (push '(js! ((fourth unhitab) "setAttribute") "style" "")
+                                    cmds)
+                              (push '(js! ((third unhitab) "setAttribute") "style" "")
+                                    cmds))
+
+                             ;; Unhighlighting window
+                             ((third unhitab)
+                              (push '(js! ((third unhitab) "document"
+                                           "documentElement" "setAttribute")
+                                          "style" "")
+                                    cmds)))
+
+                            (eval (list 'with-js
+                                        (cons 'js-list (nreverse cmds))))))
+
+                         (command-hook
+                          ()
+                          (let* ((tab (find-tab-by-cname (car ido-matches))))
+                            (mogrify-highlighting tab prev-hitab)
+                            (setq prev-hitab tab)))
+
+                         (setup-hook
+                          ()
+                          ;; Fiddle with the match list a bit: if our first match
+                          ;; is a tabbrowser window, rotate the match list until
+                          ;; the active tab comes up
+                          (let ((matched-tab (find-tab-by-cname (car ido-matches))))
+                            (when (and matched-tab
+                                       (null (fourth matched-tab))
+                                       (equal "navigator:browser"
+                                              (js! ((third matched-tab)
+                                                    "document"
+                                                    "documentElement"
+                                                    "getAttribute")
+                                                   "windowtype")))
+
+                              (loop with tab-to-match = (js< (third matched-tab)
+                                                             "gBrowser"
+                                                             "selectedTab")
+
+                                    with index = 0
+                                    for match in ido-matches
+                                    for candidate-tab = (find-tab-by-cname match)
+                                    if (eq (fourth candidate-tab) tab-to-match)
+                                    do (setq ido-cur-list (ido-chop ido-cur-list match))
+                                    and return t)))
+
+                          (add-hook 'post-command-hook #'command-hook t t)))
+
+
+                        (unwind-protect
+                            (setq selected-tab-cname
+                                  (let ((ido-minibuffer-setup-hook
+                                         (cons #'setup-hook ido-minibuffer-setup-hook)))
+                                    (ido-completing-read
+                                     prompt
+                                     (mapcar #'car tabs)
+                                     nil t nil
+                                     'js-read-tab-history)))
+
+                          (when prev-hitab
+                            (mogrify-highlighting nil prev-hitab)
+                            (setq prev-hitab nil)))
+
+                        (add-to-history 'js-read-tab-history selected-tab-cname)
+
+                        (setq selected-tab (loop for tab in tabs
+                                                 if (equal (car tab) selected-tab-cname)
+                                                 return (cdr tab)))
+
+                        (if (fourth selected-tab)
+                            (cons 'browser (third selected-tab))
+                          (cons 'window (third selected-tab)))))))
 
 (defun js--guess-eval-defun-info (pstate)
   "Helper function for `js-eval-defun'.
@@ -3236,26 +3236,26 @@ Change with `js-set-js-context'.")
 
 (defconst js--js-inserter
   "(function(func_info,func) {
-    func_info.unshift('window');
-    var obj = window;
-    for(var i = 1; i < func_info.length - 1; ++i) {
-      var next = obj[func_info[i]];
-      if(typeof next !== 'object' && typeof next !== 'function') {
-        next = obj.prototype && obj.prototype[func_info[i]];
-        if(typeof next !== 'object' && typeof next !== 'function') {
-          alert('Could not find ' + func_info.slice(0, i+1).join('.') +
-                ' or ' + func_info.slice(0, i+1).join('.') + '.prototype');
-          return;
-        }
+func_info.unshift('window');
+var obj = window;
+for(var i = 1; i < func_info.length - 1; ++i) {
+var next = obj[func_info[i]];
+if(typeof next !== 'object' && typeof next !== 'function') {
+next = obj.prototype && obj.prototype[func_info[i]];
+if(typeof next !== 'object' && typeof next !== 'function') {
+alert('Could not find ' + func_info.slice(0, i+1).join('.') +
+' or ' + func_info.slice(0, i+1).join('.') + '.prototype');
+return;
+}
 
-        func_info.splice(i+1, 0, 'prototype');
-        ++i;
-      }
-    }
+func_info.splice(i+1, 0, 'prototype');
+++i;
+}
+}
 
-    obj[func_info[i]] = func;
-    alert('Successfully updated '+func_info.join('.'));
-  })")
+obj[func_info[i]] = func;
+alert('Successfully updated '+func_info.join('.'));
+})")
 
 (defun js-set-js-context (context)
   "Set the JavaScript context to CONTEXT.
@@ -3270,18 +3270,18 @@ If one hasn't been set, or if it's stale, prompt for a new one."
    (when (or (null js--js-context)
              (js--js-handle-expired-p (cdr js--js-context))
              (ecase (car js--js-context)
-               (window (js? (js< (cdr js--js-context) "closed")))
-               (browser (not (js? (js< (cdr js--js-context)
-                                       "contentDocument"))))))
+                    (window (js? (js< (cdr js--js-context) "closed")))
+                    (browser (not (js? (js< (cdr js--js-context)
+                                            "contentDocument"))))))
      (setq js--js-context (js--read-tab "Javascript Context: ")))
    js--js-context))
 
 (defun js--js-content-window (context)
   (with-js
    (ecase (car context)
-     (window (cdr context))
-     (browser (js< (cdr context)
-                   "contentWindow" "wrappedJSObject")))))
+          (window (cdr context))
+          (browser (js< (cdr context)
+                        "contentWindow" "wrappedJSObject")))))
 
 (defun js--make-nsilocalfile (path)
   (with-js
@@ -3293,7 +3293,7 @@ If one hasn't been set, or if it's stale, prompt for a new one."
 (defun js--js-add-resource-alias (alias path)
   (with-js
    (let* ((io-service (js-get-service "@mozilla.org/network/io-service;1"
-                                                "nsIIOService"))
+                                      "nsIIOService"))
           (res-prot (js! (io-service "getProtocolHandler") "resource"))
           (res-prot (js-qi res-prot "nsIResProtocolHandler"))
           (path-file (js--make-nsilocalfile path))
@@ -3348,52 +3348,52 @@ If one hasn't been set, or if it's stale, prompt for a new one."
       (js--js-add-resource-alias "js" js-js-tmpdir)
 
       (setq temp-name (make-temp-file (concat js-js-tmpdir
-                                             "/js-")
+                                              "/js-")
                                       nil ".js"))
       (unwind-protect
           (with-js
-            (with-temp-buffer
-              (insert js--js-inserter)
-              (insert "(")
-              (insert (json-encode-list defun-info))
-              (insert ",\n")
-              (insert defun-body)
-              (insert "\n)")
-              (write-region (point-min) (point-max) temp-name
-                            nil 1))
+           (with-temp-buffer
+             (insert js--js-inserter)
+             (insert "(")
+             (insert (json-encode-list defun-info))
+             (insert ",\n")
+             (insert defun-body)
+             (insert "\n)")
+             (write-region (point-min) (point-max) temp-name
+                           nil 1))
 
-            ;; Give Mozilla responsibility for deleting this file
-            (let* ((content-window (js--js-content-window
-                                    (js--get-js-context)))
-                   (content-document (js< content-window "document"))
-                   (head (if (js? (js< content-document "body"))
-                             ;; Regular content
-                             (js< (js! (content-document "getElementsByTagName")
-                                       "head")
-                                  0)
-                           ;; Chrome
-                           (js< content-document "documentElement")))
-                   (elem (js! (content-document "createElementNS")
-                              "http://www.w3.org/1999/xhtml" "script")))
+           ;; Give Mozilla responsibility for deleting this file
+           (let* ((content-window (js--js-content-window
+                                   (js--get-js-context)))
+                  (content-document (js< content-window "document"))
+                  (head (if (js? (js< content-document "body"))
+                            ;; Regular content
+                            (js< (js! (content-document "getElementsByTagName")
+                                      "head")
+                                 0)
+                          ;; Chrome
+                          (js< content-document "documentElement")))
+                  (elem (js! (content-document "createElementNS")
+                             "http://www.w3.org/1999/xhtml" "script")))
 
-              (js! (elem "setAttribute") "type" "text/javascript")
-              (js! (elem "setAttribute") "src"
-                   (format "resource://js/%s"
-                           (file-name-nondirectory temp-name)))
+             (js! (elem "setAttribute") "type" "text/javascript")
+             (js! (elem "setAttribute") "src"
+                  (format "resource://js/%s"
+                          (file-name-nondirectory temp-name)))
 
-              (js! (head "appendChild") elem)
+             (js! (head "appendChild") elem)
 
-              (js! (content-window "addEventListener") "unload"
-                   (js! ((js-new
-                          "Function" "file"
-                          "return function() { file.remove(false) }"))
-                        (js--make-nsilocalfile temp-name))
-                   'false)
-              (setq temp-name nil)
+             (js! (content-window "addEventListener") "unload"
+                  (js! ((js-new
+                         "Function" "file"
+                         "return function() { file.remove(false) }"))
+                       (js--make-nsilocalfile temp-name))
+                  'false)
+             (setq temp-name nil)
 
 
 
-              ))
+             ))
 
         ;; temp-name is set to nil on success
         (when temp-name
@@ -3415,8 +3415,8 @@ If one hasn't been set, or if it's stale, prompt for a new one."
   (set (make-local-variable 'open-paren-in-column-0-is-defun-start) nil)
   (set (make-local-variable 'font-lock-defaults)
        (list js--font-lock-keywords
-	     nil nil nil nil
-	     '(font-lock-syntactic-keywords
+             nil nil nil nil
+             '(font-lock-syntactic-keywords
                . js-font-lock-syntactic-keywords)))
 
   (set (make-local-variable 'parse-sexp-ignore-comments) t)
