@@ -976,13 +976,13 @@ the body of `js--ensure-cache'."
                            (js--pitem-paren-depth (car open-items))
                            nil parse))
 
-              ;;              (let ((overlay (make-overlay prev-parse-point (point))))
-              ;;                (overlay-put overlay 'face '(:background "red"))
-              ;;                (unwind-protect
-              ;;                     (progn
-              ;;                       (js--debug "parsed: %S" parse)
-              ;;                       (sit-for 1))
-              ;;                  (delete-overlay overlay)))
+;;;              (let ((overlay (make-overlay prev-parse-point (point))))
+;;;                (overlay-put overlay 'face '(:background "red"))
+;;;                (unwind-protect
+;;;                     (progn
+;;;                       (js--debug "parsed: %S" parse)
+;;;                       (sit-for 1))
+;;;                  (delete-overlay overlay)))
 
               (setq prev-parse-point (point))
               (< (point) goal-point)))
