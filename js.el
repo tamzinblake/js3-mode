@@ -1819,7 +1819,7 @@ nil."
       (let ((spos
              (save-excursion
                (while (looking-back "[]})\"'][\t\n ]*")
-                 (backward-sexp))
+                 (js--backward-sexp))
 
                (cond
                 ((looking-back "[,([{].*[ \t\n]*")
@@ -1844,7 +1844,7 @@ nil."
       (let ((spos
              (save-excursion
                (while (looking-back "[]})\"'][\t\n ]*")
-                 (backward-sexp))
+                 (js--backward-sexp))
 
                (cond
                 ((looking-back "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*")
