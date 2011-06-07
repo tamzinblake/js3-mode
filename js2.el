@@ -983,8 +983,8 @@ Will only be used when we finish implementing the interpreter.")
 
 (deflocal js2-nesting-of-function 0)
 
-(deflocal js2-recorded-assignments nil
-  "Tracks assignments found during parsing.")
+(deflocal js2-recorded-identifiers nil
+  "Tracks identifiers found during parsing.")
 
 (defcustom js2-global-externs nil
   "A list of any extern names you'd like to consider always declared.
@@ -1308,13 +1308,13 @@ Not currently used."
 (defcustom js2-post-parse-callbacks nil
   "A list of callback functions invoked after parsing finishes.
 Currently, the main use for this function is to add synthetic
-declarations to `js2-recorded-assignments', which see."
+declarations to `js2-recorded-identifiers', which see."
   :type 'list
   :group 'js2-mode)
 
 (defface js2-external-variable-face
   '((t :foreground "orange"))
-  "Face used to highlight assignments to undeclared variables.
+  "Face used to highlight undeclared variable identifiers.
 An undeclared variable is any variable not declared with var or let
 in the current scope or any lexically enclosing scope.  If you assign
 to such a variable, then you are either expecting it to originate from
@@ -6998,25 +6998,25 @@ of a simple name.  Called before EXPR has a parent node."
         (js2-set-face (setq leftpos (js2-node-abs-pos name))
                       (+ leftpos (js2-node-len name))
                       'font-lock-function-name-face
-                      'record)))
-    ;; save variable assignments so we can check for undeclared later
-    ;; (can't do it here since var decls can come at end of script)
-    (when (and js2-highlight-external-variables
-               (setq name (js2-member-expr-leftmost-name left)))
-      (push (list name js2-current-scope
-                  (setq leftpos (js2-node-abs-pos name))
-                  (setq end (+ leftpos (js2-node-len name))))
-            js2-recorded-assignments))))
+                      'record)))))
+
+(defun js2-record-name-node (node)
+  "Saves NODE to `js-recorded-identifiers' to check for undeclared variables
+later. NODE must be a name node."
+  (push (list node js2-current-scope
+	      (setq leftpos (js2-node-abs-pos node))
+	      (setq end (+ leftpos (js2-node-len node))))
+	js2-recorded-identifiers))
 
 (defun js2-highlight-undeclared-vars ()
-  "After entire parse is finished, look for undeclared variable assignments.
+  "After entire parse is finished, look for undeclared variable references.
 We have to wait until entire buffer is parsed, since JavaScript permits var
 decls to occur after they're used.
 
 If any undeclared var name is in `js2-externs' or `js2-additional-externs',
 it is considered declared."
   (let (name)
-    (dolist (entry js2-recorded-assignments)
+    (dolist (entry js2-recorded-identifiers)
       (destructuring-bind (name-node scope pos end) entry
                           (setq name (js2-name-node-name name-node))
                           (unless (or (member name js2-global-externs)
@@ -7026,7 +7026,7 @@ it is considered declared."
                             (js2-set-face pos end 'js2-external-variable-face 'record)
                             (js2-record-text-property pos end 'help-echo "Undeclared variable")
                             (js2-record-text-property pos end 'point-entered #'js2-echo-help))))
-    (setq js2-recorded-assignments nil)))
+    (setq js2-recorded-identifiers nil)))
 
 (provide 'js2-highlight)
 
@@ -7750,7 +7750,7 @@ Scanner should be initialized."
           js2-current-flagged-token js2-EOF
           js2-nesting-of-function 0
           js2-labeled-stmt nil
-          js2-recorded-assignments nil)  ; for js2-highlight
+          js2-recorded-identifiers nil)  ; for js2-highlight
     (while (/= (setq tt (js2-peek-token)) js2-EOF)
       (if (= tt js2-FUNCTION)
           (progn
@@ -9680,7 +9680,8 @@ array-literals, array comprehensions and regular expressions."
 
 (defun js2-parse-name (tt-flagged tt)
   (let ((name js2-ts-string)
-        (name-pos js2-token-beg))
+        (name-pos js2-token-beg)
+	node)
     (if (and (js2-flag-set-p tt-flagged js2-ti-check-label)
              (= (js2-peek-token) js2-COLON))
         (prog1
@@ -9697,9 +9698,12 @@ array-literals, array comprehensions and regular expressions."
       ;; and js2-token-end.  We store the name's bounds in buffer vars
       ;; and `js2-create-name-node' uses them.
       (js2-save-name-token-data name-pos name)
-      (if js2-compiler-xml-available
-          (js2-parse-property-name nil name 0)
-        (js2-create-name-node 'check-activation)))))
+      (setq node (if js2-compiler-xml-available
+		     (js2-parse-property-name nil name 0)
+		   (js2-create-name-node 'check-activation)))
+      (if js2-highlight-external-variables
+	  (js2-record-name-node node))
+      node)))
 
 (defsubst js2-parse-warn-trailing-comma (msg pos elems comma-pos)
   (js2-add-strict-warning
