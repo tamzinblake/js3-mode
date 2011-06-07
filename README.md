@@ -14,7 +14,7 @@ Inspired by [A better coding convention for lists and object literals in Javascr
 
 With help from [Cheeso on StackOverflow](http://stackoverflow.com/questions/6144930/emacs-js-mode-for-npm-style) and [Mihai Bazon](http://mihai.bazon.net/projects/editing-javascript-with-emacs-js2-mode)
 
-The js2-mode included here is basically Steve Yegge's js2-mode version 20090723 findable [here](http://code.google.com/p/js2-mode/) with some reasonable defaults set.
+The js2-mode included here is basically Steve Yegge's js2-mode version 20090723 findable [here](http://code.google.com/p/js2-mode/) with some reasonable defaults set.  I expect to be improving this as time goes on.
 
 The js-mode included here is the one included with emacs version 24, with some modifications to the way it indents in certain cases and added backwards-compatibility for emacs version 23.2.
 
