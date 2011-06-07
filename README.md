@@ -32,9 +32,9 @@ Using this will entail having 2 separate JS parsers running, so sometimes it tak
 
 If your JS is in error, the indentation might look wrong.  I tend to regard this as a feature.
 
-I expect that there are still some bugs; if you see any, please report them.  I have a sneaking suspicion that I'm not handling lines with comments very well. Feel free to file issue reports on github for things like "it indented like [code block] but I want it to be [code block]".
-
 Remember - if you start a line with `(`, `[`, `+`, or `-`, strongly consider preceding it with a semicolon (`;`).
+
+**I expect that there are still some bugs; if you see any, please report them.  I have a sneaking suspicion that I'm not handling lines with comments very well. Feel free to file issue reports on github for things like "it indented like [code block] but I want it to be [code block]".**
 
 ## License ##
 
