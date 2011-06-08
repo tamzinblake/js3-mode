@@ -1325,7 +1325,7 @@ LIMIT defaults to point."
   (ignore-errors
     (save-excursion
       (js--up-nearby-list)
-      (and (looking-at "(")
+      (and (= (following-char) ?\()
            (progn (forward-symbol -1)
                   (or (looking-at "function")
                       (progn (forward-symbol -1)
@@ -1689,10 +1689,10 @@ See `font-lock-keywords'.")
   "Return non-nil if point is on a JavaScript operator, other than a comma."
   (save-match-data
     (and (looking-at js--indent-operator-re)
-         (or (not (looking-at ":"))
+         (or (not (= (following-char) ?\:))
              (save-excursion
                (and (js--re-search-backward "[?:{]\\|\\_<case\\_>" nil t)
-                    (looking-at "?")))))))
+                    (= (following-char) ?\?)))))))
 
 
 (defun js--continued-expression-p ()
@@ -1744,40 +1744,40 @@ Functionality does not exactly match backward-sexp."
     (while (looking-back "[]})\"'][\t\n ]*")
       (re-search-backward "[]})\"'][\t\n ]*" (point-min) t)
       (cond
-       ((looking-at "\"")
+       ((= (following-char) ?\")
         (re-search-backward "[^\\]\"" (point-min) t))
 
-       ((looking-at "'")
+       ((= (following-char) ?\')
         (re-search-backward "[^\\]'" (point-min) t))
 
-       ((looking-at "]")
+       (( = (following-char) ?\])
         (setq brackets (1+ brackets))
         (while (/= brackets 0)
           (re-search-backward "[][]" (point-min) t)
           (cond
-           ((looking-at "]")
+           ((= (following-char) ?\])
             (setq brackets (1+ brackets)))
-           ((looking-at "[[]")
+           ((= (following-char) ?\[)
             (setq brackets (1- brackets))))))
 
-       ((looking-at "}")
+       ((= (following-char) ?\})
         (setq brackets (1+ brackets))
         (while (/= brackets 0)
           (re-search-backward "[}{]" (point-min) t)
           (cond
-           ((looking-at "}")
+           ((= (following-char) ?\})
             (setq brackets (1+ brackets)))
-           ((looking-at "{")
+           ((= (following-char) ?\{)
             (setq brackets (1- brackets))))))
 
-       ((looking-at ")")
+       ((= (following-char) ?\))
         (setq brackets (1+ brackets))
         (while (/= brackets 0)
           (re-search-backward "[)(]" (point-min) t)
           (cond
-           ((looking-at ")")
+           ((= (following-char) ?\))
             (setq brackets (1+ brackets)))
-           ((looking-at "(")
+           ((= (following-char) ?\()
             (setq brackets (1- brackets))))))))))
 
 
@@ -1790,7 +1790,7 @@ nil."
     (back-to-indentation)
     (when (save-excursion
             (and (not (eq (point-at-bol) (point-min)))
-                 (not (looking-at "[{]"))
+                 (not (= (following-char) ?\{))
                  (progn
                    (js--re-search-backward "[[:graph:]]" nil t)
                    (or (eobp) (forward-char))
@@ -1815,7 +1815,7 @@ nil."
     (cond
 
      ;;comma-first
-     ((looking-at ",")
+     ((= (following-char) ?\,)
       (let ((spos
              (save-excursion
                (while (looking-back "[]})\"'][\t\n ]*")
@@ -1858,7 +1858,7 @@ nil."
           (+ js-indent-level js-expr-indent-offset))))
 
      ;;dot-first
-     ((looking-at "\\.")
+     ((= (following-char) ?\.)
       (save-excursion
         (when (looking-back "[]})\"'][\t\n ]*")
           (js--backward-sexp))
