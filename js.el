@@ -1740,8 +1740,10 @@ the same column as the current line."
   "Helper function for `js--proper-indentation'.
 Go backwards over matched braces, rather than whole expressions.
 Functionality does not exactly match backward-sexp."
-  (let ((brackets 0))
+  (let ((brackets 0)
+	(rv nil))
     (while (looking-back "[]})\"'][\t\n ]*")
+      (setq rv t)
       (re-search-backward "[]})\"'][\t\n ]*" (point-min) t)
       (cond
        ((= (following-char) ?\")
@@ -1778,7 +1780,8 @@ Functionality does not exactly match backward-sexp."
            ((= (following-char) ?\))
             (setq brackets (1+ brackets)))
            ((= (following-char) ?\()
-            (setq brackets (1- brackets))))))))))
+            (setq brackets (1- brackets))))))))
+    rv))
 
 
 (defun js--ctrl-statement-indentation ()
@@ -1823,8 +1826,8 @@ nil."
 
                (cond
                 ((looking-back "[,([{].*[ \t\n]*")
-                 (re-search-backward "[,([{].*[ \t\n]*" (point-min) t)
-                 (current-column))
+		 (re-search-backward "[,([{].*[ \t\n]*" (point-min) t)
+		 (current-column))
 
                 ((looking-back "\\<var\\>.*[ \t\n]*")
                  (re-search-backward "\\<var\\>.*[ \t\n]*" (point-min) t)
@@ -1840,22 +1843,38 @@ nil."
           (+ js-indent-level js-expr-indent-offset))))
 
      ;;operator-first
-     ((looking-at "\\([-+*]\\|/[^/*]\\)")
-      (let ((spos
-             (save-excursion
-               (while (looking-back "[]})\"'][\t\n ]*")
-                 (js--backward-sexp))
+     ((looking-at "\\([+*-]\\|/[^/*]\\)")
+      (let ((spos nil))
+	(save-excursion
+	  (while (looking-back "[]})\"'][\t\n ]*")
+	    (js--backward-sexp))
 
-               (cond
-                ((looking-back "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*")
-                 (re-search-backward "\\([-=+*(]\\|/[^/*]\\).*[ \t\n]*" (point-min) t)
-                 (current-column))
+	  (while (and (not spos)
+		      (looking-back "\\([(=+*-]\\|/\\([^/*]\\|$\\)\\).*[ \t\n]*"))
+	    (unless (js--backward-sexp)
+	      (cond
 
-                (t
-                 nil)))))
-        (if spos
-            spos
-          (+ js-indent-level js-expr-indent-offset))))
+	       ((looking-back "[(].*")
+		(if (= (preceding-char) ?\()
+		    (setq spos (1- (current-column)))
+		  (backward-char)))
+
+	       ((looking-back "[=].*")
+		(if (= (preceding-char) ?\=)
+		    (setq spos (1- (current-column)))
+		  (backward-char)))
+
+	       ((looking-back "^[ \t]*\\([+*-]\\|/[^/*]\\).*")
+		(if (and (looking-back "^[ \t]*\\([+*-]\\|/\\([^/*]\\|$\\)\\)")
+			 (looking-back "[+*/-]"))
+		    (setq spos (1- (current-column)))
+		  (backward-char)))
+
+	       (t (backward-char)))))
+
+	  (if spos
+	      spos
+	    (+ js-indent-level js-expr-indent-offset)))))
 
      ;;dot-first
      ((= (following-char) ?\.)
