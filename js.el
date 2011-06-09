@@ -1864,8 +1864,8 @@ nil."
 		    (setq spos (1- (current-column)))
 		  (backward-char)))
 
-	       ((looking-back "^[ \t]*\\([+*-]\\|/[^/*]\\).*")
-		(if (and (looking-back "^[ \t]*\\([+*-]\\|/\\([^/*]\\|$\\)\\)")
+	       ((looking-back "^[^+*-]*\\([+*-]\\|/[^/*]\\).*")
+		(if (and (looking-back "^[^+*-]*\\([+*-]\\|/\\([^/*]\\|$\\)\\)")
 			 (looking-back "[+*/-]"))
 		    (setq spos (1- (current-column)))
 		  (backward-char)))
