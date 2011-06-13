@@ -506,6 +506,24 @@ getting timeout messages."
   :type 'integer
   :group 'js)
 
+(defcustom js-lazy-commas nil
+  "Whether `js-mode' should line up commas to the indent-minus-2,
+rather than trying to line up to braces."
+  :type 'boolean
+  :group 'js)
+
+(defcustom js-lazy-operators nil
+  "Whether `js-mode' should line up operators to the indent-minus-2,
+rather than trying to line up to braces."
+  :type 'boolean
+  :group 'js)
+
+(defcustom js-lazy-dots nil
+  "Whether `js-mode' should line up dots to the next indent level,
+rather than trying to line up to dots."
+  :type 'boolean
+  :group 'js)
+
 ;;; KeyMap
 
 (defvar js-mode-map
@@ -1842,7 +1860,8 @@ nil."
     (cond
 
      ;;comma-first
-     ((= (following-char) ?\,)
+     ((and (not js-lazy-commas)
+	   (= (following-char) ?\,))
       (let ((spos
              (save-excursion
 	       (while (looking-back (concat "[]})\"']" js--skip-newlines-re))
@@ -1872,8 +1891,29 @@ nil."
             spos
           (+ js-indent-level js-expr-indent-offset))))
 
+     ;;dot-first
+     ((and (not js-lazy-dots)
+	   (= (following-char) ?\.))
+      (save-excursion
+        (when (looking-back (concat "[]})\"']" js--skip-newlines-re))
+          (js--backward-sexp)
+	  (js--backward-sexp-strings))
+        (if (not (looking-back (concat "^[ \t]*\\([]})]+\\|.*\\..*\\)"
+				       js--skip-newlines-re)))
+            (progn
+              (re-search-backward concat("\\<[^ \t]+" js--skip-newlines-re)
+				  (point-min) t)
+              (re-search-backward "^" (point-min) t)
+              (back-to-indentation)
+              (+ (current-column) js-indent-level))
+          (progn
+            (re-search-backward concat("\\..*" js--skip-newlines-re)
+				(point-min) t)
+            (current-column)))))
+
      ;;operator-first
-     ((looking-at js--indent-operator-re)
+     ((and (not js-lazy-operators)
+	   (looking-at js--indent-operator-re))
       (let ((spos nil))
 	(save-excursion
 	  (while (looking-back (concat "[]})\"']" js--skip-newlines-re))
@@ -1918,24 +1958,55 @@ nil."
 	      spos
 	    (+ js-indent-level js-expr-indent-offset)))))
 
-     ;;dot-first
-     ((= (following-char) ?\.)
+     ;;lazy comma-first
+     ((and js-lazy-commas
+	   (= (following-char) ?\,))
       (save-excursion
-        (when (looking-back (concat "[]})\"']" js--skip-newlines-re))
-          (js--backward-sexp)
-	  (js--backward-sexp-strings))
-        (if (not (looking-back (concat "^[ \t]*\\([]})]+\\|.*\\..*\\)"
-				       js--skip-newlines-re)))
-            (progn
-              (re-search-backward concat("\\<[^ \t]+" js--skip-newlines-re)
+	(js--backward-sexp)
+	(cond
+
+	 ((looking-back (concat "^[ \t]*,.*" js--skip-newlines-re))
+	  (re-search-backward (concat "^[ \t],.*" js--skip-newlines-re)
+			      (point-min) t)
+	  (back-to-indentation)
+	  (current-column))
+
+	 ((looking-back (concat "^[ \t]*[^ \t\n].*" js--skip-newlines-re))
+	  (re-search-backward (concat "^[ \t]*[^ \t\n].*" js--skip-newlines-re)
+			      (point-min) t)
+	  (back-to-indentation)
+	  (- (current-column) 2))
+
+	 (t
+	  (+ js-indent-level js-expr-indent-offset)))))
+
+     ;;lazy dot-first
+     ((and js-lazy-dots
+	   (= (following-char) ?\.))
+      (save-excursion
+	(js--backward-sexp)
+	(if (looking-back (concat "^[ \t]*[^ \t\n].*" js--skip-newlines-re))
+	    (progn
+	      (re-search-backward (concat "^[ \t]*[^ \t\n].*"
+					  js--skip-newlines-re)
 				  (point-min) t)
-              (re-search-backward "^" (point-min) t)
-              (back-to-indentation)
-              (+ (current-column) js-indent-level))
-          (progn
-            (re-search-backward concat("\\..*" js--skip-newlines-re)
-				(point-min) t)
-            (current-column)))))
+	      (back-to-indentation)
+	      (+ (current-column) js-indent-level))
+	  (+ js-indent-level js-expr-indent-offset))))
+
+     ;;lazy operator-first
+     ((and js-lazy-operators
+	   (looking-at js--indent-operator-re))
+      (save-excursion
+	(js--backward-sexp)
+	(if (looking-back (concat "^[ \t]*[^ \t\n].*" js--skip-newlines-re))
+	    (progn
+	      (re-search-backward (concat "^[ \t]*[^ \t\n].*"
+					  js--skip-newlines-re)
+				  (point-min) t)
+	      (back-to-indentation)
+	      (- (current-column) 2))
+	  (+ js-indent-level js-expr-indent-offset))))
 
      ;;var special case for non-comma-first continued var statements
      ((and (looking-at "[^]})]")
