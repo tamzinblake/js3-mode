@@ -1684,6 +1684,13 @@ See `font-lock-keywords'.")
           (js--regexp-opt-symbol '("in" "instanceof")))
   "Regexp matching operators that affect indentation of continued expressions.")
 
+(defconst js--indent-brace-re
+  "[[({]"
+  "Regexp matching opening braces that affect indentation.")
+
+(defconst js--indent-newlines-re
+  "[ \t\n]*"
+  "Regexp matching any amount of trailing whitespace and newlines.")
 
 (defun js--looking-at-operator-p ()
   "Return non-nil if point is on a JavaScript operator, other than a comma."
@@ -1825,16 +1832,20 @@ nil."
                  (js--backward-sexp))
 
                (cond
-                ((looking-back "[,([{].*[ \t\n]*")
+                ((looking-back (concat "[,([{].*" js--indent-newlines-re))
 		 (re-search-backward "[,([{].*[ \t\n]*" (point-min) t)
 		 (current-column))
 
-                ((looking-back "\\<var\\>.*[ \t\n]*")
-                 (re-search-backward "\\<var\\>.*[ \t\n]*" (point-min) t)
+                ((looking-back (concat "\\<var\\>.*" js--indent-newlines-re))
+                 (re-search-backward (concat "\\<var\\>.*"
+					     js--indent-newlines-re)
+				     (point-min) t)
                  (+ (current-column) 2))
 
-                ((looking-back "\\<return\\>.*[ \t\n]*")
-                 (re-search-backward "\\<return\\>.*[ \t\n]*" (point-min) t)
+                ((looking-back (concat "\\<return\\>.*" js--indent-newlines-re))
+                 (re-search-backward (concat "\\<return\\>.*"
+					     js--indent-newlines-re)
+				     (point-min) t)
                  (+ (current-column) 5))
                 (t
                  nil)))))
@@ -1843,14 +1854,20 @@ nil."
           (+ js-indent-level js-expr-indent-offset))))
 
      ;;operator-first
-     ((looking-at "\\([+*-]\\|/[^/*]\\)")
+     ((looking-at js--indent-operator-re)
       (let ((spos nil))
 	(save-excursion
-	  (while (looking-back "[]})\"'][\t\n ]*")
+	  (while (looking-back (concat "[]})\"']" js--indent-newlines-re))
 	    (js--backward-sexp))
 
 	  (while (and (not spos)
-		      (looking-back "\\([(=+*-]\\|/\\([^/*]\\|$\\)\\).*[ \t\n]*"))
+		      (looking-back (concat "\\("
+					    js--indent-operator-re
+					    "\\|"
+					    js--indent-brace-re
+					    "\\)"
+					    ".*"
+					    js--indent-newlines-re)))
 	    (unless (js--backward-sexp)
 	      (cond
 
@@ -1864,10 +1881,15 @@ nil."
 		    (setq spos (1- (current-column)))
 		  (backward-char)))
 
-	       ((looking-back "^[^+*-]*\\([+*-]\\|/[^/*]\\).*")
-		(if (and (looking-back "^[^+*-]*\\([+*-]\\|/\\([^/*]\\|$\\)\\)")
-			 (looking-back "[+*/-]"))
-		    (setq spos (1- (current-column)))
+	       ((looking-back (concat "^[^+*-]*"
+				      js--indent-operator-re
+				      ".*"))
+		(if (and (looking-back (concat "^[^+*-]*"
+					       js--indent-operator-re))
+			 (looking-back js--indent-operator-re))
+		    (if (looking-back (concat js--indent-operator-re "."))
+			(setq spos (- (current-column) 2))
+		      (setq spos (1- (current-column))))
 		  (backward-char)))
 
 	       (t (backward-char)))))
@@ -1879,16 +1901,19 @@ nil."
      ;;dot-first
      ((= (following-char) ?\.)
       (save-excursion
-        (when (looking-back "[]})\"'][\t\n ]*")
+        (when (looking-back (concat "[]})\"']" js--indent-newlines-re))
           (js--backward-sexp))
-        (if (not (looking-back "^[ \t]*\\([]})]+\\|.*\\..*\\)[ \t\n]*"))
+        (if (not (looking-back (concat "^[ \t]*\\([]})]+\\|.*\\..*\\)"
+				       js--indent-newlines-re)))
             (progn
-              (re-search-backward "\\<[^ \t]+[ \t\n]*" (point-min) t)
+              (re-search-backward concat("\\<[^ \t]+" js--indent-newlines-re)
+				  (point-min) t)
               (re-search-backward "^" (point-min) t)
               (back-to-indentation)
               (+ (current-column) js-indent-level))
           (progn
-            (re-search-backward "\\..*[ \t\n]*" (point-min) t)
+            (re-search-backward concat("\\..*" js--indent-newlines-re)
+				(point-min) t)
             (current-column)))))
 
      ;;var special case for non-comma-first continued var statements
