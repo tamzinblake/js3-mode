@@ -1773,10 +1773,24 @@ Functionality does not exactly match backward-sexp."
       (re-search-backward (concat "[\"']" js--skip-newlines-re) (point-min) t)
       (cond
        ((= (following-char) ?\")
-        (re-search-backward "[^\\]\"" (point-min) t))
+	(cond
+	 ((looking-back "[^\\]\\([\\][\\]\\)*\".*")
+	  (re-search-backward "[^\\]\\([\\][\\]\\)*\"" (point-min) t)
+	  (forward-char))
+	 (t
+	  (re-search-backward "\\(^|[^\\]\\)\\([\\][\\]\\)*\"" (point-min) t)))
+	(while (not (= (following-char) ?\"))
+	  (forward-char)))
 
        ((= (following-char) ?\')
-        (re-search-backward "[^\\]'" (point-min) t))))
+	(cond
+	 ((looking-back "[^\\]\\([\\][\\]\\)*'.*")
+	  (re-search-backward "[^\\]\\([\\][\\]\\)*'" (point-min) t)
+	  (forward-char))
+	 (t
+	  (re-search-backward "\\(^|[^\\]\\)\\([\\][\\]\\)*'" (point-min) t)))
+	(while (not (= (following-char) ?\'))
+	  (forward-char)))))
     rv))
 
 
