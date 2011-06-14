@@ -1901,13 +1901,13 @@ nil."
         (if (not (looking-back (concat "^[ \t]*\\([]})]+\\|.*\\..*\\)"
 				       js--skip-newlines-re)))
             (progn
-              (re-search-backward concat("\\<[^ \t]+" js--skip-newlines-re)
+              (re-search-backward (concat "\\<[^ \t]+" js--skip-newlines-re)
 				  (point-min) t)
               (re-search-backward "^" (point-min) t)
               (back-to-indentation)
               (+ (current-column) js-indent-level))
           (progn
-            (re-search-backward concat("\\..*" js--skip-newlines-re)
+            (re-search-backward (concat "\\..*" js--skip-newlines-re)
 				(point-min) t)
             (current-column)))))
 
