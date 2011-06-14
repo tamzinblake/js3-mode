@@ -777,7 +777,9 @@ macro as normal text."
                (setq str-terminator ?/))
              (re-search-backward
               (concat "\\([^\\]\\|^\\)" (string str-terminator))
-              (point-at-bol) t))
+              (point-at-bol) t)
+	     (when (not (string= "" (match-string 1)))
+	       (forward-char)))
             ((nth 7 parse)
              (goto-char (nth 8 parse)))
             ((or (nth 4 parse)
@@ -800,6 +802,17 @@ removed.
 
 If invoked while inside a macro, treat the macro as normal text."
   (js--re-search-forward regexp bound noerror (if count (- count) -1)))
+
+(defun js--looking-back (regexp)
+  "This function returns t if regexp matches text before point, ending at point, and nil otherwise.
+
+This function is similar to `looking-back' but ignores comments and strings"
+  (save-excursion
+    (let ((r (if (and (= ?\= (elt regexp (1- (length regexp))))
+		      (= ?\\ (elt regexp (- (length regexp) 2))))
+		 regexp
+	       (concat regexp "\\="))))
+      (numberp (js--re-search-backward r (point-min) t)))))
 
 (defun js--forward-expression ()
   "Move forward over a whole JavaScript expression.
@@ -1698,7 +1711,7 @@ See `font-lock-keywords'.")
   "Regexp matching keywords optionally followed by an opening brace.")
 
 (defconst js--indent-operator-re
-  (concat "[-+*/%<>=&^|?:.]\\([^-+*/]\\|$\\)\\|"
+  (concat "[-+*/%<>=&^|?:]\\([^-+*/]\\|$\\)\\|"
           (js--regexp-opt-symbol '("in" "instanceof")))
   "Regexp matching operators that affect indentation of continued expressions.")
 
@@ -1761,38 +1774,16 @@ the same column as the current line."
                      (= (current-indentation) saved-indent)))))))))
 
 
-(defun js--backward-sexp-strings ()
+(defun js--backward-whitespace ()
   "Helper function for `js--proper-indentation'.
-Go backwards over matched strings, rather than whole expressions.
-Do not skip over matched braces.
-Functionality does not exactly match backward-sexp."
-  (let ((brackets 0)
-	(rv nil))
-    (while (looking-back (concat "[\"']" js--skip-newlines-re))
+Skip backwards over whitespace and comments."
+  (let ((rv nil))
+    (when (js--looking-back "[ \t\n]")
       (setq rv t)
-      (re-search-backward (concat "[\"']" js--skip-newlines-re) (point-min) t)
-      (cond
-       ((= (following-char) ?\")
-	(cond
-	 ((looking-back "[^\\]\\([\\][\\]\\)*\".*")
-	  (re-search-backward "[^\\]\\([\\][\\]\\)*\"" (point-min) t)
-	  (forward-char))
-	 (t
-	  (re-search-backward "\\(^|[^\\]\\)\\([\\][\\]\\)*\"" (point-min) t)))
-	(while (not (= (following-char) ?\"))
-	  (forward-char)))
-
-       ((= (following-char) ?\')
-	(cond
-	 ((looking-back "[^\\]\\([\\][\\]\\)*'.*")
-	  (re-search-backward "[^\\]\\([\\][\\]\\)*'" (point-min) t)
-	  (forward-char))
-	 (t
-	  (re-search-backward "\\(^|[^\\]\\)\\([\\][\\]\\)*'" (point-min) t)))
-	(while (not (= (following-char) ?\'))
-	  (forward-char)))))
+      (js--re-search-backward (concat "[^ \t\n]" js--skip-newlines-re)
+			      (point-min) t)
+      (forward-char))
     rv))
-
 
 (defun js--backward-sexp ()
   "Helper function for `js--proper-indentation'.
@@ -1801,15 +1792,16 @@ Only skip over strings while looking for braces.
 Functionality does not exactly match backward-sexp."
   (let ((brackets 0)
 	(rv nil))
-    (while (looking-back (concat "[]})]" js--skip-newlines-re))
+    (while (js--looking-back (concat "[]})]" js--skip-newlines-re))
       (setq rv t)
-      (re-search-backward (concat "[]})]" js--skip-newlines-re) (point-min) t)
+      (js--re-search-backward (concat "[]})]"
+				      js--skip-newlines-re)
+			      (point-min) t)
       (cond
        ((= (following-char) ?\])
         (setq brackets (1+ brackets))
         (while (/= brackets 0)
-	  (js--backward-sexp-strings)
-          (re-search-backward "[][]" (point-min) t)
+          (js--re-search-backward "[][]" (point-min) t)
           (cond
            ((= (following-char) ?\])
             (setq brackets (1+ brackets)))
@@ -1819,8 +1811,7 @@ Functionality does not exactly match backward-sexp."
        ((= (following-char) ?\})
         (setq brackets (1+ brackets))
         (while (/= brackets 0)
-	  (js--backward-sexp-strings)
-          (re-search-backward "[}{]" (point-min) t)
+          (js--re-search-backward "[}{]" (point-min) t)
           (cond
            ((= (following-char) ?\})
             (setq brackets (1+ brackets)))
@@ -1830,8 +1821,7 @@ Functionality does not exactly match backward-sexp."
        ((= (following-char) ?\))
         (setq brackets (1+ brackets))
         (while (/= brackets 0)
-	  (js--backward-sexp-strings)
-          (re-search-backward "[)(]" (point-min) t)
+          (js--re-search-backward "[)(]" (point-min) t)
           (cond
            ((= (following-char) ?\))
             (setq brackets (1+ brackets)))
@@ -1839,6 +1829,13 @@ Functionality does not exactly match backward-sexp."
             (setq brackets (1- brackets))))))))
     rv))
 
+(defun js--backward-clean ()
+  "Helper function for `js--proper-indentation'.
+Calls js--backward-sexp and js--backward-whitespace until they are done."
+  (let ((rv nil))
+    (while (or (js--backward-whitespace) (js--backward-sexp))
+      (setq rv t))
+    rv))
 
 (defun js--ctrl-statement-indentation ()
   "Helper function for `js--proper-indentation'.
@@ -1878,26 +1875,26 @@ nil."
 	   (= (following-char) ?\,))
       (let ((spos
              (save-excursion
-	       (while (looking-back (concat "[]})\"']" js--skip-newlines-re))
-		 (js--backward-sexp)
-		 (js--backward-sexp-strings))
+	       (js--backward-clean)
                (cond
 
-                ((looking-back (concat "[,([{].*" js--skip-newlines-re))
-		 (re-search-backward (concat "[,([{].*" js--skip-newlines-re)
-				     (point-min) t)
+                ((js--looking-back (concat "[,([{].*" js--skip-newlines-re))
+		 (js--re-search-backward (concat "[,([{].*"
+						 js--skip-newlines-re)
+					 (point-min) t)
 		 (current-column))
 
-                ((looking-back (concat "\\<var\\>.*" js--skip-newlines-re))
-                 (re-search-backward (concat "\\<var\\>.*"
-					     js--skip-newlines-re)
-				     (point-min) t)
+                ((js--looking-back (concat "\\<var\\>.*" js--skip-newlines-re))
+                 (js--re-search-backward (concat "\\<var\\>.*"
+						 js--skip-newlines-re)
+					 (point-min) t)
                  (+ (current-column) 2))
 
-                ((looking-back (concat "\\<return\\>.*" js--skip-newlines-re))
-                 (re-search-backward (concat "\\<return\\>.*"
-					     js--skip-newlines-re)
-				     (point-min) t)
+                ((js--looking-back (concat "\\<return\\>.*"
+					   js--skip-newlines-re))
+                 (js--re-search-backward (concat "\\<return\\>.*"
+						 js--skip-newlines-re)
+					 (point-min) t)
                  (+ (current-column) 5))
                 (t
                  nil)))))
@@ -1909,68 +1906,50 @@ nil."
      ((and (not js-lazy-dots)
 	   (= (following-char) ?\.))
       (save-excursion
-        (when (looking-back (concat "[]})\"']" js--skip-newlines-re))
-          (js--backward-sexp)
-	  (js--backward-sexp-strings))
-        (if (not (looking-back (concat "^[ \t]*\\([]})]+\\|.*\\..*\\)"
-				       js--skip-newlines-re)))
+	(js--backward-clean)
+        (if (not (js--looking-back (concat "^[ \t]*\\([]})]+\\|.*\\..*\\)"
+					   js--skip-newlines-re)))
             (progn
-              (re-search-backward (concat "\\<[^ \t]+" js--skip-newlines-re)
-				  (point-min) t)
-              (re-search-backward "^" (point-min) t)
+              (js--re-search-backward (concat "\\<[^ \t]+" js--skip-newlines-re)
+				      (point-min) t)
+              (js--re-search-backward "^" (point-min) t)
               (back-to-indentation)
               (+ (current-column) js-indent-level))
           (progn
-            (re-search-backward (concat "\\..*" js--skip-newlines-re)
-				(point-min) t)
+            (js--re-search-backward (concat "\\..*" js--skip-newlines-re)
+				    (point-min) t)
             (current-column)))))
 
      ;;operator-first
      ((and (not js-lazy-operators)
 	   (looking-at js--indent-operator-re))
-      (let ((spos nil))
-	(save-excursion
-	  (while (looking-back (concat "[]})\"']" js--skip-newlines-re))
-	    (js--backward-sexp)
-	    (js--backward-sexp-strings))
+      (let ((spos
+	     (save-excursion
+	       (js--backward-clean)
+	       (cond
+		((js--looking-back (concat "\\("
+					   js--indent-brace-re
+					   "\\|=\\).*"))
+		 (js--re-search-backward (concat "\\("
+						 js--indent-brace-re
+						 "\\|=\\).*")
+					 (point-min) t)
+		 (current-column))
 
-	  (while (and (not spos)
-		      (looking-back (concat "\\("
-					    js--indent-operator-re
-					    "\\|"
-					    js--indent-brace-re
-					    "\\)"
-					    ".*"
-					    js--skip-newlines-re)))
-	    (unless (or (js--backward-sexp) (js--backward-sexp-strings))
-	      (cond
+		((js--looking-back (concat "^[^+*/-]*"
+					   js--indent-operator-re ".*"))
+		 (js--re-search-backward (concat "^[^+*/-]*"
+						 js--indent-operator-re ".*")
+					 (point-min) t)
+		 (js--re-search-forward js--indent-operator-re nil t)
+		 (js--re-search-backward js--indent-operator-re (point-min) t)
+		 (current-column))
 
-	       ((looking-back "[(].*")
-		(if (= (preceding-char) ?\()
-		    (setq spos (1- (current-column)))
-		  (backward-char)))
-
-	       ((looking-back "[=].*")
-		(if (= (preceding-char) ?\=)
-		    (setq spos (1- (current-column)))
-		  (backward-char)))
-
-	       ((looking-back (concat "^[^+*-]*"
-				      js--indent-operator-re
-				      ".*"))
-		(if (and (looking-back (concat "^[^+*-]*"
-					       js--indent-operator-re))
-			 (looking-back js--indent-operator-re))
-		    (if (looking-back (concat js--indent-operator-re "."))
-			(setq spos (- (current-column) 2))
-		      (setq spos (1- (current-column))))
-		  (backward-char)))
-
-	       (t (backward-char)))))
-
-	  (if spos
-	      spos
-	    (+ js-indent-level js-expr-indent-offset)))))
+		(t
+		 nil)))))
+	(if spos
+	    spos
+	  (+ js-indent-level js-expr-indent-offset))))
 
      ;;lazy comma-first
      ((and js-lazy-commas
@@ -1979,9 +1958,9 @@ nil."
 	(js--backward-sexp)
 	(cond
 
-	 ((looking-back (concat "^[ \t]*,.*" js--skip-newlines-re))
-	  (re-search-backward (concat "^[ \t],.*" js--skip-newlines-re)
-			      (point-min) t)
+	 ((js--looking-back (concat "^[ \t]*,.*" js--skip-newlines-re))
+	  (js--re-search-backward (concat "^[ \t],.*" js--skip-newlines-re)
+				  (point-min) t)
 	  (back-to-indentation)
 	  (current-column))
 
@@ -2029,7 +2008,7 @@ nil."
            (js2-node-type (js2-node-parent (js2-node-at-point)))
            (= js2-VAR (js2-node-type (js2-node-parent (js2-node-at-point)))))
       (save-excursion
-        (re-search-backward "\\<var\\>" (point-min) t)
+        (js--re-search-backward "\\<var\\>" (point-min) t)
         (+ (current-column) 4)))
 
      ((nth 4 parse-status)
