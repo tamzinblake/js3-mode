@@ -26,6 +26,8 @@ The .emacs file included contains what you need to stick the 2 modes together.
 
 For known compatible/incompatible versions of emacs, see compat.md - feel free to let me know if it is compatible or incompatible with your version of emacs.
 
+A future version is likely to simply be a fork of js2-mode with better indentation.
+
 ## Notes ##
 
 Using this will entail having 2 separate JS parsers running, so sometimes it takes a while to 'catch up' - if the indentation on a line looks off, try pressing TAB again.  Right now it looks like this only happens with non-comma-first continued var statements.  A future version will be a single mode based on JS2-mode (which has a better JS parser) which should solve some of these problems.
@@ -34,7 +36,7 @@ If your JS is in error, the indentation might look wrong.  I tend to regard this
 
 Remember - if you start a line with `(`, `[`, `+`, or `-`, strongly consider preceding it with a semicolon (`;`).
 
-**I expect that there are still some bugs; if you see any, please report them.**  I have a sneaking suspicion that I'm not handling lines with comments very well. **Feel free to file issue reports on github for things like "it indented like [code block] but I want it to be [code block]".**
+I expect that there are still some bugs; if you see any, **please report them**. Feel free to **file issue reports on github** for things like "it indented like [code block] but I want it to be [code block]".
 
 ## License ##
 
