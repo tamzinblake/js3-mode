@@ -1,36 +1,33 @@
 ## js-mode ##
 
-An improved chimeric fork of js-mode and js2-mode that supports comma-first style and other quirks.
+A chimeric fork of js-mode (included with emacs 24) and [js2-mode](http://code.google.com/p/js2-mode/) that supports comma-first style and other quirks.
 
-The goal of this project was to get a javascript mode working that supports [npm style](https://github.com/isaacs/npm/blob/master/doc/coding-style.md), but it turns out this mode is compatible with other styles as well. Most of the credit for the indentation goes to js-mode, with some handy special cases put in by yours truly.
+The goal of this project was to get a javascript mode working that supports [npm style](https://github.com/isaacs/npm/blob/master/doc/coding-style.md), but it turns out this mode is compatible with other styles as well.
+
+Since js2-mode already used indentation code copied from js-mode (then called espresso-mode) it was straightforward to update the indentation code using the official js-mode, and then make relevant changes.
+
+Notably, this js2-mode does not support bounce-indent, though it does support several popular indentation styles.
 
 ## Credits ##
 
 Created by [Thom Blake](https://github.com/thomblake).
 
-Forked from js-mode and js2-mode.
+Forked from js-mode (included with emacs 24) and [js2-mode](http://code.google.com/p/js2-mode/).
+
+There are also several changes rolled in from [mooz and dgutov's fork](https://github.com/mooz/js2-mode/) on a piecemeal basis.
 
 Inspired by [A better coding convention for lists and object literals in Javascript](https://gist.github.com/357981) and [npm style](https://github.com/isaacs/npm/blob/master/doc/coding-style.md).
 
-With help from [Cheeso on StackOverflow](http://stackoverflow.com/questions/6144930/emacs-js-mode-for-npm-style) and [Mihai Bazon](http://mihai.bazon.net/projects/editing-javascript-with-emacs-js2-mode)
+Special thanks to:
 
-The js2-mode included here is basically Steve Yegge's js2-mode version 20090723 findable [here](http://code.google.com/p/js2-mode/) with some reasonable defaults set.  I expect to be improving this as time goes on.
-
-The js-mode included here is the one included with emacs version 24, with some modifications to the way it indents in certain cases and added backwards-compatibility for emacs version 23.2.
+ * [Cheeso on StackOverflow](http://stackoverflow.com/questions/6144930/emacs-js-mode-for-npm-style)
+ * [Mihai Bazon](http://mihai.bazon.net/projects/editing-javascript-with-emacs-js2-mode)
 
 ## Installation ##
 
-Both js.el and js2.el should be placed in your emacs include path. You'll need to byte-compile js2-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js2.el> RET`.  If you want, js2-mode can be configured using `M-x customize-group RET js2-mode RET`.  See [here](http://code.google.com/p/js2-mode/wiki/InstallationInstructions) for detailed installation instructions on js2-mode.
-
-The .emacs file included contains what you need to stick the 2 modes together.
-
-For known compatible/incompatible versions of emacs, see compat.md - feel free to let me know if it is compatible or incompatible with your version of emacs.
-
-A future version is likely to simply be a fork of js2-mode with better indentation.
+js2.el should be placed in your emacs include path. You'll need to byte-compile js2-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js2.el> RET`.  If you want, js2-mode can be configured using `M-x customize-group RET js2-mode RET`.  See [here](http://code.google.com/p/js2-mode/wiki/InstallationInstructions) for detailed installation instructions on js2-mode.
 
 ## Notes ##
-
-Using this will entail having 2 separate JS parsers running, so sometimes it takes a while to 'catch up' - if the indentation on a line looks off, try pressing TAB again.  Right now it looks like this only happens with non-comma-first continued var statements.  A future version will be a single mode based on JS2-mode (which has a better JS parser) which should solve some of these problems.
 
 If your JS is in error, the indentation might look wrong.  I tend to regard this as a feature.
 
@@ -52,6 +49,3 @@ PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses/.
-
-(Several programs included and referenced here are GPL, so this is too
-why not.)
