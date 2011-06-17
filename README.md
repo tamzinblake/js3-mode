@@ -4,28 +4,19 @@ A chimeric fork of js-mode (included with emacs 24) and [js2-mode](http://code.g
 
 The goal of this project was to get a javascript mode working that supports [npm style](https://github.com/isaacs/npm/blob/master/doc/coding-style.md), but it turns out this mode is compatible with other styles as well.
 
-Since js2-mode already used indentation code copied from js-mode (then called espresso-mode) it was straightforward to update the indentation code using the official js-mode, and then make relevant changes.
-
 Notably, js3-mode does not support js2-mode's bounce-indent, though it does support several popular indentation styles.
 
 ## Credits ##
 
 Created by [Thom Blake](https://github.com/thomblake).
 
-Forked from js-mode (included with emacs 24) and [js2-mode](http://code.google.com/p/js2-mode/).
-
-There are also several changes rolled in from [mooz and dgutov's fork](https://github.com/mooz/js2-mode/) on a piecemeal basis.
-
-Inspired by [A better coding convention for lists and object literals in Javascript](https://gist.github.com/357981) and [npm style](https://github.com/isaacs/npm/blob/master/doc/coding-style.md).
-
-Special thanks to:
-
- * [Cheeso on StackOverflow](http://stackoverflow.com/questions/6144930/emacs-js-mode-for-npm-style)
- * [Mihai Bazon](http://mihai.bazon.net/projects/editing-javascript-with-emacs-js2-mode)
+For more credits, see https://github.com/thomblake/js3-mode/wiki/Credits
 
 ## Installation ##
 
-js3.el should be placed in your emacs include path. You'll need to byte-compile js3-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js3.el> RET`.  If you want, js3-mode can be configured using `M-x customize-group RET js3-mode RET`.  See [the wiki](https://github.com/thomblake/js3-mode/wiki/Installation) for more details.
+js3.el should be placed in your emacs include path. You'll need to byte-compile js3-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js3.el> RET`.  If you want, js3-mode can be configured using `M-x customize-group RET js3-mode RET`.
+
+For more details, see https://github.com/thomblake/js3-mode/wiki/Installation
 
 ## Notes ##
 
