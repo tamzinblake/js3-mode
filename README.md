@@ -1,4 +1,4 @@
-## js-mode ##
+## js3-mode ##
 
 A chimeric fork of js-mode (included with emacs 24) and [js2-mode](http://code.google.com/p/js2-mode/) that supports comma-first style and other quirks.
 
@@ -6,7 +6,7 @@ The goal of this project was to get a javascript mode working that supports [npm
 
 Since js2-mode already used indentation code copied from js-mode (then called espresso-mode) it was straightforward to update the indentation code using the official js-mode, and then make relevant changes.
 
-Notably, this js2-mode does not support bounce-indent, though it does support several popular indentation styles.
+Notably, js3-mode does not support js2-mode's bounce-indent, though it does support several popular indentation styles.
 
 ## Credits ##
 
@@ -25,7 +25,7 @@ Special thanks to:
 
 ## Installation ##
 
-js2.el should be placed in your emacs include path. You'll need to byte-compile js2-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js2.el> RET`.  If you want, js2-mode can be configured using `M-x customize-group RET js2-mode RET`.  See [here](http://code.google.com/p/js2-mode/wiki/InstallationInstructions) for detailed installation instructions on js2-mode.
+js3.el should be placed in your emacs include path. You'll need to byte-compile js3-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js3.el> RET`.  If you want, js3-mode can be configured using `M-x customize-group RET js3-mode RET`.  See [here](http://code.google.com/p/js2-mode/wiki/InstallationInstructions) for detailed installation instructions on js2-mode.
 
 ## Notes ##
 
