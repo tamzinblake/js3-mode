@@ -1,6 +1,6 @@
-//This file describes the js-lazy-commas, js-lazy-operators, and
-// js-lazy-dots config options.
-//It is recommended that if you use js-lazy-commas or js-lazy-operators,
+//This file describes the js3-lazy-commas, js3-lazy-operators, and
+// js3-lazy-dots config options.
+//It is recommended that if you use js3-lazy-commas or js3-lazy-operators,
 // then you should use both, due to the funky indentation it causes otherwise
 
 /*
@@ -10,20 +10,20 @@
 (custom-set-variables
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(js-lazy-commas t)
- '(js-lazy-operators t)
- '(js-lazy-dots t)
- '(js-expr-indent-offset 2)
- '(js-paren-indent-offset 2)
- '(js-square-indent-offset 2)
- '(js-curly-indent-offset 2))
+ '(js3-lazy-commas t)
+ '(js3-lazy-operators t)
+ '(js3-lazy-dots t)
+ '(js3-expr-indent-offset 2)
+ '(js3-paren-indent-offset 2)
+ '(js3-square-indent-offset 2)
+ '(js3-curly-indent-offset 2))
 */
 
 /*
-*   js-lazy-commas
+*   js3-lazy-commas
 */
 
-//By default, js-mode supports the following comma-first style:
+//By default, js3-mode supports the following comma-first style:
 
 var obj1 = { prop1: { prop1: "val1"
                     , prop2: "val2"
@@ -31,7 +31,7 @@ var obj1 = { prop1: { prop1: "val1"
            , prop2: "val3"
            }
 
-//By turning on js-lazy-commas with the recommended settings, you can use
+//By turning on js3-lazy-commas with the recommended settings, you can use
 // the following style:
 
 var obj2 = {
@@ -48,18 +48,18 @@ var obj2 = {
 (custom-set-variables
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(js-lazy-commas t)
- '(js-expr-indent-offset 2)
- '(js-paren-indent-offset 2)
- '(js-square-indent-offset 2)
- '(js-curly-indent-offset 2))
+ '(js3-lazy-commas t)
+ '(js3-expr-indent-offset 2)
+ '(js3-paren-indent-offset 2)
+ '(js3-square-indent-offset 2)
+ '(js3-curly-indent-offset 2))
 */
 
 /*
-*   js-lazy-operators
+*   js3-lazy-operators
 */
 
-//By default, js-mode supports the following operator-first style:
+//By default, js3-mode supports the following operator-first style:
 
 var result1 = ( 5
               + 7
@@ -67,7 +67,7 @@ var result1 = ( 5
               * 5
               )
 
-//By turning on js-lazy-operators with the recommended settings, you can use
+//By turning on js3-lazy-operators with the recommended settings, you can use
 // the following style:
 
 var result2 = (
@@ -83,24 +83,24 @@ var result2 = (
 (custom-set-variables
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(js-lazy-operators t)
- '(js-expr-indent-offset 2)
- '(js-paren-indent-offset 2)
- '(js-square-indent-offset 2)
- '(js-curly-indent-offset 2))
+ '(js3-lazy-operators t)
+ '(js3-expr-indent-offset 2)
+ '(js3-paren-indent-offset 2)
+ '(js3-square-indent-offset 2)
+ '(js3-curly-indent-offset 2))
 */
 
 /*
-*   js-lazy-dots
+*   js3-lazy-dots
 */
 
-//By default, js-mode supports the following dot-first style:
+//By default, js3-mode supports the following dot-first style:
 //(indent to the previous dot)
 
 foo.bar()
    .baz()
 
-//By turning on js-lazy-dots, you can use the following style:
+//By turning on js3-lazy-dots, you can use the following style:
 //(indent once)
 
 foo.bar()
@@ -112,6 +112,6 @@ foo.bar()
 (custom-set-variables
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
- '(js-lazy-dots t)
+ '(js3-lazy-dots t)
 */
 

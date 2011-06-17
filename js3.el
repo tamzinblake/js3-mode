@@ -321,6 +321,7 @@ Set `js3-include-gears-externs' to t to include them.")
 
 (eval-when-compile
   (require 'cl))
+  (require 'thingatpt)                    ; forward-symbol etc
 
 (eval-and-compile
   (require 'cc-mode)     ; (only) for `c-populate-syntax-table'
@@ -10022,12 +10023,21 @@ of continued expressions.")
   "[ \t\n]*"
   "Regexp matching any amount of trailing whitespace and newlines.")
 
-(defconst js3--opt-cpp-start "^\\s-*#\\s-*\\([[:alnum:]]+\\)"
+(defconst js3-opt-cpp-start "^\\s-*#\\s-*\\([[:alnum:]]+\\)"
   "Regexp matching the prefix of a cpp directive.
 This includes the directive name, or nil in languages without
 preprocessor support.  The first submatch surrounds the directive
 name.")
 
+(defun js3-backward-sws ()
+  "Move backward through whitespace and comments."
+  (interactive)
+  (while (forward-comment -1)))
+
+(defun js3-forward-sws ()
+  "Move forward through whitespace and comments."
+  (interactive)
+  (while (forward-comment 1)))
 
 (defun js3-beginning-of-macro (&optional lim)
   (let ((here (point)))
@@ -10164,6 +10174,17 @@ removed.
 If invoked while inside a macro, treat the macro as normal text."
   (js3-re-search-forward regexp bound noerror (if count (- count) -1)))
 
+
+(defun js3-looking-back (regexp)
+  "This function returns t if regexp matches text before point, ending at point, and nil otherwise.
+
+This function is similar to `looking-back' but ignores comments and strings"
+  (save-excursion
+    (let ((r (if (and (= ?\= (elt regexp (1- (length regexp))))
+		      (= ?\\ (elt regexp (- (length regexp) 2))))
+		 regexp
+	       (concat regexp "\\="))))
+      (numberp (js3-re-search-backward r (point-min) t)))))
 
 (defun js3-looking-at-operator-p ()
   "Return non-nil if point is on a JavaScript operator, other than a comma."
