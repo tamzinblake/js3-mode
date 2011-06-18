@@ -10469,6 +10469,7 @@ nil."
 
      ;;var special case for non-comma-first continued var statements
      ((and (looking-at "[^]})]")
+	   (not (looking-at "\\<var\\>"))
            (js3-node-at-point)
            (js3-node-parent (js3-node-at-point))
            (js3-node-type (js3-node-parent (js3-node-at-point)))
