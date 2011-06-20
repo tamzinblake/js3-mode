@@ -360,6 +360,12 @@ Similar to `c-basic-offset'."
   :type 'integer)
 (make-variable-buffer-local 'js3-basic-offset)
 
+(defcustom js3-pretty-vars t
+  "Non-nil to try to indent comma-last continued var statements in a pretty way.
+Does not affect comma-first continued var statements."
+  :group 'js3-mode
+  :type 'boolean)
+
 (defcustom js3-cleanup-whitespace t
   "Non-nil to invoke `delete-trailing-whitespace' before saves."
   :type 'boolean
@@ -10468,7 +10474,8 @@ nil."
 	  (+ js3-indent-level js3-expr-indent-offset))))
 
      ;;var special case for non-comma-first continued var statements
-     ((and (looking-at "[^]})]")
+     ((and js3-pretty-vars
+	   (looking-at "[^]})]")
 	   (not (looking-at "\\<var\\>"))
            (js3-node-at-point)
            (js3-node-parent (js3-node-at-point))
