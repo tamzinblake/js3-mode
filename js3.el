@@ -10443,7 +10443,7 @@ nil."
 	(cond
 
 	 ((js3-looking-back (concat "^[ \t]*,.*" js3-skip-newlines-re))
-	  (js3-re-search-backward (concat "^[ \t],.*" js3-skip-newlines-re)
+	  (js3-re-search-backward (concat "^[ \t]*,.*" js3-skip-newlines-re)
 				  (point-min) t)
 	  (back-to-indentation)
 	  (current-column))
