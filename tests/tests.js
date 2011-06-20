@@ -183,13 +183,13 @@ function commaFirstStyle () {
   //function body should be indented one step from beginning of property name
   //issue #22
   a = { f: function () {
-    var a = g
-          + h
+             var a = g
+                   + h
 
-    return [ a
-           , g
-           ]
-  }
+             return [ a
+                    , g
+                    ]
+           }
       }
 
   //test c20
@@ -204,13 +204,13 @@ function commaFirstStyle () {
                                 comment */
                          , h
                          ) {
-             var a = g
-                   + h
+                  var a = g
+                        + h
 
-             return [ a
-                    , g
-                    ]
-           }
+                  return [ a
+                         , g
+                         ]
+                }
            }
     , rv2 = a
 
@@ -228,11 +228,11 @@ function commaFirstStyle () {
 }
 
 function commaLastStyle () {
-                 /* Cases for comma-last, operator-last, and dot-last style */
-                 /* BASIC CASES */
+  /* Cases for comma-last, operator-last, and dot-last style */
+  /* BASIC CASES */
 
-                 //test s1
-                 //indent to one space after 'var', so 'a' lines up with 'b'
+  //test s1
+  //indent to one space after 'var', so 'a' lines up with 'b'
   var a = "ape",
       b = "bat",
       c = "cat",
@@ -308,8 +308,8 @@ function commaLastStyle () {
 
   /* OTHER CASES */
   /* This section contains cases which have historically been problematic,
-      * or which illustrate past issues
-      */
+   * or which illustrate past issues
+   */
 
   //test s8
   //the second line should not even temporarily be indented past the first line

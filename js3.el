@@ -10363,6 +10363,13 @@ nil."
     (back-to-indentation)
     (cond
 
+     ;;inside a comment - indent like c
+     ((nth 4 parse-status)
+      (js3-get-c-offset 'c (nth 8 parse-status)))
+
+     ;;inside a string - indent to 0 since you can't do that.
+     ((nth 8 parse-status) 0)
+
      ;;comma-first
      ((and (not js3-lazy-commas)
 	   (= (following-char) ?\,))
@@ -10541,13 +10548,16 @@ nil."
         (js3-re-search-backward "\\<var\\>" (point-min) t)
         (+ (current-column) 4)))
 
-     ((nth 4 parse-status)
-      (js3-get-c-offset 'c (nth 8 parse-status)))
-     ((nth 8 parse-status) 0) ; inside string
+     ;;indent control statement body without braces, if applicable
      ((js3-ctrl-statement-indentation))
+
+     ;;c preprocessor - indent to 0
      ((eq (char-after) ?#) 0)
+
+     ;;we're in a cpp macro - indent to 4 why not
      ((save-excursion (js3-beginning-of-macro)) 4)
 
+     ;;inside a parenthetical grouping
      ((nth 1 parse-status)
       ;; A single closing paren/bracket should be indented at the
       ;; same level as the opening statement. Same goes for
@@ -10559,8 +10569,12 @@ nil."
         (if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
             (progn ; nothing following the opening paren/bracket
               (skip-syntax-backward " ")
-              (when (eq (char-before) ?\)) (backward-list))
-              (back-to-indentation)
+              (when (eq (char-before) ?\)) (backward-list)) ;skip arg list
+	      (if (js3-looking-back (concat "\\<function\\>"
+					    js3-skip-newlines-re))
+		  (js3-re-search-backward (concat "\\<function\\>"
+						  js3-skip-newlines-re))
+		(back-to-indentation))
               (cond (same-indent-p
                      (current-column))
                     (continued-expr-p
@@ -10580,8 +10594,11 @@ nil."
             (skip-chars-forward " \t"))
           (current-column))))
 
+     ;;in a continued expression not handled by earlier cases
      ((js3-continued-expression-p)
       (+ js3-indent-level js3-expr-indent-offset))
+
+     ;;if none of these cases, then indent to 0
      (t 0))))
 
 (defun js3-indent-line ()
