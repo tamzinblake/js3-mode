@@ -360,6 +360,11 @@ Similar to `c-basic-offset'."
   :type 'integer)
 (make-variable-buffer-local 'js3-basic-offset)
 
+(defcustom js3-indent-tabs-mode nil
+  "Default setting for indent-tabs-mode for js3-mode."
+  :group 'js3-mode
+  :type 'boolean)
+
 (defcustom js3-pretty-vars t
   "Non-nil to try to indent comma-last continued var statements in a pretty way.
 Does not affect comma-first continued var statements."
@@ -10566,6 +10571,7 @@ nil."
   (set (make-local-variable 'max-lisp-eval-depth)
        (max max-lisp-eval-depth 3000))
   (set (make-local-variable 'indent-line-function) #'js3-indent-line)
+  (set (make-local-variable 'indent-tabs-mode) js3-indent-tabs-mode)
 
   ;; I tried an "improvement" to `c-fill-paragraph' that worked out badly
   ;; on most platforms other than the one I originally wrote it on.  So it's
