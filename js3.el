@@ -10482,7 +10482,9 @@ nil."
 					  js3-skip-newlines-re)
 				  (point-min) t)
 	      (back-to-indentation)
-	      (- (current-column) 2))
+	      (if (looking-at js3-indent-operator-first-re)
+		  (current-column)
+		(- (current-column) 2)))
 	  (+ js3-indent-level js3-expr-indent-offset))))
 
      ;;var special case for non-comma-first continued var statements
