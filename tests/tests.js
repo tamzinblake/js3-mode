@@ -166,7 +166,7 @@ function commaFirstStyle () {
 
   //test c17
   //properly ignoring '{' in strings
-        //issue #12
+  //issue #12
   var foo = { prop: '{baz'
             }
     , bar
@@ -175,13 +175,13 @@ function commaFirstStyle () {
   //'+ e' should line up with '+ d'
   //issue #21
   a = { b : c + d
-      + e
+              + e
       }
 
   //test c19
   //function expression in object literal
   //function body should be indented one step from beginning of property name
-      //issue #22
+  //issue #22
   a = { f: function () {
     var a = g
           + h
@@ -213,6 +213,16 @@ function commaFirstStyle () {
            }
            }
     , rv2 = a
+
+  //test c21
+  // ? : operators
+  // : should line up with colon or brace or = if available.
+  a = ( b ? c
+      : d ? e
+      : f
+      )
+
+  //end comma-first tests
 
   return 1
 }
@@ -306,6 +316,8 @@ function commaLastStyle () {
   //issue #18
   var a1
   var b1
+
+  //end comma-last tests
 
   return 1
 }

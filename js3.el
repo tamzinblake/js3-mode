@@ -10026,8 +10026,14 @@ followed by an opening brace.")
   "Regular expression matching operators that affect indentation
 of continued expressions.")
 
-(defconst js3-indent-operator-first-re
+(defconst js3-indent-lazy-operator-re
   (concat "[-+*/%<>=&^|?:]\\([^-+*/]\\|$\\)\\|"
+          (regexp-opt '("in" "instanceof") 'words))
+  "Regular expression matching operators that affect indentation
+of continued expressions in lazy-operator-first style.")
+
+(defconst js3-indent-operator-first-re
+  (concat "[-+*/%<>=&^|]\\([^-+*/]\\|$\\)\\|"
           (regexp-opt '("in" "instanceof") 'words))
   "Regular expression matching operators that affect indentation
 of continued expressions with operator-first style.")
@@ -10035,6 +10041,10 @@ of continued expressions with operator-first style.")
 (defconst js3-indent-brace-re
   "[[({]"
   "Regexp matching opening braces that affect indentation.")
+
+(defconst js3-indent-operator-brace-re
+  "[[(]"
+  "Regexp matching opening braces that affect operator indentation.")
 
 (defconst js3-skip-newlines-re
   "[ \t\n]*"
@@ -10403,6 +10413,33 @@ nil."
 				    (point-min) t)
             (current-column)))))
 
+     ;;operator-first colon
+     ((and (not js3-lazy-operators)
+	   (= (following-char) ?\:))
+      (let ((spos
+	     (save-excursion
+	       (js3-backward-clean)
+	       (cond
+		((js3-looking-back (concat "\\("
+					   js3-indent-brace-re
+					   "\\|=\\|:\\).*"))
+		 (js3-re-search-backward (concat "\\("
+						 js3-indent-brace-re
+						 "\\|=\\|:\\).*")
+					 (point-min) t)
+		 (current-column))
+
+		((js3-looking-back (concat js3-indent-operator-re ".*"))
+		 (js3-re-search-backward (concat js3-indent-operator-re ".*")
+					 (point-min) t)
+		 (current-column))
+
+		(t
+		 nil)))))
+	(if spos
+	    spos
+	  (+ js3-indent-level js3-expr-indent-offset))))
+
      ;;operator-first
      ((and (not js3-lazy-operators)
 	   (looking-at js3-indent-operator-first-re))
@@ -10411,22 +10448,27 @@ nil."
 	       (js3-backward-clean)
 	       (cond
 		((js3-looking-back (concat "\\("
-					   js3-indent-brace-re
-					   "\\|=\\).*"))
+					   js3-indent-operator-brace-re
+					   "\\|=\\)[^{\n]*\\="))
 		 (js3-re-search-backward (concat "\\("
-						 js3-indent-brace-re
-						 "\\|=\\).*")
+						 js3-indent-operator-brace-re
+						 "\\|=\\)[^{\n]*\\=")
 					 (point-min) t)
 		 (current-column))
 
-		((js3-looking-back (concat "^[^+*/-]*"
-					   js3-indent-operator-first-re ".*"))
-		 (js3-re-search-backward (concat "^[^+*/-]*"
+		((js3-looking-back (concat "\\([{]\\|^\\)[^+*/-]*"
+					   js3-indent-operator-first-re
+					   "[^{\n]*\\="))
+		 (js3-re-search-backward (concat "\\([{]\\|^\\)[^+*/-]*"
 						 js3-indent-operator-first-re
-						 ".*")
+						 "[^{\n]*\\=")
 					 (point-min) t)
-		 (js3-re-search-forward js3-indent-operator-first-re nil t)
-		 (js3-re-search-backward js3-indent-operator-first-re (point-min) t)
+		 (js3-re-search-forward (concat js3-indent-operator-first-re
+						"[^{\n]*$")
+					nil t)
+		 (js3-re-search-backward (concat js3-indent-operator-first-re
+						 "[^{\n]*\\=")
+					 (point-min) t)
 		 (current-column))
 
 		(t
@@ -10473,7 +10515,7 @@ nil."
 
      ;;lazy operator-first
      ((and js3-lazy-operators
-	   (looking-at js3-indent-operator-first-re))
+	   (looking-at js3-indent-lazy-operator-re))
       (save-excursion
 	(js3-backward-sexp)
 	(if (looking-back (concat "^[ \t]*[^ \t\n].*" js3-skip-newlines-re))
@@ -10482,7 +10524,7 @@ nil."
 					  js3-skip-newlines-re)
 				  (point-min) t)
 	      (back-to-indentation)
-	      (if (looking-at js3-indent-operator-first-re)
+	      (if (looking-at js3-indent-lazy-operator-re)
 		  (current-column)
 		(- (current-column) 2)))
 	  (+ js3-indent-level js3-expr-indent-offset))))
