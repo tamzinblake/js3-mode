@@ -201,7 +201,7 @@ function commaFirstStyle () {
                 , e
                 ]
            , f: function ( g /* silly multiline
-      comment */
+                                comment */
                          , h
                          ) {
              var a = g
@@ -214,7 +214,7 @@ function commaFirstStyle () {
            }
     , rv2 = a
 
-                 return 1
+  return 1
 }
 
 function commaLastStyle () {
@@ -274,7 +274,7 @@ function commaLastStyle () {
   //test s5
   //continued dot expression indents one level
   a.b.
-  c()
+    c()
 
   //test s6
   //in square brackets, indent one level

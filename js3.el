@@ -10021,10 +10021,16 @@ not `js3-NAME', then we use the token info saved in instance vars."
 followed by an opening brace.")
 
 (defconst js3-indent-operator-re
-  (concat "[-+*/%<>=&^|?:]\\([^-+*/]\\|$\\)\\|"
+  (concat "[-+*/%<>=&^|?:.]\\([^-+*/]\\|$\\)\\|"
           (regexp-opt '("in" "instanceof") 'words))
   "Regular expression matching operators that affect indentation
 of continued expressions.")
+
+(defconst js3-indent-operator-first-re
+  (concat "[-+*/%<>=&^|?:]\\([^-+*/]\\|$\\)\\|"
+          (regexp-opt '("in" "instanceof") 'words))
+  "Regular expression matching operators that affect indentation
+of continued expressions with operator-first style.")
 
 (defconst js3-indent-brace-re
   "[[({]"
@@ -10399,7 +10405,7 @@ nil."
 
      ;;operator-first
      ((and (not js3-lazy-operators)
-	   (looking-at js3-indent-operator-re))
+	   (looking-at js3-indent-operator-first-re))
       (let ((spos
 	     (save-excursion
 	       (js3-backward-clean)
@@ -10414,12 +10420,13 @@ nil."
 		 (current-column))
 
 		((js3-looking-back (concat "^[^+*/-]*"
-					   js3-indent-operator-re ".*"))
+					   js3-indent-operator-first-re ".*"))
 		 (js3-re-search-backward (concat "^[^+*/-]*"
-						 js3-indent-operator-re ".*")
+						 js3-indent-operator-first-re
+						 ".*")
 					 (point-min) t)
-		 (js3-re-search-forward js3-indent-operator-re nil t)
-		 (js3-re-search-backward js3-indent-operator-re (point-min) t)
+		 (js3-re-search-forward js3-indent-operator-first-re nil t)
+		 (js3-re-search-backward js3-indent-operator-first-re (point-min) t)
 		 (current-column))
 
 		(t
@@ -10466,7 +10473,7 @@ nil."
 
      ;;lazy operator-first
      ((and js3-lazy-operators
-	   (looking-at js3-indent-operator-re))
+	   (looking-at js3-indent-operator-first-re))
       (save-excursion
 	(js3-backward-sexp)
 	(if (looking-back (concat "^[ \t]*[^ \t\n].*" js3-skip-newlines-re))
