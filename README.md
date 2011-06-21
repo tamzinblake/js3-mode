@@ -22,9 +22,17 @@ For more details, see https://github.com/thomblake/js3-mode/wiki/Installation
 
 If your JS is in error, the indentation might look wrong.  I tend to regard this as a feature.
 
-Remember - if you start a line with `(`, `[`, `+`, or `-`, strongly consider preceding it with a semicolon (`;`).
+I use the default settings, plus the following which are turned off by default for historical reasons:
+
+```elisp
+ '(js3-auto-indent-p t)         ; it's nice for commas to right themselves.
+ '(js3-enter-indents-newline t) ; don't need to push tab before typing
+ '(js3-indent-on-enter-key t)   ; fix indenting before moving on
+```
 
 I expect that there are still some bugs; if you see any, **please report them**. Feel free to **file issue reports on github** for things like "it indented like [code block] but I want it to be [code block]".
+
+Remember - if you start a line with `(`, `[`, `+`, or `-`, strongly consider preceding it with a semicolon (`;`).
 
 ## License ##
 
