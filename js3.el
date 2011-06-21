@@ -8323,7 +8323,9 @@ Parses for, for-in, and for each-in statements."
         (if (js3-must-match js3-LP "msg.no.paren.catch")
             (setq lp (- js3-token-beg catch-pos)))
         (js3-must-match js3-NAME "msg.bad.catchcond")
+	(js3-push-scope (make-js3-scope))
         (setq var-name (js3-create-name-node))
+	(js3-define-symbol js3-LET (js3-name-node-name var-name) var-name t)
         (if (js3-match-token js3-IF)
             (setq guard-kwd (- js3-token-beg catch-pos)
                   catch-cond (js3-parse-expr))
@@ -8340,6 +8342,7 @@ Parses for, for-in, and for each-in statements."
                                               :block block
                                               :lp lp
                                               :rp rp))
+	(js3-pop-scope)
         (if (js3-must-match js3-RC "msg.no.brace.after.body")
             (setq try-end js3-token-beg))
         (setf (js3-node-len block) (- try-end (js3-node-pos block))
