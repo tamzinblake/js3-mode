@@ -1618,6 +1618,10 @@ Returns nil if element is not found in the list."
   "Signal an error when we encounter an unexpected code path."
   (error "failed assertion"))
 
+(defsubst js3-record-text-property (beg end prop value)
+  "Record a text property to set when parsing finishes."
+  (push (list beg end prop value) js3-mode-deferred-properties))
+
 ;; I'd like to associate errors with nodes, but for now the
 ;; easiest thing to do is get the context info from the last token.
 (defsubst js3-record-parse-error (msg &optional arg pos len)
@@ -6537,10 +6541,6 @@ FACE is the face to fontify with."
                                          point-entered nil
                                          c-in-sws nil)))
 
-(defsubst js3-record-text-property (beg end prop value)
-  "Record a text property to set when parsing finishes."
-  (push (list beg end prop value) js3-mode-deferred-properties))
-
 (defconst js3-ecma-global-props
   (concat "^"
           (regexp-opt
@@ -6931,10 +6931,11 @@ of a simple name.  Called before EXPR has a parent node."
 (defun js3-record-name-node (node)
   "Saves NODE to `js3-recorded-identifiers' to check for undeclared variables
 later. NODE must be a name node."
-  (push (list node js3-current-scope
-	      (setq leftpos (js3-node-abs-pos node))
-	      (setq end (+ leftpos (js3-node-len node))))
-	js3-recorded-identifiers))
+  (let (leftpos end)
+    (push (list node js3-current-scope
+                (setq leftpos (js3-node-abs-pos node))
+                (setq end (+ leftpos (js3-node-len node))))
+          js3-recorded-identifiers)))
 
 (defun js3-highlight-undeclared-vars ()
   "After entire parse is finished, look for undeclared variable references.
@@ -7180,7 +7181,7 @@ that it's an external variable, which must also be in the top-level scope."
   "Modify function-declaration name chains after parsing finishes.
 Some of the information is only available after the parse tree is complete.
 For instance, following a 'this' reference requires a parent function node."
-  (let (result head fn parent-chain p elem)
+  (let (result head fn parent-chain p elem parent)
     (dolist (chain chains)
       ;; examine the head of each node to get its defining scope
       (setq head (car chain))
