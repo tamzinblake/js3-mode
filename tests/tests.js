@@ -321,3 +321,19 @@ function commaLastStyle () {
 
   return 1
 }
+
+function otherTests () {
+  /* Cases that affect all style types */
+
+  //test t1
+  //the function body should be indented one step from var
+  //and the closing brace should be on the same level as var
+  //Issue #26
+  var f = function () {
+            return 1
+          }
+
+  //end other tests
+
+  return 1;
+}
