@@ -10676,7 +10676,9 @@ nil."
         js3-mode-buffer-dirty-p t
         js3-mode-parsing nil)
   (js3-reparse)
-  (run-hooks 'js3-mode-hook))
+  (if (fboundp 'run-mode-hooks)
+      (run-mode-hooks 'js3-mode-hook)
+    (run-hooks 'js3-mode-hook)))
 
 (defun js3-mode-check-compat ()
   "Signal an error if we can't run with this version of Emacs."
