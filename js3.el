@@ -330,6 +330,12 @@ Set `js3-include-gears-externs' to t to include them.")
 
 (defvar js3-emacs22 (>= emacs-major-version 22))
 
+(defun js3-mark-safe-local (name pred)
+  "Make the variable NAME buffer-local and mark it as safe file-local
+variable with predicate PRED."
+  (make-variable-buffer-local name)
+  (put name 'safe-local-variable pred))
+
 (defcustom js3-highlight-level 2
   "Amount of syntax highlighting to perform.
 nil, zero or negative means none.
