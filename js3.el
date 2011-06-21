@@ -7123,30 +7123,27 @@ VAR, if non-nil, is the expression that NODE is being assigned to."
           (js3-record-object-literal node qname (js3-node-pos node)))))))))
 
 (defun js3-compute-nested-prop-get (node)
-  "If NODE is of form foo.bar.baz, return component nodes as a list.
-Otherwise returns nil.  Element-gets can be treated as property-gets
-if the index expression is a name, a string, or a positive integer."
+  "If NODE is of form foo.bar, foo['bar'], or any nested combination, return
+component nodes as a list.  Otherwise return nil.  Element-gets are treated
+as property-gets if the index expression is a string, or a positive integer."
   (let (left right head)
     (cond
      ((or (js3-name-node-p node)
           (js3-this-node-p node))
       (list node))
      ;; foo.bar.baz is parenthesized as (foo.bar).baz => right operand is a leaf
-     ((or (and (js3-prop-get-node-p node)
-               (setq left (js3-prop-get-node-left node)
-                     right (js3-prop-get-node-right node)))
-          (and (js3-elem-get-node-p node)
-               (setq left (js3-elem-get-node-target node)
-                     right (js3-elem-get-node-element node))))
-      (if (and (or (js3-prop-get-node-p left)     ; left == foo.bar
-                   (js3-elem-get-node-p left)     ; left == foo['bar']
-                   (js3-name-node-p left)         ; left == foo
-                   (js3-this-node-p left))        ; left == this
-               (or (js3-name-node-p right)        ; .bar
-                   (js3-string-node-p right)      ; ['bar']
-                   (and (js3-number-node-p right) ; [10]
-                        (string-match "^[0-9]+$"
-                                      (js3-number-node-value right)))))
+     ((js3-prop-get-node-p node)        ; foo.bar
+      (setq left (js3-prop-get-node-left node)
+            right (js3-prop-get-node-right node))
+      (if (setq head (js3-compute-nested-prop-get left))
+          (nconc head (list right))))
+     ((js3-elem-get-node-p node)        ; foo['bar'] or foo[101]
+      (setq left (js3-elem-get-node-target node)
+            right (js3-elem-get-node-element node))
+      (if (or (js3-string-node-p right)      ; ['bar']
+              (and (js3-number-node-p right) ; [10]
+                   (string-match "^[0-9]+$"
+                                 (js3-number-node-value right))))
           (if (setq head (js3-compute-nested-prop-get left))
               (nconc head (list right))))))))
 
