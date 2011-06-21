@@ -349,17 +349,6 @@ nil, zero or negative means none.
   "An improved JavaScript mode."
   :group 'languages)
 
-(defcustom js3-basic-offset (if (and (boundp 'c-basic-offset)
-                                     (numberp c-basic-offset))
-                                c-basic-offset
-                              4)
-  "Number of spaces to indent nested statements.
-Counterintuitively, not used when indenting.
-Similar to `c-basic-offset'."
-  :group 'js3-mode
-  :type 'integer)
-(make-variable-buffer-local 'js3-basic-offset)
-
 (defcustom js3-indent-tabs-mode nil
   "Default setting for indent-tabs-mode for js3-mode."
   :group 'js3-mode
@@ -494,14 +483,6 @@ by setting this variable to t."
 It's perfectly legal to have a `return' and a `return foo' in the
 same function, but it's often an indicator of a bug, and it also
 interferes with type inference (in systems that support it.)"
-  :type 'boolean
-  :group 'js3-mode)
-
-(defcustom js3-strict-cond-assign-warning t
-  "Non-nil to warn about expressions like if (a = b).
-This often should have been '==' instead of '='.  If the warning
-is enabled, you can suppress it on a per-expression basis by
-parenthesizing the expression, e.g. if ((a = b)) ..."
   :type 'boolean
   :group 'js3-mode)
 
@@ -1123,55 +1104,6 @@ and other editors work.")
       (if color t nil)
     color))
 
-(defcustom js3-mode-indent-inhibit-undo nil
-  "Non-nil to disable collection of Undo information when indenting lines.
-Some users have requested this behavior.  It's nil by default because
-other Emacs modes don't work this way."
-  :type 'boolean
-  :group 'js3-mode)
-
-(defcustom js3-mode-indent-ignore-first-tab nil
-  "If non-nil, ignore first TAB keypress if we look indented properly.
-It's fairly common for users to navigate to an already-indented line
-and press TAB for reassurance that it's been indented.  For this class
-of users, we want the first TAB press on a line to be ignored if the
-line is already indented to one of the precomputed alternatives.
-
-This behavior is only partly implemented.  If you TAB-indent a line,
-navigate to another line, and then navigate back, it fails to clear
-the last-indented variable, so it thinks you've already hit TAB once,
-and performs the indent.  A full solution would involve getting on the
-point-motion hooks for the entire buffer.  If we come across another
-use cases that requires watching point motion, I'll consider doing it.
-
-If you set this variable to nil, then the TAB key will always change
-the indentation of the current line, if more than one alternative
-indentation spot exists."
-  :type 'boolean
-  :group 'js3-mode)
-
-(defvar js3-indent-hook nil
-  "A hook for user-defined indentation rules.
-
-Functions on this hook should expect two arguments:    (LIST INDEX)
-The LIST argument is the list of computed indentation points for
-the current line.  INDEX is the list index of the indentation point
-that `js3-bounce-indent' plans to use.  If INDEX is nil, then the
-indent function is not going to change the current line indentation.
-
-If a hook function on this list returns a non-nil value, then
-`js3-bounce-indent' assumes the hook function has performed its own
-indentation, and will do nothing.  If all hook functions on the list
-return nil, then `js3-bounce-indent' will use its computed indentation
-and reindent the line.
-
-When hook functions on this hook list are called, the variable
-`js3-mode-ast' may or may not be set, depending on whether the
-parse tree is available.  If the variable is nil, you can pass a
-callback to `js3-mode-wait-for-parse', and your callback will be
-called after the new parse tree is built.  This can take some time
-in large files.")
-
 (defface js3-warning-face
   `((((class color) (background light))
      (:underline ,(js3-underline-color "orange")))
@@ -1322,13 +1254,6 @@ The value must be no less than minus `js3-indent-level'."
   :type 'integer
   :group 'js
   :version "24.1")
-
-(defcustom js3-auto-indent-flag t
-  "Whether to automatically indent when typing punctuation characters.
-If non-nil, the characters {}();,: also indent the current line
-in `js3-mode'."
-  :type 'boolean
-  :group 'js)
 
 (defcustom js3-comment-lineup-func #'c-lineup-C-comments
   "Lineup function for `cc-mode-style', for C comments in `js3-mode'."
@@ -3541,7 +3466,7 @@ If POS is nil, returns nil."
 (defsubst js3-make-pad (indent)
   (if (zerop indent)
       ""
-    (make-string (* indent js3-basic-offset) ? )))
+    (make-string (* indent js3-indent-level) ? )))
 
 (defsubst js3-visit-ast (node callback)
   "Visit every node in ast NODE with visitor CALLBACK.
