@@ -394,6 +394,12 @@ current line is indented when certain punctuations are inserted."
   :group 'js3-mode
   :type 'boolean)
 
+(defcustom js3-consistent-level-indent-inner-bracket nil
+  "Non-nil to make indentation level inner bracket consistent,
+regardless of the beginning bracket position."
+  :group 'js3-mode
+  :type 'boolean)
+
 (defcustom js3-indent-on-enter-key nil
   "Non-nil to have Enter/Return key indent the line.
 This is unusual for Emacs modes but common in IDEs like Eclipse."
@@ -10501,8 +10507,9 @@ nil."
             (progn ; nothing following the opening paren/bracket
               (skip-syntax-backward " ")
               (when (eq (char-before) ?\)) (backward-list)) ;skip arg list
-	      (if (js3-looking-back (concat "\\<function\\>"
-					    js3-skip-newlines-re))
+	      (if (and (not js3-consistent-level-indent-inner-bracket)
+		       (js3-looking-back (concat "\\<function\\>"
+					    js3-skip-newlines-re)))
 		  (js3-re-search-backward (concat "\\<function\\>"
 						  js3-skip-newlines-re))
 		(back-to-indentation))
