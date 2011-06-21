@@ -8854,8 +8854,8 @@ by `js3-parse-variables'."
       (js3-pop-scope))
     pn))
 
-(defsubst js3-define-new-symbol (decl-type name node)
-  (js3-scope-put-symbol js3-current-scope
+(defsubst js3-define-new-symbol (decl-type name node &optional scope)
+  (js3-scope-put-symbol (or scope js3-current-scope)
                         name
                         (make-js3-symbol decl-type name node)))
 
@@ -8886,7 +8886,8 @@ If NODE is non-nil, it is the AST node associated with the symbol."
                (or (= (js3-node-type js3-current-scope) js3-IF)
                    (js3-loop-node-p js3-current-scope)))
           (js3-report-error "msg.let.decl.not.in.block")
-        (js3-define-new-symbol decl-type name node)))
+        (js3-define-new-symbol decl-type name node
+			       js3-current-script-or-fn)))
      ((or (= decl-type js3-VAR)
           (= decl-type js3-CONST)
           (= decl-type js3-FUNCTION))
