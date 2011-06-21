@@ -330,8 +330,8 @@ function otherTests () {
   //and the closing brace should be on the same level as var
   //Issue #26
   var f = function () {
-            return 1
-          }
+    return 1
+  }
 
   //end other tests
 

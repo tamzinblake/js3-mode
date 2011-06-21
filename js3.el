@@ -10518,8 +10518,11 @@ nil."
               (skip-syntax-backward " ")
               (when (eq (char-before) ?\)) (backward-list)) ;skip arg list
 	      (if (and (not js3-consistent-level-indent-inner-bracket)
-		       (js3-looking-back (concat "\\<function\\>"
-					    js3-skip-newlines-re)))
+		       (js3-looking-back (concat
+					  ":"
+					  js3-skip-newlines-re
+					  "\\<function\\>"
+					  js3-skip-newlines-re)))
 		  (js3-re-search-backward (concat "\\<function\\>"
 						  js3-skip-newlines-re))
 		(back-to-indentation))
