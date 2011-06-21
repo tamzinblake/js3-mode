@@ -6003,10 +6003,11 @@ If NODE is the ast-root, returns nil."
 
 (defsubst js3-nested-function-p (node)
   "Return t if NODE is a nested function, or is inside a nested function."
-  (js3-function-node-p (if (js3-function-node-p node)
-                           (js3-node-parent-script-or-fn node)
-                         (js3-node-parent-script-or-fn
-                          (js3-node-parent-script-or-fn node)))))
+  (unless (js3-ast-root-p node)
+    (js3-function-node-p (if (js3-function-node-p node)
+                             (js3-node-parent-script-or-fn node)
+                           (js3-node-parent-script-or-fn
+                            (js3-node-parent-script-or-fn node))))))
 
 (defsubst js3-mode-shift-kids (kids start offset)
   (dolist (kid kids)
