@@ -2582,7 +2582,8 @@ corresponding number.  Otherwise return -1."
             js3-ts-regexp-flags (js3-collect-string flags)
             js3-token-end js3-ts-cursor)
       ;; tell `parse-partial-sexp' to ignore this range of chars
-      (put-text-property js3-token-beg js3-token-end 'syntax-class '(2)))))
+      (js3-record-text-property
+       js3-token-beg js3-token-end 'syntax-class '(2)))))
 
 (defun js3-get-first-xml-token ()
   (setq js3-ts-xml-open-tags-count 0
@@ -7427,7 +7428,7 @@ is only true until the node is added to its parent; i.e., while parsing."
                        'font-lock-comment-face))
     (when (memq js3-ts-comment-type '(html preprocessor))
       ;; Tell cc-engine the bounds of the comment.
-      (put-text-property js3-token-beg (1- js3-token-end) 'c-in-sws t))))
+      (js3-record-text-property js3-token-beg (1- js3-token-end) 'c-in-sws t))))
 
 ;; This function is called depressingly often, so it should be fast.
 ;; Most of the time it's looking at the same token it peeked before.
@@ -9588,7 +9589,7 @@ array-literals, array comprehensions and regular expressions."
                                 :value js3-ts-string
                                 :flags flags)
         (js3-set-face px-pos js3-ts-cursor 'font-lock-string-face 'record)
-        (put-text-property px-pos js3-ts-cursor 'syntax-table '(2))))
+        (js3-record-text-property px-pos js3-ts-cursor 'syntax-table '(2))))
      ((or (= tt js3-NULL)
           (= tt js3-THIS)
           (= tt js3-FALSE)
@@ -10738,7 +10739,6 @@ buffer will only rebuild its `js3-mode-ast' if the buffer is dirty."
           (when (or js3-mode-buffer-dirty-p force)
             (js3-remove-overlays)
             (js3-with-unmodifying-text-property-changes
-             (remove-text-properties (point-min) (point-max) '(syntax-table))
              (setq js3-mode-buffer-dirty-p nil
                    js3-mode-fontifications nil
                    js3-mode-deferred-properties nil
@@ -10750,7 +10750,11 @@ buffer will only rebuild its `js3-mode-ast' if the buffer is dirty."
                     (setq interrupted-p
                           (catch 'interrupted
                             (setq js3-mode-ast (js3-parse))
-                            (js3-mode-fontify-regions)
+			    ;; if parsing is interrupted, comments and regex
+			    ;; literals stay ignored by `parse-partial-sexp'
+			    (remove-text-properties (point-min) (point-max)
+						    '(syntax-table))
+			    (js3-mode-apply-deferred-properties)
                             (js3-mode-remove-suppressed-warnings)
                             (js3-mode-show-warnings)
                             (js3-mode-show-errors)
@@ -10846,15 +10850,16 @@ Defaults to point."
         for o in (overlays-at pos)
         thereis (overlay-get o 'js3-error)))
 
-(defun js3-mode-fontify-regions ()
-  "Apply fontifications recorded during parsing."
-  ;; We defer clearing faces as long as possible to eliminate flashing.
-  (js3-clear-face (point-min) (point-max))
-  ;; have to reverse the recorded fontifications so that errors and
-  ;; warnings overwrite the normal fontifications
-  (dolist (f (nreverse js3-mode-fontifications))
-    (put-text-property (first f) (second f) 'face (third f)))
-  (setq js3-mode-fontifications nil)
+(defun js3-mode-apply-deferred-properties ()
+  "Apply fontifications and other text properties recorded during parsing."
+  (when (plusp js3-highlight-level)
+    ;; We defer clearing faces as long as possible to eliminate flashing.
+    (js3-clear-face (point-min) (point-max))
+    ;; Have to reverse the recorded fontifications list so that errors
+    ;; and warnings overwrite the normal fontifications.
+    (dolist (f (nreverse js3-mode-fontifications))
+      (put-text-property (first f) (second f) 'face (third f)))
+    (setq js3-mode-fontifications nil))
   (dolist (p js3-mode-deferred-properties)
     (apply #'put-text-property p))
   (setq js3-mode-deferred-properties nil))
