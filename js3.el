@@ -7202,30 +7202,36 @@ For instance, following a 'this' reference requires a parent function node."
     (dolist (chain chains)
       ;; examine the head of each node to get its defining scope
       (setq head (car chain))
-      (cond
-       ;; if top-level/external, keep as-is
-       ((js3-node-top-level-decl-p head)
-        (push chain result))
-       ;; check for a this-reference
-       ((eq (js3-node-type head) js3-THIS)
-        (setq fn (js3-node-parent-script-or-fn head))
-        ;; if there is no parent function, or if the parent function
-        ;; is nested, discard the head node and keep the rest of the chain.
-        (if (or (null fn) (js3-nested-function-p fn))
-            (push (cdr chain) result)
-          ;; else look up parent in function-map.  If not found, discard chain.
-          (when (setq parent-chain (and js3-imenu-function-map
-                                        (gethash fn js3-imenu-function-map)))
-            ;; else discard head node and prefix parent fn qname, which is
-            ;; the parent-chain sans tail, to this chain.
-            (push (append (butlast parent-chain) (cdr chain)) result))))))
+      ;; if top-level/external, keep as-is
+      (if (js3-node-top-level-decl-p head)
+          (push chain result)
+        (cond
+	 ((js3-this-node-p head)
+          (setq fn (js3-node-parent-script-or-fn head)
+                chain (cdr chain))) ; discard this-node
+	 ;; nested named function
+	 ((js3-function-node-p (setq parent (js3-node-parent head)))
+	  (setq fn (js3-node-parent-script-or-fn parent)))
+	 ;; variable assigned a function expression
+	 (t (setq fn (js3-node-parent-script-or-fn head))))
+	(unless (or (null fn) (js3-nested-function-p fn))
+	  ;; if the parent function is found, and it's not nested,
+	  ;; look it up in function-map.
+	  (if (setq parent-chain (and js3-imenu-function-map
+				      (gethash fn js3-imenu-function-map)))
+	      ;; prefix parent fn qname, which is the
+	      ;; parent-chain sans tail, to this chain.
+	      (push (append (butlast parent-chain) chain) result)
+	    ;; parent function is not nested, and not in function-map
+	    ;; => it's anonymous top-level wrapper, discard.
+	    (push chain result)))))
     ;; finally replace each node in each chain with its name.
     (dolist (chain result)
       (setq p chain)
       (while p
-        (if (js3-node-p (setq elem (car p)))
-            (setcar p (js3-node-qname-component elem)))
-        (setq p (cdr p))))
+	(if (js3-node-p (setq elem (car p)))
+	    (setcar p (js3-node-qname-component elem)))
+	(setq p (cdr p))))
     result))
 
 ;; Merge name chains into a trie-like tree structure of nested lists.
@@ -7702,8 +7708,7 @@ Scanner should be initialized."
             (js3-consume-token)
             (setq n (js3-parse-function (if js3-called-by-compile-function
                                             'FUNCTION_EXPRESSION
-                                          'FUNCTION_STATEMENT)))
-            (js3-record-imenu-functions n))
+                                          'FUNCTION_STATEMENT))))
         ;; not a function - parse a statement
         (setq n (js3-parse-statement)))
       ;; add function or statement to script
@@ -7893,7 +7898,7 @@ Last token scanned is the close-curly for the function body."
                              (js3-name-node-name name)
                              fn-node))
       (if (and name
-               (eq function-type 'FUNCTION_EXPRESSION_STATEMENT))
+               (not (eq function-type 'FUNCTION_EXPRESSION)))
           (js3-record-imenu-functions fn-node)))
     (setf (js3-node-len fn-node) (- js3-ts-cursor pos)
           (js3-function-node-member-expr fn-node) member-expr-node)  ; may be nil
