@@ -1406,6 +1406,7 @@ First match-group is the leading whitespace.")
 (deflocal js3-mode-deferred-properties nil "Private variable")
 (deflocal js3-imenu-recorder nil "Private variable")
 (deflocal js3-imenu-function-map nil "Private variable")
+(deflocal js3-imenu-fn-type-map nil "Private variable")
 
 (defvar js3-paragraph-start
   "\\(@[a-zA-Z]+\\>\\|$\\)")
@@ -7177,11 +7178,24 @@ that it's an external variable, which must also be in the top-level scope."
       (js3-ast-root-p defining-scope))
      (t t))))
 
+(defsubst js3-anonymous-wrapper-fn-p (node)
+  "Returns t if NODE is an anonymous function that's invoked immediately.
+NODE must be `js3-function-node'."
+  (let ((parent (js3-node-parent node)))
+    (and (js3-paren-node-p parent)
+         ;; (function(){...})();
+         (or (js3-call-node-p (setq parent (js3-node-parent parent)))
+             ;; (function(){...}).call(this);
+             (and (js3-prop-get-node-p parent)
+                  (member (js3-name-node-name (js3-prop-get-node-right parent))
+                          '("call" "apply"))
+                  (js3-call-node-p (js3-node-parent parent)))))))
+
 (defun js3-browse-postprocess-chains (chains)
   "Modify function-declaration name chains after parsing finishes.
 Some of the information is only available after the parse tree is complete.
 For instance, following a 'this' reference requires a parent function node."
-  (let (result head fn parent-chain p elem parent)
+  (let (result head fn fn-type parent-chain p elem parent)
     (dolist (chain chains)
       ;; examine the head of each node to get its defining scope
       (setq head (car chain))
@@ -7197,17 +7211,25 @@ For instance, following a 'this' reference requires a parent function node."
 	  (setq fn (js3-node-parent-script-or-fn parent)))
 	 ;; variable assigned a function expression
 	 (t (setq fn (js3-node-parent-script-or-fn head))))
-	(unless (or (null fn) (js3-nested-function-p fn))
-	  ;; if the parent function is found, and it's not nested,
-	  ;; look it up in function-map.
-	  (if (setq parent-chain (and js3-imenu-function-map
-				      (gethash fn js3-imenu-function-map)))
-	      ;; prefix parent fn qname, which is the
-	      ;; parent-chain sans tail, to this chain.
-	      (push (append (butlast parent-chain) chain) result)
-	    ;; parent function is not nested, and not in function-map
-	    ;; => it's anonymous top-level wrapper, discard.
-	    (push chain result)))))
+        (when fn
+          (if js3-imenu-fn-type-map
+              (setq fn-type (gethash fn js3-imenu-fn-type-map))
+            (setq js3-imenu-fn-type-map (make-hash-table :test 'eq)))
+          (unless fn-type
+            (setq fn-type
+                  (cond ((js3-nested-function-p fn) 'skip)
+                        ((setq parent-chain
+                               (gethash fn js3-imenu-function-map))
+                         'named)
+                        ((js3-anonymous-wrapper-fn-p fn) 'anon)
+                        (t 'skip)))
+            (puthash fn fn-type js3-imenu-fn-type-map))
+          (case fn-type
+		('anon (push chain result)) ; anonymous top-level wrapper
+		('named                     ; top-level named function
+		 ;; prefix parent fn qname, which is
+		 ;; parent-chain sans last elem, to this chain.
+		 (push (append (butlast parent-chain) chain) result))))))
     ;; finally replace each node in each chain with its name.
     (dolist (chain result)
       (setq p chain)
@@ -7655,6 +7677,7 @@ leaving a statement, an expression, or a function definition."
             js3-parsed-warnings nil
             js3-imenu-recorder nil
             js3-imenu-function-map nil
+	    js3-imenu-fn-type-map nil
             js3-label-set nil)
       (js3-init-scanner)
       (setq ast (js3-with-unmodifying-text-property-changes
@@ -11735,7 +11758,8 @@ destroying the region selection."
     (prog1
         (js3-build-imenu-index)
       (setq js3-imenu-recorder nil
-            js3-imenu-function-map nil))))
+            js3-imenu-function-map nil
+	    js3-imenu-fn-type-map nil))))
 
 (defun js3-mode-find-tag ()
   "Replacement for `find-tag-default'.
