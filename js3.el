@@ -1406,7 +1406,6 @@ First match-group is the leading whitespace.")
 (deflocal js3-mode-deferred-properties nil "Private variable")
 (deflocal js3-imenu-recorder nil "Private variable")
 (deflocal js3-imenu-function-map nil "Private variable")
-(deflocal js3-imenu-fn-type-map nil "Private variable")
 
 (defvar js3-paragraph-start
   "\\(@[a-zA-Z]+\\>\\|$\\)")
@@ -7196,7 +7195,8 @@ NODE must be `js3-function-node'."
   "Modify function-declaration name chains after parsing finishes.
 Some of the information is only available after the parse tree is complete.
 For instance, following a 'this' reference requires a parent function node."
-  (let (result head fn fn-type parent-chain p elem parent)
+  (let ((js3-imenu-fn-type-map (make-hash-table :test 'eq))
+	result head fn fn-type parent-chain p elem parent)
     (dolist (chain chains)
       ;; examine the head of each node to get its defining scope
       (setq head (car chain))
@@ -7213,9 +7213,7 @@ For instance, following a 'this' reference requires a parent function node."
 	 ;; variable assigned a function expression
 	 (t (setq fn (js3-node-parent-script-or-fn head))))
         (when fn
-          (if js3-imenu-fn-type-map
-              (setq fn-type (gethash fn js3-imenu-fn-type-map))
-            (setq js3-imenu-fn-type-map (make-hash-table :test 'eq)))
+	  (setq fn-type (gethash fn js3-imenu-fn-type-map))
           (unless fn-type
             (setq fn-type
                   (cond ((js3-nested-function-p fn) 'skip)
@@ -7678,7 +7676,6 @@ leaving a statement, an expression, or a function definition."
             js3-parsed-warnings nil
             js3-imenu-recorder nil
             js3-imenu-function-map nil
-	    js3-imenu-fn-type-map nil
             js3-label-set nil)
       (js3-init-scanner)
       (setq ast (js3-with-unmodifying-text-property-changes
@@ -11759,8 +11756,7 @@ destroying the region selection."
     (prog1
         (js3-build-imenu-index)
       (setq js3-imenu-recorder nil
-            js3-imenu-function-map nil
-	    js3-imenu-fn-type-map nil))))
+            js3-imenu-function-map nil))))
 
 (defun js3-mode-find-tag ()
   "Replacement for `find-tag-default'.
