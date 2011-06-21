@@ -211,6 +211,7 @@
             UserDataHandler
 
             ;; Window
+	    window
             alert
             confirm
             document
