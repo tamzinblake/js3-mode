@@ -3932,8 +3932,7 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
 (put 'cl-struct-js3-return-node 'js3-printer 'js3-print-return-node)
 
 (defun js3-visit-return-node (n v)
-  (if (js3-return-node-retval n)
-      (js3-visit-ast (js3-return-node-retval n) v)))
+  (js3-visit-ast (js3-return-node-retval n) v))
 
 (defun js3-print-return-node (n i)
   (insert (js3-make-pad i) "return")
@@ -3968,8 +3967,7 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
 (defun js3-visit-if-node (n v)
   (js3-visit-ast (js3-if-node-condition n) v)
   (js3-visit-ast (js3-if-node-then-part n) v)
-  (if (js3-if-node-else-part n)
-      (js3-visit-ast (js3-if-node-else-part n) v)))
+  (js3-visit-ast (js3-if-node-else-part n) v))
 
 (defun js3-print-if-node (n i)
   (let ((pad (js3-make-pad i))
@@ -4012,8 +4010,7 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
   (js3-visit-ast (js3-try-node-try-block n) v)
   (dolist (clause (js3-try-node-catch-clauses n))
     (js3-visit-ast clause v))
-  (if (js3-try-node-finally-block n)
-      (js3-visit-ast (js3-try-node-finally-block n) v)))
+  (js3-visit-ast (js3-try-node-finally-block n) v))
 
 (defun js3-print-try-node (n i)
   (let ((pad (js3-make-pad i))
@@ -4142,8 +4139,7 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
 (put 'cl-struct-js3-case-node 'js3-printer 'js3-print-case-node)
 
 (defun js3-visit-case-node (n v)
-  (if (js3-case-node-expr n)  ; nil for default: case
-      (js3-visit-ast (js3-case-node-expr n) v))
+  (js3-visit-ast (js3-case-node-expr n) v)
   (js3-visit-block n v))
 
 (defun js3-print-case-node (n i)
@@ -4289,9 +4285,7 @@ NODE is a `js3-labels-node'.  LABEL is an identifier."
   target) ; target js3-labels-node or loop/switch statement
 
 (defun js3-visit-jump-node (n v)
-  ;; we don't visit the target, since it's a back-link
-  (if (js3-jump-node-label n)
-      (js3-visit-ast (js3-jump-node-label n) v)))
+  (js3-visit-ast (js3-jump-node-label n) v))
 
 (defstruct (js3-break-node
             (:include js3-jump-node)
@@ -4372,8 +4366,7 @@ The `params' field is a lisp list of nodes.  Each node is either a simple
 (put 'cl-struct-js3-function-node 'js3-printer 'js3-print-function-node)
 
 (defun js3-visit-function-node (n v)
-  (if (js3-function-node-name n)
-      (js3-visit-ast (js3-function-node-name n) v))
+  (js3-visit-ast (js3-function-node-name n) v)
   (dolist (p (js3-function-node-params n))
     (js3-visit-ast p v))
   (js3-visit-ast (js3-function-node-body n) v))
@@ -4476,8 +4469,7 @@ The type field will be js3-CONST for a const decl."
 
 (defun js3-visit-var-init-node (n v)
   (js3-visit-ast (js3-var-init-node-target n) v)
-  (if (js3-var-init-node-initializer n)
-      (js3-visit-ast (js3-var-init-node-initializer n) v)))
+  (js3-visit-ast (js3-var-init-node-initializer n) v))
 
 (defun js3-print-var-init-node (n i)
   (let ((pad (js3-make-pad i))
@@ -4544,10 +4536,8 @@ The type field inherited from `js3-node' holds the operator."
 (put 'cl-struct-js3-infix-node 'js3-printer 'js3-print-infix-node)
 
 (defun js3-visit-infix-node (n v)
-  (when (js3-infix-node-left n)
-    (js3-visit-ast (js3-infix-node-left n) v))
-  (when (js3-infix-node-right n)
-    (js3-visit-ast (js3-infix-node-right n) v)))
+  (js3-visit-ast (js3-infix-node-left n) v)
+  (js3-visit-ast (js3-infix-node-right n) v))
 
 (defconst js3-operator-tokens
   (let ((table (make-hash-table :test 'eq))
@@ -4685,10 +4675,8 @@ Note that a let declaration such as let x=6, y=7 is a `js3-var-decl-node'."
 (put 'cl-struct-js3-let-node 'js3-printer 'js3-print-let-node)
 
 (defun js3-visit-let-node (n v)
-  (when (js3-let-node-vars n)
-    (js3-visit-ast (js3-let-node-vars n) v))
-  (when (js3-let-node-body n)
-    (js3-visit-ast (js3-let-node-body n) v)))
+  (js3-visit-ast (js3-let-node-vars n) v)
+  (js3-visit-ast (js3-let-node-body n) v))
 
 (defun js3-print-let-node (n i)
   (insert (js3-make-pad i) "let (")
@@ -4749,8 +4737,7 @@ The node type is set to js3-NULL, js3-THIS, etc.")
   (js3-visit-ast (js3-new-node-target n) v)
   (dolist (arg (js3-new-node-args n))
     (js3-visit-ast arg v))
-  (when (js3-new-node-initializer n)
-    (js3-visit-ast (js3-new-node-initializer n) v)))
+  (js3-visit-ast (js3-new-node-initializer n) v))
 
 (defun js3-print-new-node (n i)
   (insert (js3-make-pad i) "new ")
@@ -4867,8 +4854,7 @@ You can tell the quote type by looking at the first character."
 
 (defun js3-visit-array-node (n v)
   (dolist (e (js3-array-node-elems n))
-    (when e  ; can be nil, e.g. [a, ,b]
-      (js3-visit-ast e v))))
+    (js3-visit-ast e v)))
 
 (defun js3-print-array-node (n i)
   (insert (js3-make-pad i) "[")
@@ -4958,10 +4944,8 @@ property `GETTER_SETTER' set to js3-GET or js3-SET. ")
 (put 'cl-struct-js3-prop-get-node 'js3-printer 'js3-print-prop-get-node)
 
 (defun js3-visit-prop-get-node (n v)
-  (when (js3-prop-get-node-left n)
-    (js3-visit-ast (js3-prop-get-node-left n) v))
-  (when (js3-prop-get-node-right n)
-    (js3-visit-ast (js3-prop-get-node-right n) v)))
+  (js3-visit-ast (js3-prop-get-node-left n) v)
+  (js3-visit-ast (js3-prop-get-node-right n) v))
 
 (defun js3-print-prop-get-node (n i)
   (insert (js3-make-pad i))
@@ -5106,8 +5090,7 @@ as opposed to required parens such as those enclosing an if-conditional."
   (js3-visit-ast (js3-array-comp-node-result n) v)
   (dolist (l (js3-array-comp-node-loops n))
     (js3-visit-ast l v))
-  (if (js3-array-comp-node-filter n)
-      (js3-visit-ast (js3-array-comp-node-filter n) v)))
+  (js3-visit-ast (js3-array-comp-node-filter n) v))
 
 (defun js3-print-array-comp-node (n i)
   (let ((pad (js3-make-pad i))
@@ -5293,10 +5276,8 @@ propname)
 (put 'cl-struct-js3-xml-prop-ref-node 'js3-printer 'js3-print-xml-prop-ref-node)
 
 (defun js3-visit-xml-prop-ref-node (n v)
-  (if (js3-xml-prop-ref-node-namespace n)
-      (js3-visit-ast (js3-xml-prop-ref-node-namespace n) v))
-  (if (js3-xml-prop-ref-node-propname n)
-      (js3-visit-ast (js3-xml-prop-ref-node-propname n) v)))
+  (js3-visit-ast (js3-xml-prop-ref-node-namespace n) v)
+  (js3-visit-ast (js3-xml-prop-ref-node-propname n) v))
 
 (defun js3-print-xml-prop-ref-node (n i)
   (insert (js3-make-pad i))
@@ -5345,10 +5326,8 @@ rb)
 (put 'cl-struct-js3-xml-elem-ref-node 'js3-printer 'js3-print-xml-elem-ref-node)
 
 (defun js3-visit-xml-elem-ref-node (n v)
-  (if (js3-xml-elem-ref-node-namespace n)
-      (js3-visit-ast (js3-xml-elem-ref-node-namespace n) v))
-  (if (js3-xml-elem-ref-node-expr n)
-      (js3-visit-ast (js3-xml-elem-ref-node-expr n) v)))
+  (js3-visit-ast (js3-xml-elem-ref-node-namespace n) v)
+  (js3-visit-ast (js3-xml-elem-ref-node-expr n) v))
 
 (defun js3-print-xml-elem-ref-node (n i)
   (insert (js3-make-pad i))
