@@ -362,7 +362,9 @@ nil, zero or negative means none.
 
 (defcustom js3-pretty-vars t
   "Non-nil to try to indent comma-last continued var statements in a pretty way.
-Does not affect comma-first continued var statements."
+Does not affect comma-first continued var statements.
+
+Note that this forces a reparse so should be turned off if not being used"
   :group 'js3-mode
   :type 'boolean)
 
@@ -10542,6 +10544,7 @@ nil."
 (defun js3-indent-line ()
   "Indent the current line as JavaScript."
   (interactive)
+  (when js3-pretty-vars (js3-reparse))
   (save-restriction
     (widen)
     (let* ((parse-status
