@@ -1228,7 +1228,7 @@ another file, or you've got a potential bug."
   :group 'js3-mode)
 
 (defcustom js3-highlight-external-variables t
-  "Non-nil to higlight assignments to undeclared variables."
+  "Non-nil to highlight assignments to undeclared variables."
   :type 'boolean
   :group 'js3-mode)
 
