@@ -14,7 +14,7 @@ For more credits, see https://github.com/thomblake/js3-mode/wiki/Credits
 
 ## Installation ##
 
-js3.el should be placed in your emacs include path. You'll need to byte-compile js3-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js3.el> RET`.  If you want, js3-mode can be configured using `M-x customize-group RET js3-mode RET`.
+js3.el should be placed in your emacs include path. You'll need to byte-compile js3-mode before using it - in emacs, `M-x byte-compile-file RET <path-to-js3.el> RET`.  Or on the command line: `emacs --batch -f batch-byte-compile js3.el` If you want, js3-mode can be configured using `M-x customize-group RET js3-mode RET`.
 
 For more details, see https://github.com/thomblake/js3-mode/wiki/Installation
 
