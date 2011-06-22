@@ -7727,9 +7727,10 @@ Scanner should be initialized."
         (js3-node-add-children root comment)))
     (setf (js3-node-len root) (- end pos))
     ;; Give extensions a chance to muck with things before highlighting starts.
-    (dolist (callback js3-post-parse-callbacks)
-      (funcall callback))
-    (js3-highlight-undeclared-vars)
+    (let ((js3-additional-externs js3-additional-externs))
+      (dolist (callback js3-post-parse-callbacks)
+	(funcall callback))
+      (js3-highlight-undeclared-vars))
     root))
 
 (defun js3-function-parser ()
@@ -10772,8 +10773,7 @@ buffer will only rebuild its `js3-mode-ast' if the buffer is dirty."
             (js3-with-unmodifying-text-property-changes
              (setq js3-mode-buffer-dirty-p nil
                    js3-mode-fontifications nil
-                   js3-mode-deferred-properties nil
-                   js3-additional-externs nil)
+                   js3-mode-deferred-properties nil)
              (if js3-mode-verbose-parse-p
                  (message "parsing..."))
              (setq time
