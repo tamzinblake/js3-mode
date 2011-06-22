@@ -360,6 +360,7 @@ nil, zero or negative means none.
   "Default setting for indent-tabs-mode for js3-mode."
   :group 'js3-mode
   :type 'boolean)
+(js3-mark-safe-local 'js3-indent-tabs-mode 'booleanp)
 
 (defcustom js3-pretty-vars t
   "Non-nil to try to indent comma-last continued var statements in a pretty way.
@@ -368,6 +369,7 @@ Does not affect comma-first continued var statements.
 Note that this forces a reparse so should be turned off if not being used"
   :group 'js3-mode
   :type 'boolean)
+(js3-mark-safe-local 'js3-pretty-vars 'booleanp)
 
 (defcustom js3-cleanup-whitespace t
   "Non-nil to invoke `delete-trailing-whitespace' before saves."
@@ -396,24 +398,28 @@ so this behavior is customizable."
 current line is indented when certain punctuations are inserted."
   :group 'js3-mode
   :type 'boolean)
+(js3-mark-safe-local 'js3-auto-indent-p 'booleanp)
 
 (defcustom js3-consistent-level-indent-inner-bracket nil
   "Non-nil to make indentation level inner bracket consistent,
 regardless of the beginning bracket position."
   :group 'js3-mode
   :type 'boolean)
+(js3-mark-safe-local 'js3-consistent-level-indent-inner-bracket 'booleanp)
 
 (defcustom js3-indent-on-enter-key nil
   "Non-nil to have Enter/Return key indent the line.
 This is unusual for Emacs modes but common in IDEs like Eclipse."
   :type 'boolean
   :group 'js3-mode)
+(js3-mark-safe-local 'js3-indent-on-enter-key 'booleanp)
 
 (defcustom js3-enter-indents-newline nil
   "Non-nil to have Enter/Return key indent the newly-inserted line.
 This is unusual for Emacs modes but common in IDEs like Eclipse."
   :type 'boolean
   :group 'js3-mode)
+(js3-mark-safe-local 'js3-enter-indents-newline 'booleanp)
 
 (defcustom js3-rebind-eol-bol-keys nil
   "Non-nil to rebind beginning-of-line and end-of-line keys.
@@ -1241,57 +1247,65 @@ another file, or you've got a potential bug."
 (defcustom js3-indent-level 2
   "Number of spaces for each indentation step in `js3-mode'."
   :type 'integer
-  :group 'js)
+  :group 'js3-mode)
+(js3-mark-safe-local 'js3-indent-level 'integerp)
 
 (defcustom js3-expr-indent-offset 0
   "Number of additional spaces for indenting continued expressions.
 The value must be no less than minus `js3-indent-level'."
   :type 'integer
-  :group 'js)
+  :group 'js-mode)
+(js3-mark-safe-local 'js3-expr-indent-offset 'integerp)
 
 (defcustom js3-paren-indent-offset 0
   "Number of additional spaces for indenting expressions in parentheses.
 The value must be no less than minus `js3-indent-level'."
   :type 'integer
-  :group 'js
+  :group 'js3-mode
   :version "24.1")
+(js3-mark-safe-local 'js3-paren-indent-offset 'integerp)
 
 (defcustom js3-square-indent-offset 0
   "Number of additional spaces for indenting expressions in square braces.
 The value must be no less than minus `js3-indent-level'."
   :type 'integer
-  :group 'js
+  :group 'js3-mode
   :version "24.1")
+(js3-mark-safe-local 'js3-square-indent-offset 'integerp)
 
 (defcustom js3-curly-indent-offset 0
   "Number of additional spaces for indenting expressions in curly braces.
 The value must be no less than minus `js3-indent-level'."
   :type 'integer
-  :group 'js
+  :group 'js3-mode
   :version "24.1")
+(js3-mark-safe-local 'js3-curly-indent-offset 'integerp)
 
 (defcustom js3-comment-lineup-func #'c-lineup-C-comments
   "Lineup function for `cc-mode-style', for C comments in `js3-mode'."
   :type 'function
-  :group 'js)
+  :group 'js3-mode)
 
 (defcustom js3-lazy-commas nil
   "Whether `js3-mode' should line up commas to the indent-minus-2,
 rather than trying to line up to braces."
   :type 'boolean
   :group 'js3-mode)
+(js3-mark-safe-local 'js3-lazy-commas 'booleanp)
 
 (defcustom js3-lazy-operators nil
   "Whether `js3-mode' should line up operators to the indent-minus-2,
 rather than trying to line up to braces."
   :type 'boolean
   :group 'js3-mode)
+(js3-mark-safe-local 'js3-lazy-operators 'booleanp)
 
 (defcustom js3-lazy-dots nil
   "Whether `js3-mode' should line up dots to the next indent level,
 rather than trying to line up to dots."
   :type 'boolean
   :group 'js3-mode)
+(js3-mark-safe-local 'js3-lazy-dots 'booleanp)
 
 (defvar js3-mode-map
   (let ((map (make-sparse-keymap))
