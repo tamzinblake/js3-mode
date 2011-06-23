@@ -183,13 +183,13 @@ function commaFirstStyle () {
   //function body should be indented one step from beginning of property name
   //issue #22
   a = { f: function () {
-             var a = g
-                   + h
+          var a = g
+                + h
 
-             return [ a
-                    , g
-                    ]
-           }
+          return [ a
+                 , g
+                 ]
+        }
       }
 
   //test c20
@@ -204,13 +204,13 @@ function commaFirstStyle () {
                                 comment */
                          , h
                          ) {
-                  var a = g
-                        + h
+               var a = g
+                     + h
 
-                  return [ a
-                         , g
-                         ]
-                }
+               return [ a
+                      , g
+                      ]
+             }
            }
     , rv2 = a
 

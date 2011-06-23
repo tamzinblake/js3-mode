@@ -10548,8 +10548,21 @@ nil."
 					  js3-skip-newlines-re
 					  "\\<function\\>"
 					  js3-skip-newlines-re)))
-		  (js3-re-search-backward (concat "\\<function\\>"
-						  js3-skip-newlines-re))
+		  (progn
+		    (js3-re-search-backward (concat
+					     ":"
+					     js3-skip-newlines-re
+					     "\\<function\\>"
+					     js3-skip-newlines-re))
+		    (js3-backward-clean)
+		    (if (looking-back "[{[(,][^{[(,\n]*")
+			(progn
+			  (js3-re-search-backward "[{[(,][^{[(,\n]*")
+			  (forward-char)
+			  (js3-re-search-forward "[ \t]*"))
+		      (progn
+			(js3-re-search-backward "^")
+			(back-to-indentation))))
 		(back-to-indentation))
               (cond (same-indent-p
                      (current-column))
