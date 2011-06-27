@@ -10473,7 +10473,9 @@ nil."
 	  (re-search-backward (concat "^[ \t]*[^ \t\n].*" js3-skip-newlines-re)
 			      (point-min) t)
 	  (back-to-indentation)
-	  (- (current-column) 2))
+	  (if (< (current-column) 2)
+	      (current-column)
+	    (- (current-column) 2)))
 
 	 (t
 	  (+ js3-indent-level js3-expr-indent-offset)))))
@@ -10503,7 +10505,8 @@ nil."
 					  js3-skip-newlines-re)
 				  (point-min) t)
 	      (back-to-indentation)
-	      (if (looking-at js3-indent-lazy-operator-re)
+	      (if (or (looking-at js3-indent-lazy-operator-re)
+		      (< (current-column) 2))
 		  (current-column)
 		(- (current-column) 2)))
 	  (+ js3-indent-level js3-expr-indent-offset))))

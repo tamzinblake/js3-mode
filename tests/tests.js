@@ -337,3 +337,15 @@ function otherTests () {
 
   return 1;
 }
+
+//test z1
+//operator should be indented to column 0 - emacs should not throw an error
+//possibly related to Issue #28
+1
++ 2
+
+//test z2
+//comma should be indented to column 0 - emacs should not throw an error
+//possibly related to Issue #28
+1
+, 2
