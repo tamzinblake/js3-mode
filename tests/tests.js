@@ -222,6 +222,60 @@ function commaFirstStyle () {
       : f
       )
 
+  //test c22
+  //comma should line up with the r in var
+  //issue #32
+  var x = require("./test/test").something
+                 , y = require('./test2')
+
+  //test c23
+  //The function body should probably be indented past the paren, since there
+  // are multiple arguments.  However, in the general case of passing only
+  // one function to a method, one would normally want it to indent
+  // only one indent for convenience.
+  //issue #31
+
+  something({ value: "data"
+            , errback: function(code, e) {
+                var u = new Something(user_data)
+                u.method( function(data) {
+                  res.json(data)
+                }
+                        , function(data) {
+                          res.json(data)
+                        }
+                        )
+              }
+            , callback: function(data){
+                res.json()
+              }
+            })
+  res.writeHead(201)
+
+  //test c24
+  // && should line up properly with (
+  //issue #29
+
+  x = ( a != b
+           && c != d
+      )
+
+  //test c25
+  //, should line up with var
+  //issue #30
+
+  var boolReg = '^(' + boolFields.join('|') + ')$'
+                                      , ignoreReg = '^(' + ignoreFields.join('|') + ')$'
+
+  //test c26
+  //comma should line up with the ( even though it's a weird case.
+  //issue #33
+
+  foo( a
+     + b
+  , c
+     + d
+
   //end comma-first tests
 
   return 1
@@ -349,3 +403,4 @@ function otherTests () {
 //possibly related to Issue #28
 1
 , 2
+
