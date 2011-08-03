@@ -273,8 +273,9 @@ function commaFirstStyle () {
 
   foo( a
      + b
-  , c
+     , c
      + d
+     )
 
   //end comma-first tests
 
@@ -395,14 +396,16 @@ function otherTests () {
 //test z1
 //operator should be indented to column 0 - emacs should not throw an error
 //possibly related to Issue #28
+//Edit: the following is no longer supported - indentation of '+' is undefined
 1
-+ 2
+        + 2
 
 //test z2
 //comma should be indented to column 0 - emacs should not throw an error
 //possibly related to Issue #28
+//Edit: the following is no longer supported - indentation of ',' is undefined
 1
-, 2
+                      , 2
 
 //test z3
 //+ should correctly indent to first column without throwing an error

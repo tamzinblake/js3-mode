@@ -10368,6 +10368,13 @@ nil."
 						 js3-skip-newlines-re)
 					 (point-min) t)
                  (+ (current-column) 5))
+
+                ((js3-looking-back (concat "[,([{]\\(.\\|\n\\)*" js3-skip-newlines-re))
+		 (js3-re-search-backward (concat "[,([{]\\(.\\|\n\\)*"
+						 js3-skip-newlines-re)
+					 (point-min) t)
+		 (current-column))
+
                 (t
                  nil)))))
         (if spos
