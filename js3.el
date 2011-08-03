@@ -10399,12 +10399,21 @@ nil."
 	     (save-excursion
 	       (js3-backward-clean)
 	       (cond
+		((js3-looking-back (concat "\\(."
+					   js3-indent-brace-re
+					   "\\|[^!=]=\\|.:\\).*"))
+		 (js3-re-search-backward (concat "\\(."
+						 js3-indent-brace-re
+						 "\\|[^!=]=\\|.:\\).*")
+					 (point-min) t)
+		 (1+ (current-column)))
+
 		((js3-looking-back (concat "\\("
 					   js3-indent-brace-re
-					   "\\|=\\|:\\).*"))
+					   "\\|:\\).*"))
 		 (js3-re-search-backward (concat "\\("
 						 js3-indent-brace-re
-						 "\\|=\\|:\\).*")
+						 "\\|:\\).*")
 					 (point-min) t)
 		 (current-column))
 
@@ -10426,12 +10435,21 @@ nil."
 	     (save-excursion
 	       (js3-backward-clean)
 	       (cond
+		((js3-looking-back (concat "\\(."
+					   js3-indent-operator-brace-re
+					   "\\|[^!=]=\\)[^{\n]*\\="))
+		 (js3-re-search-backward (concat "\\(."
+						 js3-indent-operator-brace-re
+						 "\\|[^!=]=\\)[^{\n]*\\=")
+					 (point-min) t)
+		 (1+ (current-column)))
+
 		((js3-looking-back (concat "\\("
 					   js3-indent-operator-brace-re
-					   "\\|=\\)[^{\n]*\\="))
+					   "\\)[^{\n]*\\="))
 		 (js3-re-search-backward (concat "\\("
 						 js3-indent-operator-brace-re
-						 "\\|=\\)[^{\n]*\\=")
+						 "\\)[^{\n]*\\=")
 					 (point-min) t)
 		 (current-column))
 

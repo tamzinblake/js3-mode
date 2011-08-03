@@ -257,7 +257,7 @@ function commaFirstStyle () {
   //issue #29
 
   x = ( a != b
-           && c != d
+      && c != d
       )
 
   //test c25
@@ -404,3 +404,9 @@ function otherTests () {
 1
 , 2
 
+//test z3
+//+ should correctly indent to first column without throwing an error
+//related to fix for Issue #29
+( 1
++ 2
+)
