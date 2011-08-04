@@ -20,6 +20,8 @@ For more details, see https://github.com/thomblake/js3-mode/wiki/Installation
 
 ## Notes ##
 
+Right now, all commits are the 'current development build' - so far, nothing that feels like a sufficiently stable release exists.  Several features persist from the software this is based on that may or may not be removed in the near future.
+
 If your JS is in error, the indentation might look wrong.  I tend to regard this as a feature.
 
 I use the default settings, plus the following which are turned off by default for historical reasons:
