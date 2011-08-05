@@ -635,20 +635,20 @@ which doesn't seem particularly useful, but Rhino permits it."
 (defvar js3-BITOR 9)
 (defvar js3-BITXOR 10)
 (defvar js3-BITAND 11)
-(defvar js3-EQ 12)
-(defvar js3-NE 13)
-(defvar js3-LT 14)
-(defvar js3-LE 15)
-(defvar js3-GT 16)
-(defvar js3-GE 17)
-(defvar js3-LSH 18)
-(defvar js3-RSH 19)
-(defvar js3-URSH 20)
-(defvar js3-ADD 21)            ; infix plus
-(defvar js3-SUB 22)            ; infix minus
-(defvar js3-MUL 23)
-(defvar js3-DIV 24)
-(defvar js3-MOD 25)
+(defvar js3-ADD 12)            ; infix plus
+(defvar js3-SUB 13)            ; infix minus
+(defvar js3-MUL 14)
+(defvar js3-DIV 15)
+(defvar js3-MOD 16)
+(defvar js3-LT 17)
+(defvar js3-GT 18)
+(defvar js3-EQ 19)
+(defvar js3-NE 20)
+(defvar js3-LE 21)
+(defvar js3-GE 22)
+(defvar js3-LSH 23)
+(defvar js3-RSH 24)
+(defvar js3-URSH 25)
 (defvar js3-NOT 26)
 (defvar js3-BITNOT 27)
 (defvar js3-POS 28)            ; unary plus
@@ -723,14 +723,14 @@ which doesn't seem particularly useful, but Rhino permits it."
 (defvar js3-ASSIGN_BITOR 90)   ; |=
 (defvar js3-ASSIGN_BITXOR 91)  ; ^=
 (defvar js3-ASSIGN_BITAND 92)  ; &=
-(defvar js3-ASSIGN_LSH 93)     ; <<=
-(defvar js3-ASSIGN_RSH 94)     ; >>=
-(defvar js3-ASSIGN_URSH 95)    ; >>>=
-(defvar js3-ASSIGN_ADD 96)     ; +=
-(defvar js3-ASSIGN_SUB 97)     ; -=
-(defvar js3-ASSIGN_MUL 98)     ; *=
-(defvar js3-ASSIGN_DIV 99)     ; /=
-(defvar js3-ASSIGN_MOD 100)    ; %=
+(defvar js3-ASSIGN_ADD 93)     ; +=
+(defvar js3-ASSIGN_SUB 94)     ; -=
+(defvar js3-ASSIGN_MUL 95)     ; *=
+(defvar js3-ASSIGN_DIV 96)     ; /=
+(defvar js3-ASSIGN_MOD 97)     ; %=
+(defvar js3-ASSIGN_LSH 98)     ; <<=
+(defvar js3-ASSIGN_RSH 99)     ; >>=
+(defvar js3-ASSIGN_URSH 100)   ; >>>=
 
 (defvar js3-first-assign js3-ASSIGN)
 (defvar js3-last-assign js3-ASSIGN_MOD)
@@ -1285,6 +1285,14 @@ The value must be no less than minus `js3-indent-level'."
   "Lineup function for `cc-mode-style', for C comments in `js3-mode'."
   :type 'function
   :group 'js3-mode)
+
+(defcustom js3-reparse-on-indent t
+  "Whether `js3-mode' should perform a reparse before indenting.
+Might be slow, but important for comma-first and operator-first style,
+as well as pretty var statements."
+  :type 'boolean
+  :group 'js3-mode)
+(js3-mark-safe-local 'js3-lazy-commas 'booleanp)
 
 (defcustom js3-lazy-commas nil
   "Whether `js3-mode' should line up commas to the indent-minus-2,
@@ -3539,6 +3547,7 @@ are currently no guarantees around this."
   "Base AST node type."
   (type -1)  ; token type
   (pos -1)   ; start position of this AST node in parsed input
+  (abs -1)   ; absolute start of node, saved
   (len 1)    ; num characters spanned by the node
   props      ; optional node property list (an alist)
   parent)    ; link to parent node; null for root
@@ -3555,6 +3564,7 @@ are currently no guarantees around this."
 Any node in the list may be nil, for convenience."
   (dolist (node nodes)
     (when node
+      (setf (js3-node-abs node) (js3-node-pos node))
       (setf (js3-node-pos node) (- (js3-node-pos node)
                                    (js3-node-pos n))))))
 
@@ -10005,7 +10015,7 @@ of continued expressions.")
 of continued expressions in lazy-operator-first style.")
 
 (defconst js3-indent-operator-first-re
-  (concat "[-+*/%<>=&^|]\\([^-+*/]\\|$\\)\\|"
+  (concat "[-+*/%<>!=&^|?:.]\\([^-+*/]\\|$\\)\\|"
           (regexp-opt '("in" "instanceof") 'words))
   "Regular expression matching operators that affect indentation
 of continued expressions with operator-first style.")
@@ -10185,6 +10195,17 @@ This function is similar to `looking-back' but ignores comments and strings"
 	       (concat regexp "\\="))))
       (numberp (js3-re-search-backward r (point-min) t)))))
 
+(defun js3-looking-at (regexp)
+  "This function returns t if regexp matches text after point, beginning at point, and nil otherwise.
+
+This function is similar to `looking-at' but ignores comments and strings"
+  (save-excursion
+    (let ((r (if (and (= ?\= (elt regexp 1))
+		      (= ?\\ (elt regexp 0)))
+		 regexp
+	       (concat "\\=" regexp))))
+      (numberp (js3-re-search-forward r nil t)))))
+
 (defun js3-looking-at-operator-p ()
   "Return non-nil if point is on a JavaScript operator, other than a comma."
   (save-match-data
@@ -10342,145 +10363,216 @@ nil."
      ;;inside a string - indent to 0 since you can't do that.
      ((nth 8 parse-status) 0)
 
-     ;;comma-first
-     ((and (not js3-lazy-commas)
-	   (= (following-char) ?\,))
-      (let ((spos
-             (save-excursion
-	       (js3-backward-clean)
-               (cond
+     ;;comma-first and operator-first
+     ((or
+       (and (not js3-lazy-commas)
+	    (= (following-char) ?\,))
+       (and (not js3-lazy-operators)
+	    (looking-at js3-indent-operator-first-re)
+	    (or (not (= (following-char) ?\.))
+		(not js3-lazy-dots))))
+      (let ((node (js3-node-at-point))
+	    (char (following-char)))
+	(let ((spos
+	       (save-excursion
+		 (cond
 
-                ((js3-looking-back (concat "[,([{].*" js3-skip-newlines-re))
-		 (js3-re-search-backward (concat "[,([{].*"
-						 js3-skip-newlines-re)
-					 (point-min) t)
-		 (current-column))
+		  ((and
+		    node
+;;;		    helpful debugging
+;;;		    (message (number-to-string (js3-node-type node)))
+;;;		    (js3-print-ast node)
+;;;		    (message (number-to-string (js3-node-abs node)))
+		    (js3-node-type node)
+		    (= js3-VAR (js3-node-type node))) ; var node
+		   (goto-char (js3-node-abs node))
+		   (+ (current-column) 2))
 
-                ((js3-looking-back (concat "\\<var\\>.*" js3-skip-newlines-re))
-                 (js3-re-search-backward (concat "\\<var\\>.*"
-						 js3-skip-newlines-re)
-					 (point-min) t)
-                 (+ (current-column) 2))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= js3-RETURN (js3-node-type node)))
+		   (goto-char (js3-node-abs node))
+		   (+ (current-column) 5))
 
-                ((js3-looking-back (concat "\\<return\\>.*"
-					   js3-skip-newlines-re))
-                 (js3-re-search-backward (concat "\\<return\\>.*"
-						 js3-skip-newlines-re)
-					 (point-min) t)
-                 (+ (current-column) 5))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= js3-ARRAYLIT (js3-node-type node)))
+		   (goto-char (js3-node-abs node))
+		   (js3-re-search-forward "[[]" nil t)
+		   (backward-char)
+		   (current-column))
 
-                ((js3-looking-back (concat "[,([{]\\(.\\|\n\\)*"
-					   js3-skip-newlines-re))
-		 (js3-re-search-backward (concat "[,([{]\\(.\\|\n\\)*"
-						 js3-skip-newlines-re)
-					 (point-min) t)
-		 (current-column))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= js3-OBJECTLIT (js3-node-type node)))
+		   (goto-char (js3-node-abs node))
+		   (js3-re-search-forward "{" nil t)
+		   (backward-char)
+		   (current-column))
 
-                (t
-                 nil)))))
-        (if spos
-            spos
-          (+ js3-indent-level js3-expr-indent-offset))))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= js3-FUNCTION (js3-node-type node)))
+		   (goto-char (js3-node-abs node))
+		   (js3-re-search-forward "(" nil t)
+		   (backward-char)
+		   (current-column))
 
-     ;;dot-first
-     ((and (not js3-lazy-dots)
-	   (= (following-char) ?\.))
-      (save-excursion
-	(js3-backward-clean)
-        (if (not (js3-looking-back (concat "^[ \t]*\\([]})]+\\|.*\\..*\\)"
-					   js3-skip-newlines-re)))
-            (progn
-              (js3-re-search-backward (concat "\\<[^ \t]+" js3-skip-newlines-re)
-				      (point-min) t)
-              (js3-re-search-backward "^" (point-min) t)
-              (back-to-indentation)
-              (+ (current-column) js3-indent-level))
-          (progn
-            (js3-re-search-backward (concat "\\..*" js3-skip-newlines-re)
-				    (point-min) t)
-            (current-column)))))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= js3-CALL (js3-node-type node)))
+		   (goto-char (js3-node-abs node))
+		   (js3-re-search-forward "(" nil t)
+		   (backward-char)
+		   (current-column))
 
-     ;;operator-first colon
-     ((and (not js3-lazy-operators)
-	   (= (following-char) ?\:))
-      (let ((spos
-	     (save-excursion
-	       (js3-backward-clean)
-	       (cond
-		((js3-looking-back (concat "\\(."
-					   js3-indent-brace-re
-					   "\\|[^!=]=\\|.:\\).*"))
-		 (js3-re-search-backward (concat "\\(."
-						 js3-indent-brace-re
-						 "\\|[^!=]=\\|.:\\).*")
-					 (point-min) t)
-		 (1+ (current-column)))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (>= (js3-node-type node) 9)
+		    (<= (js3-node-type node) 18))    ; binary operators
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char)
+		   (current-column))
 
-		((js3-looking-back (concat "\\("
-					   js3-indent-brace-re
-					   "\\|:\\).*"))
-		 (js3-re-search-backward (concat "\\("
-						 js3-indent-brace-re
-						 "\\|:\\).*")
-					 (point-min) t)
-		 (current-column))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= js3-COMMA (js3-node-type node))) ; comma operator
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char)
+		   (current-column))
 
-		((js3-looking-back (concat js3-indent-operator-re ".*"))
-		 (js3-re-search-backward (concat js3-indent-operator-re ".*")
-					 (point-min) t)
-		 (current-column))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= js3-GETPROP (js3-node-type node))) ; dot operator
+		   (goto-char (js3-node-abs node))
+		   (if (js3-looking-at ".*\\..*")
+		       (progn (js3-re-search-forward "\\." nil t)
+			      (backward-char)
+			      (current-column))
+		     (+ (current-column)
+			js3-expr-indent-offset js3-indent-level)))
 
-		(t
-		 nil)))))
-	(if spos
-	    spos
-	  (+ js3-indent-level js3-expr-indent-offset))))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (>= (js3-node-type node) 19)
+		    (<= (js3-node-type node) 24))    ; 2-char binary operators
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char 2)
+		   (current-column))
 
-     ;;operator-first
-     ((and (not js3-lazy-operators)
-	   (looking-at js3-indent-operator-first-re))
-      (let ((spos
-	     (save-excursion
-	       (js3-backward-clean)
-	       (cond
-		((js3-looking-back (concat "\\(."
-					   js3-indent-operator-brace-re
-					   "\\|[^!=]=\\)[^{\n]*\\="))
-		 (js3-re-search-backward (concat "\\(."
-						 js3-indent-operator-brace-re
-						 "\\|[^!=]=\\)[^{\n]*\\=")
-					 (point-min) t)
-		 (1+ (current-column)))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= (js3-node-type node) 25))    ; 3-char binary operators
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char 3)
+		   (current-column))
 
-		((js3-looking-back (concat "\\("
-					   js3-indent-operator-brace-re
-					   "\\)[^{\n]*\\="))
-		 (js3-re-search-backward (concat "\\("
-						 js3-indent-operator-brace-re
-						 "\\)[^{\n]*\\=")
-					 (point-min) t)
-		 (current-column))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (>= (js3-node-type node) 103)
+		    (<= (js3-node-type node) 104))    ; logical and/or
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char 2)
+		   (current-column))
 
-		((js3-looking-back (concat "\\([{]\\|^\\)[^+*/-]*"
-					   js3-indent-operator-first-re
-					   "[^{\n]*\\="))
-		 (js3-re-search-backward (concat "\\([{]\\|^\\)[^+*/-]*"
-						 js3-indent-operator-first-re
-						 "[^{\n]*\\=")
-					 (point-min) t)
-		 (js3-re-search-forward (concat js3-indent-operator-first-re
-						"[^{\n]*$")
-					nil t)
-		 (js3-re-search-backward (concat js3-indent-operator-first-re
-						 "[^{\n]*\\=")
-					 (point-min) t)
-		 (current-column))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= js3-ASSIGN (js3-node-type node))) ; assignment
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char)
+		   (current-column))
 
-		(t
-		 nil)))))
-	(if spos
-	    spos
-	  (+ js3-indent-level js3-expr-indent-offset))))
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (>= (js3-node-type node) 90)
+		    (<= (js3-node-type node) 97))    ; assignment 2-char
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char 2)
+		   (current-column))
+
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (>= (js3-node-type node) 98)
+		    (<= (js3-node-type node) 99))    ; assignment 3-char
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char 3)
+		   (current-column))
+
+		  ((and
+		    node
+		    (js3-node-type node)
+		    (= (js3-node-type node) 100))    ; assignment 4-char
+		   (goto-char (js3-node-abs node))
+		   (when (= (preceding-char) ?\ )
+		     (backward-char))
+		   (backward-char 4)
+		   (current-column))
+
+		  (t
+		   (js3-backward-clean)
+		   (cond
+		    ((js3-looking-back (concat "[,([{].*" js3-skip-newlines-re))
+		     (js3-re-search-backward (concat "[,([{].*"
+						     js3-skip-newlines-re)
+					     (point-min) t)
+		     (current-column))
+
+		    ((js3-looking-back (concat "\\<var\\>.*"
+					       js3-skip-newlines-re))
+		     (js3-re-search-backward (concat "\\<var\\>.*"
+						     js3-skip-newlines-re)
+					     (point-min) t)
+		     (+ (current-column) 2))
+
+		    ((js3-looking-back (concat "\\<return\\>.*"
+					       js3-skip-newlines-re))
+		     (js3-re-search-backward (concat "\\<return\\>.*"
+						     js3-skip-newlines-re)
+					     (point-min) t)
+		     (+ (current-column) 5))
+
+		    ((js3-looking-back (concat "[,([{]\\(.\\|\n\\)*"
+					       js3-skip-newlines-re))
+		     (js3-re-search-backward (concat "[,([{]\\(.\\|\n\\)*"
+						     js3-skip-newlines-re)
+					     (point-min) t)
+		     (current-column))
+
+		    (t
+		     nil)))))))
+	  (if spos
+	      spos
+	    (+ js3-indent-level js3-expr-indent-offset)))))
 
      ;;lazy comma-first
      ((and js3-lazy-commas
@@ -10622,7 +10714,7 @@ nil."
 (defun js3-indent-line ()
   "Indent the current line as JavaScript."
   (interactive)
-  (when js3-pretty-vars (js3-reparse))
+  (when js3-reparse-on-indent (js3-reparse))
   (save-restriction
     (widen)
     (let* ((parse-status

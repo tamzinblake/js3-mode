@@ -126,7 +126,7 @@ function commaFirstStyle () {
   a = ( b + ( c
             / d
             )
-      * e
+          * e
       )
 
   //test c14
@@ -172,10 +172,10 @@ function commaFirstStyle () {
     , bar
 
   //test c18
-  //'+ e' should line up with '+ d'
+  //'+ e' should line up with ': c'
   //issue #21
   a = { b : c + d
-              + e
+          + e
       }
 
   //test c19
@@ -216,7 +216,7 @@ function commaFirstStyle () {
 
   //test c21
   // ? : operators
-  // : should line up with colon or brace or = if available.
+  // : should line up with open paren
   a = ( b ? c
       : d ? e
       : f
@@ -226,7 +226,7 @@ function commaFirstStyle () {
   //comma should line up with the r in var
   //issue #32
   var x = require("./test/test").something
-                 , y = require('./test2')
+    , y = require('./test2')
 
   //test c23
   //The function body should probably be indented past the paren, since there
@@ -254,10 +254,11 @@ function commaFirstStyle () {
 
   //test c24
   // && should line up properly with (
+  // set back one character so args line up
   //issue #29
 
   x = ( a != b
-      && c != d
+     && c != d
       )
 
   //test c25
@@ -265,7 +266,7 @@ function commaFirstStyle () {
   //issue #30
 
   var boolReg = '^(' + boolFields.join('|') + ')$'
-                                      , ignoreReg = '^(' + ignoreFields.join('|') + ')$'
+    , ignoreReg = '^(' + ignoreFields.join('|') + ')$'
 
   //test c26
   //comma should line up with the ( even though it's a weird case.
@@ -276,6 +277,85 @@ function commaFirstStyle () {
      , c
      + d
      )
+
+  //test c27
+  // * g should line up with - e
+  // + h should line up with & d
+  // & i should line up with | c
+  // | j should line up with = b
+  // this is a weird but consistent case - to avoid, use parens.
+
+  a = b | c & d - e * f
+                * g
+            + h
+        & i
+    | j
+
+  //test c28
+  //similar to test c27
+  //all operators should line up with parens
+
+  a = ( b | ( c & ( d - ( e * f
+                        * g
+                        )
+                  + h
+                  )
+            & i
+            )
+      | j
+      )
+
+  //test c29
+  //logical operators and such
+  //  = should line up vertically
+  // || should line up vertically
+  // && should line up vertically
+
+  a = b
+    = c
+    = d < e || f > g
+            || h < i && j < k
+                     && l > m
+            || n < b
+
+  //test c30
+  //comparison operators
+  //again, looks strange without parens
+  //>= i !== j === k should all line up under !== f
+  // != l == m should both line up under = b
+  a = b == c != d === e !== f >= g <= h
+                         >= i
+                        !== j
+                        === k
+   != l
+   == m
+
+  //tests c31-c33
+  //various nice lining up of dots
+  //from gist https://gist.github.com/1128152 (HT isaacs)
+
+  var someKindOfObject = {}
+
+  //test c31
+  //dots should line up
+
+  var xyz = someKindOfObject.foo("asdf")
+                            .bar("bloo")
+                            .bloo("blerg")
+
+  //test c32
+  //dots should be indented once from the object name
+
+  var xyx = someKindOfObject
+              .foo("asdf")
+              .bar("bloo")
+
+  //test c33
+  //dots should line up
+
+  someKindOfObject.doSomething()
+                  .doSomethingElse()
+                  .yetAnotherSomething()
 
   //end comma-first tests
 
@@ -397,15 +477,17 @@ function otherTests () {
 //operator should be indented to column 0 - emacs should not throw an error
 //possibly related to Issue #28
 //Edit: the following is no longer supported - indentation of '+' is undefined
+//Rationale: this is never useful JS code
 1
-        + 2
+                                         + 2
 
 //test z2
 //comma should be indented to column 0 - emacs should not throw an error
 //possibly related to Issue #28
 //Edit: the following is no longer supported - indentation of ',' is undefined
+//Rationale: this is never useful JS code
 1
-                      , 2
+                                         , 2
 
 //test z3
 //+ should correctly indent to first column without throwing an error
