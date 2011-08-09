@@ -322,7 +322,7 @@ Set `js3-include-gears-externs' to t to include them.")
 
 (eval-when-compile
   (require 'cl))
-  (require 'thingatpt)                    ; forward-symbol etc
+(require 'thingatpt)                    ; forward-symbol etc
 
 (eval-and-compile
   (require 'cc-mode)     ; (only) for `c-populate-syntax-table'
@@ -697,17 +697,14 @@ which doesn't seem particularly useful, but Rhino permits it."
 (defvar js3-REF_SPECIAL 71)    ; reference for special properties like __proto
 (defvar js3-YIELD 72)          ; JS 1.7 yield pseudo keyword
 
-;; XML support
-(defvar js3-DEFAULTNAMESPACE 73)
-(defvar js3-ESCXMLATTR 74)
-(defvar js3-ESCXMLTEXT 75)
-(defvar js3-REF_MEMBER 76)     ; Reference for x.@y, x..y etc.
-(defvar js3-REF_NS_MEMBER 77)  ; Reference for x.ns::y, x..ns::y etc.
-(defvar js3-REF_NAME 78)       ; Reference for @y, @[y] etc.
-(defvar js3-REF_NS_NAME 79)    ; Reference for ns::y, @ns::y@[y] etc.
-
-(defvar js3-first-bytecode js3-ENTERWITH)
-(defvar js3-last-bytecode js3-REF_NS_NAME)
+;; deprecated
+(defvar js3-DEPRECATED-A 73)
+(defvar js3-DEPRECATED-B 74)
+(defvar js3-DEPRECATED-C 75)
+(defvar js3-DEPRECATED-D 76)
+(defvar js3-DEPRECATED-E 77)
+(defvar js3-DEPRECATED-F 78)
+(defvar js3-DEPRECATED-G 79)
 
 (defvar js3-TRY 80)
 (defvar js3-SEMI 81)           ; semicolon
@@ -781,13 +778,13 @@ which doesn't seem particularly useful, but Rhino permits it."
 (defvar js3-LOCAL_BLOCK 140)
 (defvar js3-SET_REF_OP 141)    ; *reference op= something
 
-;; For XML support:
-(defvar js3-DOTDOT 142)        ; member operator (..)
-(defvar js3-COLONCOLON 143)    ; namespace::name
-(defvar js3-XML 144)           ; XML type
-(defvar js3-DOTQUERY 145)      ; .() -- e.g., x.emps.emp.(name == "terry")
-(defvar js3-XMLATTR 146)       ; @
-(defvar js3-XMLEND 147)
+;; deprecated
+(defvar js3-DEPRECATED-H 142)
+(defvar js3-DEPRECATED-I 143)
+(defvar js3-DEPRECATED-J 144)
+(defvar js3-DEPRECATED-K 145)
+(defvar js3-DEPRECATED-L 146)
+(defvar js3-DEPRECATED-M 147)
 
 ;; Optimizer-only tokens
 (defvar js3-TO_OBJECT 148)
@@ -850,15 +847,6 @@ Last literal number scanned.")
   "Token stream buffer-local variable.
 Current scan position.")
 
-(deflocal js3-ts-is-xml-attribute nil
-  "Token stream buffer-local variable.")
-
-(deflocal js3-ts-xml-is-tag-content nil
-  "Token stream buffer-local variable.")
-
-(deflocal js3-ts-xml-open-tags-count 0
-  "Token stream buffer-local variable.")
-
 (deflocal js3-ts-string-buffer nil
   "Token stream buffer-local variable.
 List of chars built up while scanning various tokens.")
@@ -920,7 +908,6 @@ parser as a frontend to an interpreter or byte compiler.")
 (deflocal js3-compiler-generate-debug-info t)
 (deflocal js3-compiler-use-dynamic-scope nil)
 (deflocal js3-compiler-reserved-keywords-as-identifier nil)
-(deflocal js3-compiler-xml-available t)
 (deflocal js3-compiler-optimization-level 0)
 (deflocal js3-compiler-generating-source t)
 (deflocal js3-compiler-strict-mode nil)
@@ -1967,9 +1954,6 @@ into temp buffers."
           js3-ts-lineno (or line 1)
           js3-ts-line-end-char -1
           js3-ts-cursor (point-min)
-          js3-ts-is-xml-attribute nil
-          js3-ts-xml-is-tag-content nil
-          js3-ts-xml-open-tags-count 0
           js3-ts-string-buffer nil)))
 
 ;; This function uses the cached op, string and number fields in
@@ -2162,8 +2146,6 @@ corresponding number.  Otherwise return -1."
             (setq continue nil))))
         ;; Assume the token will be 1 char - fixed up below.
         (js3-ts-set-char-token-bounds)
-        (when (eq c ?@)
-          (throw 'return js3-XMLATTR))
         ;; identifier/keyword/instanceof?
         ;; watch out for starting with a <backslash>
         (cond
@@ -2411,15 +2393,9 @@ corresponding number.  Otherwise return -1."
               (??
                (throw 'return js3-HOOK))
               (?:
-               (if (js3-match-char ?:)
-                   (js3-ts-return js3-COLONCOLON)
-                 (throw 'return js3-COLON)))
+	       (throw 'return js3-COLON))
               (?.
-               (if (js3-match-char ?.)
-                   (js3-ts-return js3-DOTDOT)
-                 (if (js3-match-char ?\()
-                     (js3-ts-return js3-DOTQUERY)
-                   (throw 'return js3-DOT))))
+	       (throw 'return js3-DOT))
               (?|
                (if (js3-match-char ?|)
                    (throw 'return js3-OR)
@@ -2610,212 +2586,6 @@ corresponding number.  Otherwise return -1."
       ;; tell `parse-partial-sexp' to ignore this range of chars
       (js3-record-text-property
        js3-token-beg js3-token-end 'syntax-class '(2)))))
-
-(defun js3-get-first-xml-token ()
-  (setq js3-ts-xml-open-tags-count 0
-        js3-ts-is-xml-attribute nil
-        js3-ts-xml-is-tag-content nil)
-  (js3-unget-char)
-  (js3-get-next-xml-token))
-
-(defsubst js3-xml-discard-string ()
-  "Throw away the string in progress and flag an XML parse error."
-  (setq js3-ts-string-buffer nil
-        js3-ts-string nil)
-  (js3-report-scan-error "msg.XML.bad.form" t))
-
-(defun js3-get-next-xml-token ()
-  (setq js3-ts-string-buffer nil  ; for recording the XML
-        js3-token-beg js3-ts-cursor)
-  (let (c result)
-    (setq result
-          (catch 'return
-            (while t
-              (setq c (js3-get-char))
-              (cond
-               ((= c js3-EOF_CHAR)
-                (throw 'return js3-ERROR))
-               (js3-ts-xml-is-tag-content
-                (case c
-                      (?>
-                       (js3-add-to-string c)
-                       (setq js3-ts-xml-is-tag-content nil
-                             js3-ts-is-xml-attribute nil))
-                      (?/
-                       (js3-add-to-string c)
-                       (when (eq ?> (js3-peek-char))
-                         (setq c (js3-get-char))
-                         (js3-add-to-string c)
-                         (setq js3-ts-xml-is-tag-content nil)
-                         (decf js3-ts-xml-open-tags-count)))
-                      (?{
-                       (js3-unget-char)
-                       (setq js3-ts-string (js3-get-string-from-buffer))
-                       (throw 'return js3-XML))
-                      ((?\' ?\")
-                       (js3-add-to-string c)
-                       (unless (js3-read-quoted-string c)
-                         (throw 'return js3-ERROR)))
-                      (?=
-                       (js3-add-to-string c)
-                       (setq js3-ts-is-xml-attribute t))
-                      ((? ?\t ?\r ?\n)
-                       (js3-add-to-string c))
-                      (t
-                       (js3-add-to-string c)
-                       (setq js3-ts-is-xml-attribute nil)))
-                (when (and (not js3-ts-xml-is-tag-content)
-                           (zerop js3-ts-xml-open-tags-count))
-                  (setq js3-ts-string (js3-get-string-from-buffer))
-                  (throw 'return js3-XMLEND)))
-               (t
-                ;; else not tag content
-                (case c
-                      (?<
-                       (js3-add-to-string c)
-                       (setq c (js3-peek-char))
-                       (case c
-                             (?!
-                              (setq c (js3-get-char)) ;; skip !
-                              (js3-add-to-string c)
-                              (setq c (js3-peek-char))
-                              (case c
-                                    (?-
-                                     (setq c (js3-get-char)) ;; skip -
-                                     (js3-add-to-string c)
-                                     (if (eq c ?-)
-                                         (progn
-                                           (js3-add-to-string c)
-                                           (unless (js3-read-xml-comment)
-                                             (throw 'return js3-ERROR)))
-                                       (js3-xml-discard-string)
-                                       (throw 'return js3-ERROR)))
-                                    (?\[
-                                     (setq c (js3-get-char)) ;; skip [
-                                     (js3-add-to-string c)
-                                     (if (and (= (js3-get-char) ?C)
-                                              (= (js3-get-char) ?D)
-                                              (= (js3-get-char) ?A)
-                                              (= (js3-get-char) ?T)
-                                              (= (js3-get-char) ?A)
-                                              (= (js3-get-char) ?\[))
-                                         (progn
-                                           (js3-add-to-string ?C)
-                                           (js3-add-to-string ?D)
-                                           (js3-add-to-string ?A)
-                                           (js3-add-to-string ?T)
-                                           (js3-add-to-string ?A)
-                                           (js3-add-to-string ?\[)
-                                           (unless (js3-read-cdata)
-                                             (throw 'return js3-ERROR)))
-                                       (js3-xml-discard-string)
-                                       (throw 'return js3-ERROR)))
-                                    (t
-                                     (unless (js3-read-entity)
-                                       (throw 'return js3-ERROR)))))
-                             (??
-                              (setq c (js3-get-char)) ;; skip ?
-                              (js3-add-to-string c)
-                              (unless (js3-read-PI)
-                                (throw 'return js3-ERROR)))
-                             (?/
-                              ;; end tag
-                              (setq c (js3-get-char)) ;; skip /
-                              (js3-add-to-string c)
-                              (when (zerop js3-ts-xml-open-tags-count)
-                                (js3-xml-discard-string)
-                                (throw 'return js3-ERROR))
-                              (setq js3-ts-xml-is-tag-content t)
-                              (decf js3-ts-xml-open-tags-count))
-                             (t
-                              ;; start tag
-                              (setq js3-ts-xml-is-tag-content t)
-                              (incf js3-ts-xml-open-tags-count))))
-                      (?{
-                       (js3-unget-char)
-                       (setq js3-ts-string (js3-get-string-from-buffer))
-                       (throw 'return js3-XML))
-                      (t
-                       (js3-add-to-string c))))))))
-    (setq js3-token-end js3-ts-cursor)
-    result))
-
-(defun js3-read-quoted-string (quote)
-  (let (c)
-    (catch 'return
-      (while (/= (setq c (js3-get-char)) js3-EOF_CHAR)
-        (js3-add-to-string c)
-        (if (eq c quote)
-            (throw 'return t)))
-      (js3-xml-discard-string)  ;; throw away string in progress
-      nil)))
-
-(defun js3-read-xml-comment ()
-  (let ((c (js3-get-char)))
-    (catch 'return
-      (while (/= c js3-EOF_CHAR)
-        (catch 'continue
-          (js3-add-to-string c)
-          (when (and (eq c ?-) (eq ?- (js3-peek-char)))
-            (setq c (js3-get-char))
-            (js3-add-to-string c)
-            (if (eq (js3-peek-char) ?>)
-                (progn
-                  (setq c (js3-get-char)) ;; skip >
-                  (js3-add-to-string c)
-                  (throw 'return t))
-              (throw 'continue nil)))
-          (setq c (js3-get-char))))
-      (js3-xml-discard-string)
-      nil)))
-
-(defun js3-read-cdata ()
-  (let ((c (js3-get-char)))
-    (catch 'return
-      (while (/= c js3-EOF_CHAR)
-        (catch 'continue
-          (js3-add-to-string c)
-          (when (and (eq c ?\]) (eq (js3-peek-char) ?\]))
-            (setq c (js3-get-char))
-            (js3-add-to-string c)
-            (if (eq (js3-peek-char) ?>)
-                (progn
-                  (setq c (js3-get-char)) ;; Skip >
-                  (js3-add-to-string c)
-                  (throw 'return t))
-              (throw 'continue nil)))
-          (setq c (js3-get-char))))
-      (js3-xml-discard-string)
-      nil)))
-
-(defun js3-read-entity ()
-  (let ((decl-tags 1)
-        c)
-    (catch 'return
-      (while (/= js3-EOF_CHAR (setq c (js3-get-char)))
-        (js3-add-to-string c)
-        (case c
-              (?<
-               (incf decl-tags))
-              (?>
-               (decf decl-tags)
-               (if (zerop decl-tags)
-                   (throw 'return t)))))
-      (js3-xml-discard-string)
-      nil)))
-
-(defun js3-read-PI ()
-  "Scan an XML processing instruction."
-  (let (c)
-    (catch 'return
-      (while (/= js3-EOF_CHAR (setq c (js3-get-char)))
-        (js3-add-to-string c)
-        (when (and (eq c ??) (eq (js3-peek-char) ?>))
-          (setq c (js3-get-char))  ;; Skip >
-          (js3-add-to-string c)
-          (throw 'return t)))
-      (js3-xml-discard-string)
-      nil)))
 
 (defun js3-scanner-get-line ()
   "Return the text of the current scan line."
@@ -3094,15 +2864,6 @@ the correct number of ARGS must be provided."
 (js3-msg "msg.no.name.after.dot"
          "missing name after . operator")
 
-(js3-msg "msg.no.name.after.coloncolon"
-         "missing name after :: operator")
-
-(js3-msg "msg.no.name.after.dotdot"
-         "missing name after .. operator")
-
-(js3-msg "msg.no.name.after.xmlAttr"
-         "missing name after .@")
-
 (js3-msg "msg.no.bracket.index"
          "missing ] in index expression")
 
@@ -3235,12 +2996,6 @@ the correct number of ARGS must be provided."
 (js3-msg "msg.unexpected.eof"
          "Unexpected end of file")
 
-(js3-msg "msg.XML.bad.form"
-         "illegally formed XML syntax")
-
-(js3-msg "msg.XML.not.available"
-         "XML runtime not available")
-
 (js3-msg "msg.too.deep.parser.recursion"
          "Too deep recursion while parsing")
 
@@ -3330,9 +3085,6 @@ the correct number of ARGS must be provided."
 
 (js3-msg "msg.function.not.found.in"
          "Cannot find function %s in object %s.")
-
-(js3-msg "msg.isnt.xml.object"
-         "%s is not an xml object.")
 
 (js3-msg "msg.no.ref.to.get"
          "%s is not a reference to read reference value.")
@@ -3440,10 +3192,6 @@ the correct number of ARGS must be provided."
 (js3-msg "msg.invalid.escape"
          "invalid Unicode escape sequence")
 
-(js3-msg "msg.bad.namespace"
-         "not a valid default namespace statement. "
-         "Syntax is: default xml namespace = EXPRESSION;")
-
 ;; TokensStream warnings
 (js3-msg "msg.bad.octal.literal"
          "illegal octal literal digit %s; "
@@ -3494,11 +3242,6 @@ the correct number of ARGS must be provided."
 (eval-and-compile
   (require 'cl))
 
-
-;; flags for ast node property 'member-type (used for e4x operators)
-(defvar js3-property-flag    #x1 "property access: element is valid name")
-(defvar js3-attribute-flag   #x2 "x.@y or x..@y")
-(defvar js3-descendants-flag #x4 "x..y or x..@i")
 
 (defsubst js3-relpos (pos anchor)
   "Convert POS to be relative to ANCHOR.
@@ -5176,405 +4919,6 @@ as opposed to required parens such as those enclosing an if-conditional."
 (put 'cl-struct-js3-empty-expr-node 'js3-visitor 'js3-visit-none)
 (put 'cl-struct-js3-empty-expr-node 'js3-printer 'js3-print-none)
 
-(defstruct (js3-xml-node
-            (:include js3-block-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-node (&key (type js3-XML)
-                                                  (pos js3-token-beg)
-                                                  len
-                                                  kids)))
-  "AST node for initial parse of E4X literals.
-The kids field is a list of XML fragments, each a `js3-string-node' or
-a `js3-xml-js-expr-node'.  Equivalent to Rhino's XmlLiteral node.")
-
-(put 'cl-struct-js3-xml-node 'js3-visitor 'js3-visit-block)
-(put 'cl-struct-js3-xml-node 'js3-printer 'js3-print-xml-node)
-
-(defun js3-print-xml-node (n i)
-  (dolist (kid (js3-xml-node-kids n))
-    (js3-print-ast kid i)))
-
-(defstruct (js3-xml-js-expr-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-js-expr-node (&key (type js3-XML)
-                                                          (pos js3-ts-cursor)
-                                                          len
-                                                          expr)))
-  "AST node for an embedded JavaScript {expression} in an E4X literal.
-The start and end fields correspond to the curly-braces."
-  expr)  ; a `js3-expr-node' of some sort
-
-(put 'cl-struct-js3-xml-js-expr-node 'js3-visitor 'js3-visit-xml-js-expr)
-(put 'cl-struct-js3-xml-js-expr-node 'js3-printer 'js3-print-xml-js-expr)
-
-(defun js3-visit-xml-js-expr (n v)
-  (js3-visit-ast (js3-xml-js-expr-node-expr n) v))
-
-(defun js3-print-xml-js-expr (n i)
-  (insert (js3-make-pad i))
-  (insert "{")
-  (js3-print-ast (js3-xml-js-expr-node-expr n) 0)
-  (insert "}"))
-
-(defstruct (js3-xml-dot-query-node
-            (:include js3-infix-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-dot-query-node (&key (type js3-DOTQUERY)
-                                                            (pos js3-ts-cursor)
-                                                            op-pos
-                                                            len
-                                                            left
-                                                            right
-                                                            rp)))
-  "AST node for an E4X foo.(bar) filter expression.
-Note that the left-paren is automatically the character immediately
-following the dot (.) in the operator.  No whitespace is permitted
-between the dot and the lp by the scanner."
-  rp)
-
-(put 'cl-struct-js3-xml-dot-query-node 'js3-visitor 'js3-visit-infix-node)
-(put 'cl-struct-js3-xml-dot-query-node 'js3-printer 'js3-print-xml-dot-query)
-
-(defun js3-print-xml-dot-query (n i)
-  (insert (js3-make-pad i))
-  (js3-print-ast (js3-xml-dot-query-node-left n) 0)
-  (insert ".(")
-  (js3-print-ast (js3-xml-dot-query-node-right n) 0)
-  (insert ")"))
-
-(defstruct (js3-xml-ref-node
-            (:include js3-node)
-            (:constructor nil))  ; abstract
-  "Base type for E4X XML attribute-access or property-get expressions.
-Such expressions can take a variety of forms.  The general syntax has
-three parts:
-
-- (optional) an @ (specifying an attribute access)
-- (optional) a namespace (a `js3-name-node') and double-colon
-- (required) either a `js3-name-node' or a bracketed [expression]
-
-The property-name expressions (examples:  ns::name, @name) are
-represented as `js3-xml-prop-ref' nodes.  The bracketed-expression
-versions (examples:  ns::[name], @[name]) become `js3-xml-elem-ref' nodes.
-
-This node type (or more specifically, its subclasses) will sometimes
-be the right-hand child of a `js3-prop-get-node' or a
-`js3-infix-node' of type `js3-DOTDOT', the .. xml-descendants operator.
-The `js3-xml-ref-node' may also be a standalone primary expression with
-no explicit target, which is valid in certain expression contexts such as
-
-company..employee.(@id < 100)
-
-in this case, the @id is a `js3-xml-ref' that is part of an infix '<'
-expression whose parent is a `js3-xml-dot-query-node'."
-  namespace
-  at-pos
-  colon-pos)
-
-(defsubst js3-xml-ref-node-attr-access-p (node)
-  "Return non-nil if this expression began with an @-token."
-  (and (numberp (js3-xml-ref-node-at-pos node))
-       (plusp (js3-xml-ref-node-at-pos node))))
-
-(defstruct (js3-xml-prop-ref-node
-            (:include js3-xml-ref-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-prop-ref-node (&key (type js3-REF_NAME)
-                                                           (pos js3-token-beg)
-                                                           len
-                                                           propname
-                                                           namespace
-                                                           at-pos
-                                                           colon-pos)))
-  "AST node for an E4X XML [expr] property-ref expression.
-The JavaScript syntax is an optional @, an optional ns::, and a name.
-
-[ '@' ] [ name '::' ] name
-
-Examples include name, ns::name, ns::*, *::name, *::*, @attr, @ns::attr,
-@ns::*, @*::attr, @*::*, and @*.
-
-The node starts at the @ token, if present.  Otherwise it starts at the
-namespace name.  The node bounds extend through the closing right-bracket,
-or if it is missing due to a syntax error, through the end of the index
-expression."
-propname)
-
-(put 'cl-struct-js3-xml-prop-ref-node 'js3-visitor 'js3-visit-xml-prop-ref-node)
-(put 'cl-struct-js3-xml-prop-ref-node 'js3-printer 'js3-print-xml-prop-ref-node)
-
-(defun js3-visit-xml-prop-ref-node (n v)
-  (js3-visit-ast (js3-xml-prop-ref-node-namespace n) v)
-  (js3-visit-ast (js3-xml-prop-ref-node-propname n) v))
-
-(defun js3-print-xml-prop-ref-node (n i)
-  (insert (js3-make-pad i))
-  (if (js3-xml-ref-node-attr-access-p n)
-      (insert "@"))
-  (when (js3-xml-prop-ref-node-namespace n)
-    (js3-print-ast (js3-xml-prop-ref-node-namespace n) 0)
-    (insert "::"))
-  (if (js3-xml-prop-ref-node-propname n)
-      (js3-print-ast (js3-xml-prop-ref-node-propname n) 0)))
-
-(defstruct (js3-xml-elem-ref-node
-            (:include js3-xml-ref-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-elem-ref-node (&key (type js3-REF_MEMBER)
-                                                           (pos js3-token-beg)
-                                                           len
-                                                           expr
-                                                           lb
-                                                           rb
-                                                           namespace
-                                                           at-pos
-                                                           colon-pos)))
-  "AST node for an E4X XML [expr] member-ref expression.
-Syntax:
-
-[ '@' ] [ name '::' ] '[' expr ']'
-
-Examples include ns::[expr], @ns::[expr], @[expr], *::[expr] and @*::[expr].
-
-Note that the form [expr] (i.e. no namespace or attribute-qualifier)
-is not a legal E4X XML element-ref expression, since it's already used
-for standard JavaScript element-get array indexing.  Hence, a
-`js3-xml-elem-ref-node' always has either the attribute-qualifier, a
-non-nil namespace node, or both.
-
-The node starts at the @ token, if present.  Otherwise it starts
-at the namespace name.  The node bounds extend through the closing
-right-bracket, or if it is missing due to a syntax error, through the
-end of the index expression."
-expr  ; the bracketed index expression
-lb
-rb)
-
-(put 'cl-struct-js3-xml-elem-ref-node 'js3-visitor 'js3-visit-xml-elem-ref-node)
-(put 'cl-struct-js3-xml-elem-ref-node 'js3-printer 'js3-print-xml-elem-ref-node)
-
-(defun js3-visit-xml-elem-ref-node (n v)
-  (js3-visit-ast (js3-xml-elem-ref-node-namespace n) v)
-  (js3-visit-ast (js3-xml-elem-ref-node-expr n) v))
-
-(defun js3-print-xml-elem-ref-node (n i)
-  (insert (js3-make-pad i))
-  (if (js3-xml-ref-node-attr-access-p n)
-      (insert "@"))
-  (when (js3-xml-elem-ref-node-namespace n)
-    (js3-print-ast (js3-xml-elem-ref-node-namespace n) 0)
-    (insert "::"))
-  (insert "[")
-  (if (js3-xml-elem-ref-node-expr n)
-      (js3-print-ast (js3-xml-elem-ref-node-expr n) 0))
-  (insert "]"))
-
-;;; Placeholder nodes for when we try parsing the XML literals structurally.
-
-(defstruct (js3-xml-start-tag-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-start-tag-node (&key (type js3-XML)
-                                                            (pos js3-ts-cursor)
-                                                            len
-                                                            name
-                                                            attrs
-                                                            kids
-                                                            empty-p)))
-  "AST node for an XML start-tag.  Not currently used.
-The `kids' field is a lisp list of child content nodes."
-  name      ; a `js3-xml-name-node'
-  attrs     ; a lisp list of `js3-xml-attr-node'
-  empty-p)  ; t if this is an empty element such as <foo bar="baz"/>
-
-(put 'cl-struct-js3-xml-start-tag-node 'js3-visitor 'js3-visit-xml-start-tag)
-(put 'cl-struct-js3-xml-start-tag-node 'js3-printer 'js3-print-xml-start-tag)
-
-(defun js3-visit-xml-start-tag (n v)
-  (js3-visit-ast (js3-xml-start-tag-node-name n) v)
-  (dolist (attr (js3-xml-start-tag-node-attrs n))
-    (js3-visit-ast attr v))
-  (js3-visit-block n v))
-
-(defun js3-print-xml-start-tag (n i)
-  (insert (js3-make-pad i) "<")
-  (js3-print-ast (js3-xml-start-tag-node-name n) 0)
-  (when (js3-xml-start-tag-node-attrs n)
-    (insert " ")
-    (js3-print-list (js3-xml-start-tag-node-attrs n) " "))
-  (insert ">"))
-
-;; I -think- I'm going to make the parent node the corresponding start-tag,
-;; and add the end-tag to the kids list of the parent as well.
-(defstruct (js3-xml-end-tag-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-end-tag-node (&key (type js3-XML)
-                                                          (pos js3-ts-cursor)
-                                                          len
-                                                          name)))
-  "AST node for an XML end-tag.  Not currently used."
-  name)  ; a `js3-xml-name-node'
-
-(put 'cl-struct-js3-xml-end-tag-node 'js3-visitor 'js3-visit-xml-end-tag)
-(put 'cl-struct-js3-xml-end-tag-node 'js3-printer 'js3-print-xml-end-tag)
-
-(defun js3-visit-xml-end-tag (n v)
-  (js3-visit-ast (js3-xml-end-tag-node-name n) v))
-
-(defun js3-print-xml-end-tag (n i)
-  (insert (js3-make-pad i))
-  (insert "</")
-  (js3-print-ast (js3-xml-end-tag-node-name n) 0)
-  (insert ">"))
-
-(defstruct (js3-xml-name-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-name-node (&key (type js3-XML)
-                                                       (pos js3-ts-cursor)
-                                                       len
-                                                       namespace
-                                                       kids)))
-  "AST node for an E4X XML name.  Not currently used.
-Any XML name can be qualified with a namespace, hence the namespace field.
-Further, any E4X name can be comprised of arbitrary JavaScript {} expressions.
-The kids field is a list of `js3-name-node' and `js3-xml-js-expr-node'.
-For a simple name, the kids list has exactly one node, a `js3-name-node'."
-  namespace)  ; a `js3-string-node'
-
-(put 'cl-struct-js3-xml-name-node 'js3-visitor 'js3-visit-xml-name-node)
-(put 'cl-struct-js3-xml-name-node 'js3-printer 'js3-print-xml-name-node)
-
-(defun js3-visit-xml-name-node (n v)
-  (js3-visit-ast (js3-xml-name-node-namespace n) v))
-
-(defun js3-print-xml-name-node (n i)
-  (insert (js3-make-pad i))
-  (when (js3-xml-name-node-namespace n)
-    (js3-print-ast (js3-xml-name-node-namespace n) 0)
-    (insert "::"))
-  (dolist (kid (js3-xml-name-node-kids n))
-    (js3-print-ast kid 0)))
-
-(defstruct (js3-xml-pi-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-pi-node (&key (type js3-XML)
-                                                     (pos js3-ts-cursor)
-                                                     len
-                                                     name
-                                                     attrs)))
-  "AST node for an E4X XML processing instruction.  Not currently used."
-  name   ; a `js3-xml-name-node'
-  attrs) ; a list of `js3-xml-attr-node'
-
-(put 'cl-struct-js3-xml-pi-node 'js3-visitor 'js3-visit-xml-pi-node)
-(put 'cl-struct-js3-xml-pi-node 'js3-printer 'js3-print-xml-pi-node)
-
-(defun js3-visit-xml-pi-node (n v)
-  (js3-visit-ast (js3-xml-pi-node-name n) v)
-  (dolist (attr (js3-xml-pi-node-attrs n))
-    (js3-visit-ast attr v)))
-
-(defun js3-print-xml-pi-node (n i)
-  (insert (js3-make-pad i) "<?")
-  (js3-print-ast (js3-xml-pi-node-name n))
-  (when (js3-xml-pi-node-attrs n)
-    (insert " ")
-    (js3-print-list (js3-xml-pi-node-attrs n)))
-  (insert "?>"))
-
-(defstruct (js3-xml-cdata-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-cdata-node (&key (type js3-XML)
-                                                        (pos js3-ts-cursor)
-                                                        len
-                                                        content)))
-  "AST node for a CDATA escape section.  Not currently used."
-  content)  ; a `js3-string-node' with node-property 'quote-type 'cdata
-
-(put 'cl-struct-js3-xml-cdata-node 'js3-visitor 'js3-visit-xml-cdata-node)
-(put 'cl-struct-js3-xml-cdata-node 'js3-printer 'js3-print-xml-cdata-node)
-
-(defun js3-visit-xml-cdata-node (n v)
-  (js3-visit-ast (js3-xml-cdata-node-content n) v))
-
-(defun js3-print-xml-cdata-node (n i)
-  (insert (js3-make-pad i))
-  (js3-print-ast (js3-xml-cdata-node-content n)))
-
-(defstruct (js3-xml-attr-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-attr-node (&key (type js3-XML)
-                                                   (pos js3-ts-cursor)
-                                                   len
-                                                   name
-                                                   value
-                                                   eq-pos
-                                                   quote-type)))
-  "AST node representing a foo='bar' XML attribute value.  Not yet used."
-  name   ; a `js3-xml-name-node'
-  value  ; a `js3-xml-name-node'
-  eq-pos ; buffer position of "=" sign
-  quote-type) ; 'single or 'double
-
-(put 'cl-struct-js3-xml-attr-node 'js3-visitor 'js3-visit-xml-attr-node)
-(put 'cl-struct-js3-xml-attr-node 'js3-printer 'js3-print-xml-attr-node)
-
-(defun js3-visit-xml-attr-node (n v)
-  (js3-visit-ast (js3-xml-attr-node-name n) v)
-  (js3-visit-ast (js3-xml-attr-node-value n) v))
-
-(defun js3-print-xml-attr-node (n i)
-  (let ((quote (if (eq (js3-xml-attr-node-quote-type n) 'single)
-                   "'"
-                 "\"")))
-    (insert (js3-make-pad i))
-    (js3-print-ast (js3-xml-attr-node-name n) 0)
-    (insert "=" quote)
-    (js3-print-ast (js3-xml-attr-node-value n) 0)
-    (insert quote)))
-
-(defstruct (js3-xml-text-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-text-node (&key (type js3-XML)
-                                                   (pos js3-ts-cursor)
-                                                   len
-                                                   content)))
-  "AST node for an E4X XML text node.  Not currently used."
-  content)  ; a lisp list of `js3-string-node' and `js3-xml-js-expr-node'
-
-(put 'cl-struct-js3-xml-text-node 'js3-visitor 'js3-visit-xml-text-node)
-(put 'cl-struct-js3-xml-text-node 'js3-printer 'js3-print-xml-text-node)
-
-(defun js3-visit-xml-text-node (n v)
-  (js3-visit-ast (js3-xml-text-node-content n) v))
-
-(defun js3-print-xml-text-node (n i)
-  (insert (js3-make-pad i))
-  (dolist (kid (js3-xml-text-node-content n))
-    (js3-print-ast kid)))
-
-(defstruct (js3-xml-comment-node
-            (:include js3-xml-node)
-            (:constructor nil)
-            (:constructor make-js3-xml-comment-node (&key (type js3-XML)
-                                                          (pos js3-ts-cursor)
-                                                          len)))
-  "AST node for E4X XML comment.  Not currently used.")
-
-(put 'cl-struct-js3-xml-comment-node 'js3-visitor 'js3-visit-none)
-(put 'cl-struct-js3-xml-comment-node 'js3-printer 'js3-print-xml-comment)
-
-(defun js3-print-xml-comment (n i)
-  (insert (js3-make-pad i)
-          (js3-node-string n)))
-
 ;;; Node utilities
 
 (defsubst js3-node-line (n)
@@ -5681,8 +5025,7 @@ Returns nil for zero-length child lists or unsupported nodes."
     cl-struct-js3-paren-node
     cl-struct-js3-switch-node
     cl-struct-js3-while-node
-    cl-struct-js3-with-node
-    cl-struct-js3-xml-dot-query-node)
+    cl-struct-js3-with-node)
   "Node types that can have a parenthesized child expression.
 In particular, nodes that respond to `js3-node-lp' and `js3-node-rp'.")
 
@@ -5723,8 +5066,6 @@ Note that the position may be nil in the case of a parse error."
     (js3-array-comp-node-lp node))
    ((js3-with-node-p node)
     (js3-with-node-lp node))
-   ((js3-xml-dot-query-node-p node)
-    (1+ (js3-infix-node-op-pos node)))
    (t
     (error "Unsupported node type: %s" (js3-node-short-name node)))))
 
@@ -5758,8 +5099,6 @@ Note that the position may be nil in the case of a parse error."
     (js3-array-comp-node-rp node))
    ((js3-with-node-p node)
     (js3-with-node-rp node))
-   ((js3-xml-dot-query-node-p node)
-    (1+ (js3-xml-dot-query-node-rp node)))
    (t
     (error "Unsupported node type: %s" (js3-node-short-name node)))))
 
@@ -6196,13 +5535,14 @@ You should use `js3-print-tree' instead of this function."
 
 (defun js3-member-expr-leftmost-name (node)
   "For an expr such as foo.bar.baz, return leftmost node foo.
-NODE is any `js3-node' object.  If it represents a member expression,
-which is any sequence of property gets, element-gets, function calls,
-or xml descendants/filter operators, then we look at the lexically
-leftmost (first) node in the chain.  If it is a name-node we return it.
-Note that NODE can be a raw name-node and it will be returned as well.
-If NODE is not a name-node or member expression, or if it is a member
-expression whose leftmost target is not a name node, returns nil."
+NODE is any `js3-node' object.  If it represents a member
+expression, which is any sequence of property gets, element-gets,
+or function calls, then we look at the lexically leftmost (first)
+node in the chain.  If it is a name-node we return it.  Note that
+NODE can be a raw name-node and it will be returned as well.  If
+NODE is not a name-node or member expression, or if it is a
+member expression whose leftmost target is not a name node,
+returns nil."
   (let ((continue t)
         result)
     (while (and continue (not result))
@@ -6211,7 +5551,6 @@ expression whose leftmost target is not a name node, returns nil."
         (setq result node))
        ((js3-prop-get-node-p node)
         (setq node (js3-prop-get-node-left node)))
-       ;; TODO:  handle call-nodes, xml-nodes, others?
        (t
         (setq continue nil))))
     result))
@@ -6220,7 +5559,6 @@ expression whose leftmost target is not a name node, returns nil."
   (list js3-BLOCK
         js3-BREAK
         js3-CONTINUE
-        js3-DEFAULT  ; e4x "default xml namespace" statement
         js3-DO
         js3-EXPR_RESULT
         js3-EXPR_VOID
@@ -7616,10 +6954,6 @@ Returns t on match, nil if no match."
   (if (js3-function-node-p js3-current-script-or-fn)
       (setf (js3-function-node-is-generator js3-current-script-or-fn) t)))
 
-(defsubst js3-must-have-xml ()
-  (unless js3-compiler-xml-available
-    (js3-report-error "msg.XML.not.available")))
-
 (defsubst js3-push-scope (scope)
   "Push SCOPE, a `js3-scope', onto the lexical scope chain."
   (assert (js3-scope-p scope))
@@ -7685,7 +7019,6 @@ leaving a statement, an expression, or a function definition."
   (if (and cb (not (functionp cb)))
       (error "criteria callbacks not yet implemented"))
   (let ((inhibit-point-motion-hooks t)
-        (js3-compiler-xml-available (>= js3-language-version 160))
         ;; This is a recursive-descent parser, so give it a big stack.
         (max-lisp-eval-depth (max max-lisp-eval-depth 3000))
         (max-specpdl-size (max max-specpdl-size 3000))
@@ -7986,7 +7319,6 @@ node are given relative start positions and correct lengths."
     (aset parsers js3-CONST     #'js3-parse-const-var)
     (aset parsers js3-CONTINUE  #'js3-parse-continue)
     (aset parsers js3-DEBUGGER  #'js3-parse-debugger)
-    (aset parsers js3-DEFAULT   #'js3-parse-default-xml-namespace)
     (aset parsers js3-DO        #'js3-parse-do)
     (aset parsers js3-FOR       #'js3-parse-for)
     (aset parsers js3-FUNCTION  #'js3-function-parser)
@@ -8676,33 +8008,6 @@ Last matched token is js3-SEMI or js3-ERROR."
       (js3-report-error "msg.syntax" nil pos len)
       (make-js3-error-node :pos pos :len len))))
 
-(defun js3-parse-default-xml-namespace ()
-  "Parse a `default xml namespace = <expr>' e4x statement."
-  (let ((pos js3-token-beg)
-        end len expr unary es)
-    (js3-consume-token)
-    (js3-must-have-xml)
-    (js3-set-requires-activation)
-    (setq len (- js3-ts-cursor pos))
-    (unless (and (js3-match-token js3-NAME)
-                 (string= js3-ts-string "xml"))
-      (js3-report-error "msg.bad.namespace" nil pos len))
-    (unless (and (js3-match-token js3-NAME)
-                 (string= js3-ts-string "namespace"))
-      (js3-report-error "msg.bad.namespace" nil pos len))
-    (unless (js3-match-token js3-ASSIGN)
-      (js3-report-error "msg.bad.namespace" nil pos len))
-    (setq expr (js3-parse-expr)
-          end (js3-node-end expr)
-          unary (make-js3-unary-node :type js3-DEFAULTNAMESPACE
-                                     :pos pos
-                                     :len (- end pos)
-                                     :operand expr))
-    (js3-node-add-children unary expr)
-    (make-js3-expr-stmt-node :pos pos
-                             :len (- end pos)
-                             :expr unary)))
-
 (defun js3-record-label (label bundle)
   ;; current token should be colon that `js3-parse-primary-expr' left untouched
   (js3-consume-token)
@@ -9212,11 +8517,6 @@ to parse the operand (for prefix operators)."
      ((= tt js3-ERROR)
       (js3-consume-token)
       (make-js3-error-node))  ; try to continue
-     ((and (= tt js3-LT)
-           js3-compiler-xml-available)
-      ;; XML stream encountered in expression.
-      (js3-consume-token)
-      (js3-parse-member-expr-tail t (js3-parse-xml-initializer)))
      (t
       (setq pn (js3-parse-member-expr t)
             ;; Don't look across a newline boundary for a postfix incop.
@@ -9228,61 +8528,6 @@ to parse the operand (for prefix operators)."
         (js3-node-set-prop pn 'postfix t)
         (js3-check-bad-inc-dec tt js3-token-beg js3-token-end pn))
       pn))))
-
-(defun js3-parse-xml-initializer ()
-  "Parse an E4X XML initializer.
-I'm parsing it the way Rhino parses it, but without the tree-rewriting.
-Then I'll postprocess the result, depending on whether we're in IDE
-mode or codegen mode, and generate the appropriate rewritten AST.
-IDE mode uses a rich AST that models the XML structure.  Codegen mode
-just concatenates everything and makes a new XML or XMLList out of it."
-  (let ((tt (js3-get-first-xml-token))
-        pn-xml
-        pn
-        expr
-        kids
-        expr-pos
-        (continue t)
-        (first-token t))
-    (when (not (or (= tt js3-XML) (= tt js3-XMLEND)))
-      (js3-report-error "msg.syntax"))
-    (setq pn-xml (make-js3-xml-node))
-    (while continue
-      (if first-token
-          (setq first-token nil)
-        (setq tt (js3-get-next-xml-token)))
-      (cond
-       ;; js3-XML means we found a {expr} in the XML stream.
-       ;; The js3-ts-string is the XML up to the left-curly.
-       ((= tt js3-XML)
-        (push (make-js3-string-node :pos js3-token-beg
-                                    :len (- js3-ts-cursor js3-token-beg))
-              kids)
-        (js3-must-match js3-LC "msg.syntax")
-        (setq expr-pos js3-ts-cursor
-              expr (if (eq (js3-peek-token) js3-RC)
-                       (make-js3-empty-expr-node :pos expr-pos)
-                     (js3-parse-expr)))
-        (js3-must-match js3-RC "msg.syntax")
-        (setq pn (make-js3-xml-js-expr-node :pos (js3-node-pos expr)
-                                            :len (js3-node-len expr)
-                                            :expr expr))
-        (js3-node-add-children pn expr)
-        (push pn kids))
-       ;; a js3-XMLEND token means we hit the final close-tag.
-       ((= tt js3-XMLEND)
-        (push (make-js3-string-node :pos js3-token-beg
-                                    :len (- js3-ts-cursor js3-token-beg))
-              kids)
-        (dolist (kid (nreverse kids))
-          (js3-block-node-push pn-xml kid))
-        (setf (js3-node-len pn-xml) (- js3-ts-cursor
-                                       (js3-node-pos pn-xml))
-              continue nil))
-       (t
-        (js3-report-error "msg.syntax")
-        (setq continue nil))))
-    pn-xml))
 
 
 (defun js3-parse-argument-list ()
@@ -9351,10 +8596,8 @@ Returns an expression tree that includes PN, the parent node."
     (while continue
       (setq tt (js3-peek-token))
       (cond
-       ((or (= tt js3-DOT) (= tt js3-DOTDOT))
+       ((= tt js3-DOT)
         (setq pn (js3-parse-property-access tt pn)))
-       ((= tt js3-DOTQUERY)
-        (setq pn (js3-parse-dot-query pn)))
        ((= tt js3-LB)
         (setq pn (js3-parse-element-get pn)))
        ((= tt js3-LP)
@@ -9365,32 +8608,6 @@ Returns an expression tree that includes PN, the parent node."
         (setq continue nil))))
     (if (>= js3-highlight-level 2)
         (js3-parse-highlight-member-expr-node pn))
-    pn))
-
-(defun js3-parse-dot-query (pn)
-  "Parse a dot-query expression, e.g. foo.bar.(@name == 2)
-Last token parsed must be `js3-DOTQUERY'."
-  (let ((pos (js3-node-pos pn))
-        op-pos
-        expr
-        end)
-    (js3-consume-token)
-    (js3-must-have-xml)
-    (js3-set-requires-activation)
-    (setq op-pos js3-token-beg
-          expr (js3-parse-expr)
-          end (js3-node-end expr)
-          pn (make-js3-xml-dot-query-node :left pn
-                                          :pos pos
-                                          :op-pos op-pos
-                                          :right expr))
-    (js3-node-add-children pn
-                           (js3-xml-dot-query-node-left pn)
-                           (js3-xml-dot-query-node-right pn))
-    (if (js3-must-match js3-RP "msg.no.paren")
-        (setf (js3-xml-dot-query-node-rp pn) js3-token-beg
-              end js3-token-end))
-    (setf (js3-node-len pn) (- end pos))
     pn))
 
 (defun js3-parse-element-get (pn)
@@ -9432,160 +8649,21 @@ Last token parsed must be `js3-RB'."
     pn))
 
 (defun js3-parse-property-access (tt pn)
-  "Parse a property access, XML descendants access, or XML attr access."
-  (let ((member-type-flags 0)
-        (dot-pos js3-token-beg)
-        (dot-len (if (= tt js3-DOTDOT) 2 1))
-        name
-        ref  ; right side of . or .. operator
+  "Parse a property access."
+  (let (name
+        ref  ; right side of . operator
         result)
     (js3-consume-token)
-    (when (= tt js3-DOTDOT)
-      (js3-must-have-xml)
-      (setq member-type-flags js3-descendants-flag))
-    (if (not js3-compiler-xml-available)
-        (progn
-          (js3-must-match-prop-name "msg.no.name.after.dot")
-          (setq name (js3-create-name-node t js3-GETPROP)
-                result (make-js3-prop-get-node :left pn
-                                               :pos js3-token-beg
-                                               :right name
-                                               :len (- js3-token-end
-                                                       js3-token-beg)))
-          (js3-node-add-children result pn name)
-          result)
-      ;; otherwise look for XML operators
-      (setf result (if (= tt js3-DOT)
-                       (make-js3-prop-get-node)
-                     (make-js3-infix-node :type js3-DOTDOT))
-            (js3-node-pos result) (js3-node-pos pn)
-            (js3-infix-node-op-pos result) dot-pos
-            (js3-infix-node-left result) pn  ; do this after setting position
-            tt (js3-next-token))
-      (cond
-       ;; needed for generator.throw()
-       ((= tt js3-THROW)
-        (js3-save-name-token-data js3-token-beg "throw")
-        (setq ref (js3-parse-property-name nil js3-ts-string member-type-flags)))
-       ;; handles: name, ns::name, ns::*, ns::[expr]
-       ((js3-valid-prop-name-token tt)
-        (setq ref (js3-parse-property-name -1 js3-ts-string member-type-flags)))
-       ;; handles: *, *::name, *::*, *::[expr]
-       ((= tt js3-MUL)
-        (js3-save-name-token-data js3-token-beg "*")
-        (setq ref (js3-parse-property-name nil "*" member-type-flags)))
-       ;; handles: '@attr', '@ns::attr', '@ns::*', '@ns::[expr]', etc.
-       ((= tt js3-XMLATTR)
-        (setq result (js3-parse-attribute-access)))
-       (t
-        (js3-report-error "msg.no.name.after.dot" nil dot-pos dot-len)))
-      (if ref
-          (setf (js3-node-len result) (- (js3-node-end ref)
-                                         (js3-node-pos result))
-                (js3-infix-node-right result) ref))
-      (if (js3-infix-node-p result)
-          (js3-node-add-children result
-                                 (js3-infix-node-left result)
-                                 (js3-infix-node-right result)))
-      result)))
+    (js3-must-match-prop-name "msg.no.name.after.dot")
+    (setq name (js3-create-name-node t js3-GETPROP)
+	  result (make-js3-prop-get-node :left pn
+					 :pos js3-token-beg
+					 :right name
+					 :len (- js3-token-end
+						 js3-token-beg)))
+    (js3-node-add-children result pn name)
+    result))
 
-(defun js3-parse-attribute-access ()
-  "Parse an E4X XML attribute expression.
-This includes expressions of the forms:
-
-@attr      @ns::attr     @ns::*
-@*         @*::attr      @*::*
-@[expr]    @*::[expr]    @ns::[expr]
-
-Called if we peeked an '@' token."
-  (let ((tt (js3-next-token))
-        (at-pos js3-token-beg))
-    (cond
-     ;; handles: @name, @ns::name, @ns::*, @ns::[expr]
-     ((js3-valid-prop-name-token tt)
-      (js3-parse-property-name at-pos js3-ts-string 0))
-     ;; handles: @*, @*::name, @*::*, @*::[expr]
-     ((= tt js3-MUL)
-      (js3-save-name-token-data js3-token-beg "*")
-      (js3-parse-property-name js3-token-beg "*" 0))
-     ;; handles @[expr]
-     ((= tt js3-LB)
-      (js3-parse-xml-elem-ref at-pos))
-     (t
-      (js3-report-error "msg.no.name.after.xmlAttr")
-      ;; Avoid cascaded errors that happen if we make an error node here.
-      (js3-save-name-token-data js3-token-beg "")
-      (js3-parse-property-name js3-token-beg "" 0)))))
-
-(defun js3-parse-property-name (at-pos s member-type-flags)
-  "Check if :: follows name in which case it becomes qualified name.
-
-AT-POS is a natural number if we just read an '@' token, else nil.
-S is the name or string that was matched:  an identifier, 'throw' or '*'.
-MEMBER-TYPE-FLAGS is a bit set tracking whether we're a '.' or '..' child.
-
-Returns a `js3-xml-ref-node' if it's an attribute access, a child of a '..'
-operator, or the name is followed by ::.  For a plain name, returns a
-`js3-name-node'.  Returns a `js3-error-node' for malformed XML expressions."
-  (let ((pos (or at-pos js3-token-beg))
-        colon-pos
-        (name (js3-create-name-node t js3-current-token))
-        ns
-        tt
-        ref
-        pn)
-    (catch 'return
-      (when (js3-match-token js3-COLONCOLON)
-        (setq ns name
-              colon-pos js3-token-beg
-              tt (js3-next-token))
-        (cond
-         ;; handles name::name
-         ((js3-valid-prop-name-token tt)
-          (setq name (js3-create-name-node)))
-         ;; handles name::*
-         ((= tt js3-MUL)
-          (js3-save-name-token-data js3-token-beg "*")
-          (setq name (js3-create-name-node)))
-         ;; handles name::[expr]
-         ((= tt js3-LB)
-          (throw 'return (js3-parse-xml-elem-ref at-pos ns colon-pos)))
-         (t
-          (js3-report-error "msg.no.name.after.coloncolon"))))
-      (if (and (null ns) (zerop member-type-flags))
-          name
-        (prog1
-            (setq pn
-                  (make-js3-xml-prop-ref-node :pos pos
-                                              :len (- (js3-node-end name) pos)
-                                              :at-pos at-pos
-                                              :colon-pos colon-pos
-                                              :propname name))
-          (js3-node-add-children pn name))))))
-
-(defun js3-parse-xml-elem-ref (at-pos &optional namespace colon-pos)
-  "Parse the [expr] portion of an xml element reference.
-For instance, @[expr], @*::[expr], or ns::[expr]."
-  (let* ((lb js3-token-beg)
-         (pos (or at-pos lb))
-         rb
-         (expr (js3-parse-expr))
-         (end (js3-node-end expr))
-         pn)
-    (if (js3-must-match js3-RB "msg.no.bracket.index")
-        (setq rb js3-token-beg
-              end js3-token-end))
-    (prog1
-        (setq pn
-              (make-js3-xml-elem-ref-node :pos pos
-                                          :len (- end pos)
-                                          :namespace namespace
-                                          :colon-pos colon-pos
-                                          :at-pos at-pos
-                                          :expr expr
-                                          :lb (js3-relpos lb pos)
-                                          :rb (js3-relpos rb pos)))
-      (js3-node-add-children pn namespace expr))))
 
 (defun js3-parse-primary-expr ()
   "Parses a literal (leaf) expression of some sort.
@@ -9617,9 +8695,6 @@ array-literals, array comprehensions and regular expressions."
                                     :len (- js3-token-end px-pos)))
       (js3-node-add-children pn (js3-paren-node-expr pn))
       pn)
-     ((= tt js3-XMLATTR)
-      (js3-must-have-xml)
-      (js3-parse-attribute-access))
      ((= tt js3-NAME)
       (js3-parse-name tt-flagged tt))
      ((= tt js3-NUMBER)
@@ -9681,9 +8756,7 @@ array-literals, array comprehensions and regular expressions."
       ;; and js3-token-end.  We store the name's bounds in buffer vars
       ;; and `js3-create-name-node' uses them.
       (js3-save-name-token-data name-pos name)
-      (setq node (if js3-compiler-xml-available
-		     (js3-parse-property-name nil name 0)
-		   (js3-create-name-node 'check-activation)))
+      (setq node (js3-create-name-node 'check-activation))
       (if js3-highlight-external-variables
 	  (js3-record-name-node node))
       node)))
