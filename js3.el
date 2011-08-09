@@ -602,7 +602,7 @@ which doesn't seem particularly useful, but Rhino permits it."
   :type 'boolean
   :group 'js3-mode)
 
-(defvar js3-mode-version 20110717
+(defvar js3-mode-version 20110809
   "Release number for `js3-mode'.")
 
 ;; scanner variables
