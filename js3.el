@@ -1,7 +1,7 @@
 ;;; js3.el -- an improved JavaScript editing mode
 ;;;
 
-;;; js3-mode.el --- an improved JavaScript editing mode
+;;; js3-head.el
 
 ;; Author:  Thom Blake (webmaster@thomblake.com)
 ;; Authors of historical versions:
@@ -81,6 +81,9 @@
 ;; Please submit bug reports to github at https://github.com/thomblake/js3-mode
 
 ;;; Code:
+
+;;; js3-head.el ends here
+;;; js3-externs.el -- external name definitions
 
 (defvar js3-ecma-262-externs
   (mapcar 'symbol-name
@@ -3235,6 +3238,8 @@ the correct number of ARGS must be provided."
          "Yield from closing generator")
 
 (provide 'js3-messages)
+
+;; js3-messages.el ends here
 ;;; js3-ast.el --- JavaScript syntax tree node definitions
 
 ;;; Code:
@@ -9797,6 +9802,7 @@ nil."
       (when (> offset 0) (forward-char offset)))))
 
 ;;; js3-indent.el ends here
+;;; js3-foot.el
 
 (eval-when-compile
   (require 'cl))
@@ -11105,6 +11111,6 @@ it marks the next defun after the ones already marked."
 
 (provide 'js3-mode)
 
-;;; js3-mode.el ends here
+;;; js3-foot.el ends here
 
 ;;; js3.el ends here
