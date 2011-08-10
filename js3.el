@@ -9731,10 +9731,9 @@ nil."
      ;;inside a parenthetical grouping
      ((nth 1 parse-status)
       ;; A single closing paren/bracket should be indented at the
-      ;; same level as the opening statement. Same goes for
-      ;; "case" and "default".
+      ;; same level as the opening statement.
       (let ((same-indent-p (looking-at
-                            "[]})]\\|\\_<case\\_>\\|\\_<default\\_>"))
+                            "[]})]"))
             (continued-expr-p (js3-continued-expression-p)))
         (goto-char (nth 1 parse-status)) ; go to the opening char
         (if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
