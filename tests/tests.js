@@ -64,9 +64,9 @@ function commaFirstStyle () {
   //please don't ever do this
   if (a) {
     return 1
-         , 2
-         , 3
-         , 4 // returns the last value, 4
+           , 2
+           , 3
+           , 4 // returns the last value, 4
   }
 
   //test c7
@@ -321,12 +321,12 @@ function commaFirstStyle () {
   //test c30
   //comparison operators
   //again, looks strange without parens
-  //>= i !== j === k should all line up under !== f
-  // != l == m should both line up under = b
+  //>= i should line up under !==f
+  // !== j === k != l == m should all line up under = b
   a = b == c != d === e !== f >= g <= h
                          >= i
-                        !== j
-                        === k
+  !== j
+  === k
    != l
    == m
 
