@@ -678,13 +678,13 @@ nil."
               (when (eq (char-before) ?\)) (backward-list)) ;skip arg list
 	      (if (and (not js3-consistent-level-indent-inner-bracket)
 		       (js3-looking-back (concat
-					  ":"
+					  "\\(:\\|,\\)"
 					  js3-skip-newlines-re
 					  "\\<function\\>"
 					  js3-skip-newlines-re)))
 		  (progn
 		    (js3-re-search-backward (concat
-					     ":"
+					     "\\(:\\|,\\)"
 					     js3-skip-newlines-re
 					     "\\<function\\>"
 					     js3-skip-newlines-re))
@@ -696,7 +696,9 @@ nil."
 			  (js3-re-search-forward "[ \t]*"))
 		      (progn
 			(js3-re-search-backward "^")
-			(back-to-indentation))))
+			(back-to-indentation)
+			(while (\= (char-after) ?f)
+			  (forward-char)))))
 		(back-to-indentation))
               (cond (same-indent-p
                      (current-column))

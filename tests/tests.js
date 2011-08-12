@@ -57,7 +57,7 @@ function commaFirstStyle () {
   //test c5
   //dot lines up under dot
   a.b
-   .c()
+      .c()
 
   //test c6
   //commas lined up under 'n' in 'return'.
@@ -242,8 +242,8 @@ function commaFirstStyle () {
                   res.json(data)
                 }
                         , function(data) {
-                          res.json(data)
-                        }
+                            res.json(data)
+                          }
                         )
               }
             , callback: function(data){
@@ -340,23 +340,36 @@ function commaFirstStyle () {
   //dots should line up
 
   var xyz = someKindOfObject.foo("asdf")
-                            .bar("bloo")
-                            .bloo("blerg")
+        .bar("bloo")
+        .bloo("blerg")
 
   //test c32
   //dots should be indented once from the object name
 
   var xyx = someKindOfObject
-              .foo("asdf")
-              .bar("bloo")
+        .foo("asdf")
+        .bar("bloo")
 
   //test c33
   //dots should line up
 
   someKindOfObject.doSomething()
-                  .doSomethingElse()
-                  .yetAnotherSomething()
+            .doSomethingElse()
+                              .yetAnotherSomething()
 
+  //test c34
+  //function body should be indented once past 'function' keyword
+  //isssue #35
+  function myThing (args, cb) {
+    getData( args
+           , function (er, data) {
+               if ( er ) {
+                 return log.er( cb, "Couldn't get data" )(er)
+               }
+               return doSomethingElse( data, cb )
+             }
+           )
+  }
   //end comma-first tests
 
   return 1
@@ -495,3 +508,4 @@ function otherTests () {
 ( 1
 + 2
 )
+e
