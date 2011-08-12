@@ -57,7 +57,7 @@ function commaFirstStyle () {
   //test c5
   //dot lines up under dot
   a.b
-      .c()
+   .c()
 
   //test c6
   //commas lined up under 'n' in 'return'.
@@ -340,22 +340,22 @@ function commaFirstStyle () {
   //dots should line up
 
   var xyz = someKindOfObject.foo("asdf")
-        .bar("bloo")
-        .bloo("blerg")
+                            .bar("bloo")
+                            .bloo("blerg")
 
   //test c32
   //dots should be indented once from the object name
 
   var xyx = someKindOfObject
-        .foo("asdf")
-        .bar("bloo")
+              .foo("asdf")
+              .bar("bloo")
 
   //test c33
   //dots should line up
 
   someKindOfObject.doSomething()
-            .doSomethingElse()
-                              .yetAnotherSomething()
+                  .doSomethingElse()
+                  .yetAnotherSomething()
 
   //test c34
   //function body should be indented once past 'function' keyword
@@ -508,4 +508,3 @@ function otherTests () {
 ( 1
 + 2
 )
-e

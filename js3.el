@@ -8656,16 +8656,19 @@ Last token parsed must be `js3-RB'."
 (defun js3-parse-property-access (tt pn)
   "Parse a property access."
   (let (name
+	(pos (js3-node-pos pn))
+	end
         ref  ; right side of . operator
         result)
     (js3-consume-token)
     (js3-must-match-prop-name "msg.no.name.after.dot")
     (setq name (js3-create-name-node t js3-GETPROP)
+	  end (js3-node-end name)
 	  result (make-js3-prop-get-node :left pn
-					 :pos js3-token-beg
+					 :pos pos
 					 :right name
-					 :len (- js3-token-end
-						 js3-token-beg)))
+					 :len (- end
+						 pos)))
     (js3-node-add-children result pn name)
     result))
 
@@ -9457,10 +9460,6 @@ nil."
 
 		  ((and
 		    node
-;;;		    helpful debugging
-;;;		    (message (number-to-string (js3-node-type node)))
-;;;		    (js3-print-ast node)
-;;;		    (message (number-to-string (js3-node-abs node)))
 		    (js3-node-type node)
 		    (= js3-VAR (js3-node-type node))) ; var node
 		   (goto-char (js3-node-abs node))

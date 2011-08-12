@@ -393,10 +393,6 @@ nil."
 
 		  ((and
 		    node
-;;;		    helpful debugging
-;;;		    (message (number-to-string (js3-node-type node)))
-;;;		    (js3-print-ast node)
-;;;		    (message (number-to-string (js3-node-abs node)))
 		    (js3-node-type node)
 		    (= js3-VAR (js3-node-type node))) ; var node
 		   (goto-char (js3-node-abs node))
