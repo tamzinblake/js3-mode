@@ -9440,6 +9440,7 @@ nil."
   (current-column))
 
 (defun js3-back-offset-re (abs re)
+  "Helper function for `js3-proper-indentation'."
   (goto-char abs)
   (js3-re-search-forward re nil t)
   (backward-char)
@@ -9580,7 +9581,8 @@ nil."
 		 (= (following-char) ?\.))
 	    (save-excursion
 	      (js3-backward-sexp)
-	      (if (looking-back (concat "^[ \t]*[^ \t\n].*" js3-skip-newlines-re))
+	      (if (looking-back (concat "^[ \t]*[^ \t\n].*"
+					js3-skip-newlines-re))
 		  (progn
 		    (re-search-backward (concat "^[ \t]*[^ \t\n].*"
 						js3-skip-newlines-re)
@@ -9594,7 +9596,8 @@ nil."
 		 (looking-at js3-indent-lazy-operator-re))
 	    (save-excursion
 	      (js3-backward-sexp)
-	      (if (looking-back (concat "^[ \t]*[^ \t\n].*" js3-skip-newlines-re))
+	      (if (looking-back (concat "^[ \t]*[^ \t\n].*"
+					js3-skip-newlines-re))
 		  (progn
 		    (re-search-backward (concat "^[ \t]*[^ \t\n].*"
 						js3-skip-newlines-re)
@@ -9613,7 +9616,8 @@ nil."
 		 (js3-node-at-point)
 		 (js3-node-parent (js3-node-at-point))
 		 (js3-node-type (js3-node-parent (js3-node-at-point)))
-		 (= js3-VAR (js3-node-type (js3-node-parent (js3-node-at-point)))))
+		 (= js3-VAR
+		    (js3-node-type (js3-node-parent (js3-node-at-point)))))
 	    (save-excursion
 	      (js3-re-search-backward "\\<var\\>" (point-min) t)
 	      (+ (current-column) 4)))
