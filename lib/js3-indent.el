@@ -5,7 +5,7 @@
 ;; This code is taken as much as possible from the current version of
 ;; js.el included with emacs 24, with modifications.
 
-;; Unlike js3-mode, this does not support bounce-indent.
+;; Unlike js2-mode, this does not support bounce-indent.
 
 ;;; Code:
 
