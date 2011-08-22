@@ -440,7 +440,6 @@ nil."
 		   (<= type 18)) ; binary operators
 	      (js3-back-offset abs 1))
 	     ((= type js3-COMMA)
-	      (message "found comma operator")
 	      (js3-back-offset abs 1))
 	     ((= type js3-ASSIGN)
 	      (js3-back-offset abs 1))

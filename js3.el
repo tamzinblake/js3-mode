@@ -1282,7 +1282,7 @@ Might be slow, but important for comma-first and operator-first style,
 as well as pretty var statements."
   :type 'boolean
   :group 'js3-mode)
-(js3-mark-safe-local 'js3-lazy-commas 'booleanp)
+(js3-mark-safe-local 'js3-reparse-on-indent 'booleanp)
 
 (defcustom js3-lazy-commas nil
   "Whether `js3-mode' should line up commas to the indent-minus-2,
@@ -9507,7 +9507,6 @@ nil."
 		   (<= type 18)) ; binary operators
 	      (js3-back-offset abs 1))
 	     ((= type js3-COMMA)
-	      (message "found comma operator")
 	      (js3-back-offset abs 1))
 	     ((= type js3-ASSIGN)
 	      (js3-back-offset abs 1))

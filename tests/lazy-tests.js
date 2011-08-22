@@ -52,7 +52,7 @@ function lazyCommaFirst () {
     // issue #37
     var logStream = fs.createWriteStream(argv.log, {
         flags: 'a'
-                                                   , mode: 0644
+      , mode: 0644
     })}
 
 function lazyOperatorFirst () {
