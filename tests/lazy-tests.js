@@ -46,7 +46,14 @@ function lazyCommaFirst () {
           }
         }
     }
-}
+
+    // test lc4
+    // should work as advertised
+    // issue #37
+    var logStream = fs.createWriteStream(argv.log, {
+        flags: 'a'
+                                                   , mode: 0644
+    })}
 
 function lazyOperatorFirst () {
 

@@ -359,7 +359,7 @@ function commaFirstStyle () {
 
   //test c34
   //function body should be indented once past 'function' keyword
-  //isssue #35
+  //issue #35
   function myThing (args, cb) {
     getData( args
            , function (er, data) {
@@ -370,6 +370,23 @@ function commaFirstStyle () {
              }
            )
   }
+
+  //test c35
+  // comma before logStream should line up with 'r' in 'var'
+  //issue #37
+
+  var options = { flags: 'a'
+                , mode: 0644
+                }
+    , logStream = fs.createWriteStream(argv.log, options)
+
+  //test c36
+  // comma in object literal should line up with opening bracket
+  //issue #37
+  var logStream = fs.createWriteStream(argv.log, { flags: 'a'
+                                                 , mode: 0644
+                                                 })
+
   //end comma-first tests
 
   return 1
