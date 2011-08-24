@@ -9454,7 +9454,7 @@ nil."
       (if (not node)
 	  0
 	(let ((char (following-char))
-	      (abs (js3-node-abs node))
+	      (abs (js3-node-abs-pos node))
 	      (type (js3-node-type node)))
 	  (cond
 
