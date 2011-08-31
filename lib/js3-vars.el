@@ -31,12 +31,14 @@ nil, zero or negative means none.
                  (const :tag "Include Properties" 2)
                  (const :tag "Include Functions" 3)))
 
-(defvar js3-mode-dev-mode-p nil
-  "Non-nil if running in development mode.  Normally nil.")
-
 (defgroup js3-mode nil
   "An improved JavaScript mode."
   :group 'languages)
+
+(defcustom js3-mode-dev-mode-p nil
+  "Non-nil if running in development mode.  Normally nil."
+  :group 'js3-mode
+  :type 'boolean)
 
 (defcustom js3-indent-tabs-mode nil
   "Default setting for indent-tabs-mode for js3-mode."

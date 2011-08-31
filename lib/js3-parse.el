@@ -1252,10 +1252,10 @@ but not BEFORE."
 (defun js3-parse-block ()
   "Parser for a curly-delimited statement block.
 Last token matched must be js3-LC."
-  (let ((pos js3-token-beg)
-        (pn (make-js3-scope)))
+  (let* ((pos js3-token-beg)
+	 (pn (make-js3-block-node :pos pos)))
     (js3-consume-token)
-    (js3-push-scope pn)
+    (js3-push-scope (make-js3-scope))
     (unwind-protect
         (progn
           (js3-parse-statements pn)

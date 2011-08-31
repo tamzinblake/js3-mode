@@ -352,12 +352,14 @@ nil, zero or negative means none.
                  (const :tag "Include Properties" 2)
                  (const :tag "Include Functions" 3)))
 
-(defvar js3-mode-dev-mode-p nil
-  "Non-nil if running in development mode.  Normally nil.")
-
 (defgroup js3-mode nil
   "An improved JavaScript mode."
   :group 'languages)
+
+(defcustom js3-mode-dev-mode-p nil
+  "Non-nil if running in development mode.  Normally nil."
+  :group 'js3-mode
+  :type 'boolean)
 
 (defcustom js3-indent-tabs-mode nil
   "Default setting for indent-tabs-mode for js3-mode."
@@ -5234,7 +5236,10 @@ Function also calls `js3-node-add-children' to add the parent link."
     (let ((node (js3-node-at-point)))
       (message "%s" (if node
                         (js3-node-short-name node)
-                      "No node found at point.")))))
+                      "No node found at point."))))
+  (defun js3-print-debug-tree ()
+    (interactive)
+    (print (js3-node-at-point))))
 
 (defun js3-node-at-point (&optional pos skip-comments)
   "Return AST node at POS, a buffer position, defaulting to current point.
@@ -7988,10 +7993,10 @@ but not BEFORE."
 (defun js3-parse-block ()
   "Parser for a curly-delimited statement block.
 Last token matched must be js3-LC."
-  (let ((pos js3-token-beg)
-        (pn (make-js3-scope)))
+  (let* ((pos js3-token-beg)
+	 (pn (make-js3-block-node :pos pos)))
     (js3-consume-token)
-    (js3-push-scope pn)
+    (js3-push-scope (make-js3-scope))
     (unwind-protect
         (progn
           (js3-parse-statements pn)

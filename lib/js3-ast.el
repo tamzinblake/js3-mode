@@ -1992,7 +1992,10 @@ Function also calls `js3-node-add-children' to add the parent link."
     (let ((node (js3-node-at-point)))
       (message "%s" (if node
                         (js3-node-short-name node)
-                      "No node found at point.")))))
+                      "No node found at point."))))
+  (defun js3-print-debug-tree ()
+    (interactive)
+    (print (js3-node-at-point))))
 
 (defun js3-node-at-point (&optional pos skip-comments)
   "Return AST node at POS, a buffer position, defaulting to current point.
