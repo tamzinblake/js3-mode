@@ -64,9 +64,9 @@ function commaFirstStyle () {
   //please don't ever do this
   if (a) {
     return 1
-           , 2
-           , 3
-           , 4 // returns the last value, 4
+         , 2
+         , 3
+         , 4 // returns the last value, 4
   }
 
   //test c7
@@ -525,5 +525,3 @@ function otherTests () {
 ( 1
 + 2
 )
-
-//
