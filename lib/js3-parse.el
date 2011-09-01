@@ -1851,7 +1851,7 @@ Returns the list in reverse order.  Consumes the right-paren token."
               end (js3-node-end init)
               (js3-new-node-initializer pn) init)
         (js3-node-add-children pn init))
-      (setf (js3-node-len pn) (- beg pos)))  ; end outer if
+      (setf (js3-node-len pn) (- end beg)))  ; end outer if
     (js3-parse-member-expr-tail allow-call-syntax pn)))
 
 (defun js3-parse-member-expr-tail (allow-call-syntax pn)
