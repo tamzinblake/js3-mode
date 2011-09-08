@@ -413,7 +413,7 @@ This ensures that the counts and `next-error' are correct."
       (backward-char 1))))
 
 (defun js3-mode-extend-comment ()
-  "When inside a comment block, add comment prefix."
+  "Indent the line and, when inside a comment block, add comment prefix."
   (let (star single col first-line needs-close)
     (save-excursion
       (back-to-indentation)
@@ -455,12 +455,14 @@ This ensures that the counts and `next-error' are correct."
             (insert "\n")
             (indent-to col)
             (insert "*/"))))
-     (single
-      (when (save-excursion
-              (and (zerop (forward-line 1))
-                   (looking-at "\\s-*//")))
-        (indent-to col)
-        (insert "// "))))))
+     ((and single
+	   (save-excursion
+	     (and (zerop (forward-line 1))
+		  (looking-at "\\s-*//"))))
+      (indent-to col)
+      (insert "// "))
+     (js3-enter-indents-newline
+      (js3-indent-line)))))
 
 (defun js3-fill-string (beg quote)
   "Line-wrap a single-line string into a multi-line string.
