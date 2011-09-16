@@ -387,6 +387,18 @@ function commaFirstStyle () {
                                                  , mode: 0644
                                                  })
 
+  //test c37
+  // this issue actually apperas in non-comma-first too
+  // 'var' in the function should line up appropriately with 'function'
+  //issue #40
+
+  var text = text.replace( /https?\:\/\/[^"\s\<\>]*[^.,;'">\:\s\<\>\)\]\!]/g
+                         , function (wholeMatch,matchIndex) {
+                             var left = text.slice(0, matchIndex)
+                               , right = text.slice(matchIndex)
+                           }
+                         )
+
   //end comma-first tests
 
   return 1
