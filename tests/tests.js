@@ -409,6 +409,14 @@ function commaFirstStyle () {
                      .bind( 'enterframe'
                           , function (e) {})
 
+  //test c39
+  // the function body should be intended past 'function' keyword
+  // (according to assumptions of current implementation)
+  //issue #41
+  Crafty.load(['sprite.png'], function() {
+                 Crafty.scene('main')
+               })
+
   //end comma-first tests
 
   return 1
