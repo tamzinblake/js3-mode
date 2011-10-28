@@ -418,6 +418,15 @@ function commaFirstStyle () {
     Crafty.scene('main')
   })
 
+  //test c40
+  // the function bodies should be indented consistently
+  this.bind('enterframe', function () {
+    return 1;
+  })
+      .bind('keydown', function (e) {
+    return 2;
+  })
+
   //end comma-first tests
 
   return 1

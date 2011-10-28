@@ -10445,12 +10445,27 @@ nil."
 				 (fparent (js3-node-parent (js3-node-at-point)))
 				 (fpabs (js3-node-abs-pos fparent))
 				 (fptype (js3-node-type fparent)))
-			    (if (or (eq fptype js3-VAR)
-				    (eq fptype js3-COLON)
-				    (and (eq fptype js3-CALL)
-					 (<= (count-lines fpabs fnabs) 1)))
-				(goto-char fpabs)
-			      (goto-char fnabs))))
+			    (cond
+			     ((or (eq fptype js3-VAR)
+				  (eq fptype js3-COLON))
+			      (goto-char fpabs))
+
+			     ((eq fptype js3-CALL)
+			      (let* ((target (js3-call-node-target fparent))
+				     (ttype (js3-node-type target)))
+				(if (eq ttype js3-GETPROP)
+				    (let* ((tright
+					    (js3-prop-get-node-right target))
+					   (trabs (js3-node-abs-pos tright)))
+				      (if (<= (count-lines trabs fnabs) 1)
+					  (goto-char fpabs)
+					(goto-char fnabs)))
+				  (if (<= (count-lines fpabs fnabs) 1)
+				      (goto-char fpabs)
+				    (goto-char fnabs)))))
+
+			     (t
+			      (goto-char fnabs)))))
 	    	      (back-to-indentation))
 	    	    (cond (same-indent-p
 	    		   (current-column))
