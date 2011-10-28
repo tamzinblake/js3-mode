@@ -10434,25 +10434,23 @@ nil."
 	    	    (when (eq (char-before) ?\)) (backward-list)) ;skip arg list
 	    	    (if (and (not js3-consistent-level-indent-inner-bracket)
 	    		     (js3-looking-back (concat
-	    					"\\(:\\|,\\)"
-	    					js3-skip-newlines-re
 	    					"\\<function\\>"
 	    					js3-skip-newlines-re)))
 	    		(progn
 	    		  (js3-re-search-backward (concat
-	    					   "\\(:\\|,\\)"
-	    					   js3-skip-newlines-re
 	    					   "\\<function\\>"
 	    					   js3-skip-newlines-re))
-	    		  (if (looking-back "[{[(,][^{[(,\n]*")
-	    		      (progn
-	    			(js3-re-search-backward "[{[(,][^{[(,\n]*")
-	    			(forward-char)
-	    			(js3-re-search-forward "[ \t]*"))
-	    		    (progn
-	    		      (back-to-indentation)
-	    		      (while (/= (char-after) ?f)
-	    			(forward-char)))))
+			  (let* ((fnode (js3-node-at-point))
+				 (fnabs (js3-node-abs-pos fnode))
+				 (fparent (js3-node-parent (js3-node-at-point)))
+				 (fpabs (js3-node-abs-pos fparent))
+				 (fptype (js3-node-type fparent)))
+			    (if (or (eq fptype js3-VAR)
+				    (eq fptype js3-COLON)
+				    (and (eq fptype js3-CALL)
+					 (<= (count-lines fpabs fnabs) 1)))
+				(goto-char fpabs)
+			      (goto-char fnabs))))
 	    	      (back-to-indentation))
 	    	    (cond (same-indent-p
 	    		   (current-column))

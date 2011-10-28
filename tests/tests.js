@@ -233,6 +233,7 @@ function commaFirstStyle () {
   // are multiple arguments.  However, in the general case of passing only
   // one function to a method, one would normally want it to indent
   // only one indent for convenience.
+  // Just make functions take a first argument that's not a function to fix
   //issue #31
 
   something({ value: "data"
@@ -400,7 +401,7 @@ function commaFirstStyle () {
                          )
 
   //test c38
-  // the comma before 'functin' should line up with the parens for '.bind',
+  // the comma before 'function' should line up with the parens for '.bind',
   // not the parens for '.e'
   //issue #42
   var player = Crafty.e( '2D'
@@ -414,8 +415,8 @@ function commaFirstStyle () {
   // (according to assumptions of current implementation)
   //issue #41
   Crafty.load(['sprite.png'], function () {
-                 Crafty.scene('main')
-               })
+    Crafty.scene('main')
+  })
 
   //end comma-first tests
 
@@ -521,12 +522,12 @@ function otherTests () {
   /* Cases that affect all style types */
 
   //test t1
-  //the function body should be indented one step from var
-  //and the closing brace should be on the same level as var
+  //the function body should be indented one step from function name
+  //and the closing brace should be on the same level as function name
   //Issue #26
-  var f = function () {
-    return 1
-  }
+  var function_name = function () {
+        return 1
+      }
 
   //end other tests
 
