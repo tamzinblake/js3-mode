@@ -388,7 +388,7 @@ function commaFirstStyle () {
                                                  })
 
   //test c37
-  // this issue actually apperas in non-comma-first too
+  // this issue actually appears in non-comma-first too
   // 'var' in the function should line up appropriately with 'function'
   //issue #40
 
@@ -413,7 +413,7 @@ function commaFirstStyle () {
   // the function body should be intended past 'function' keyword
   // (according to assumptions of current implementation)
   //issue #41
-  Crafty.load(['sprite.png'], function() {
+  Crafty.load(['sprite.png'], function () {
                  Crafty.scene('main')
                })
 
