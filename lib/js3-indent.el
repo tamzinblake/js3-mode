@@ -433,7 +433,8 @@ nil."
 	     ((= type js3-FUNCTION)
 	      (js3-back-offset-re abs "("))
 	     ((= type js3-CALL)
-	      (js3-back-offset-re abs "("))
+	      (goto-char (+ abs (js3-call-node-lp node)))
+	      (current-column))
 
 	     ;;operators
 	     ((and (>= type 9)

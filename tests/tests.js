@@ -399,6 +399,16 @@ function commaFirstStyle () {
                            }
                          )
 
+  //test c38
+  // the comma before 'functin' should line up with the parens for '.bind',
+  // not the parens for '.e'
+  //issue #42
+  var player = Crafty.e( '2D'
+                       , 'DOM'
+                       )
+                     .bind( 'enterframe'
+                          , function (e) {})
+
   //end comma-first tests
 
   return 1
