@@ -1041,6 +1041,12 @@ rather than trying to line up to dots."
   :group 'js3-mode)
 (js3-mark-safe-local 'js3-lazy-dots 'booleanp)
 
+(defcustom js3-indent-dots nil
+  "Whether `js3-mode' should line up dots at all"
+  :type 'boolean
+  :group 'js3-mode)
+(js3-mark-safe-local 'js3-indent-dots 'booleanp)
+
 (defvar js3-mode-map
   (let ((map (make-sparse-keymap))
         keys)

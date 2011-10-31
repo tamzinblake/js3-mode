@@ -55,9 +55,9 @@ function commaFirstStyle () {
       }
 
   //test c5
-  //dot lines up under dot
+  //dot lines up under dot if js3-indent-dots is t
   a.b
-   .c()
+  .c()
 
   //test c6
   //commas lined up under 'n' in 'return'.
@@ -109,9 +109,9 @@ function commaFirstStyle () {
    )
 
   //test c11
-  //line up with correct dot
+  //line up with correct dot if js3-indent-dots is t
   a.b( c.d )
-   .e()
+  .e()
 
   //test c12
   //line up with correct brace
@@ -338,25 +338,25 @@ function commaFirstStyle () {
   var someKindOfObject = {}
 
   //test c31
-  //dots should line up
+  //dots should line up if js3-indent-dots is t
 
   var xyz = someKindOfObject.foo("asdf")
-                            .bar("bloo")
-                            .bloo("blerg")
+            .bar("bloo")
+            .bloo("blerg")
 
   //test c32
-  //dots should be indented once from the object name
+  //dots should be indented once from the object name if js3-indent-dots is t
 
   var xyx = someKindOfObject
-              .foo("asdf")
-              .bar("bloo")
+            .foo("asdf")
+            .bar("bloo")
 
   //test c33
-  //dots should line up
+  //dots should line up if js3-indent-dots is t
 
   someKindOfObject.doSomething()
-                  .doSomethingElse()
-                  .yetAnotherSomething()
+  .doSomethingElse()
+  .yetAnotherSomething()
 
   //test c34
   //function body should be indented once past 'function' keyword
@@ -407,8 +407,8 @@ function commaFirstStyle () {
   var player = Crafty.e( '2D'
                        , 'DOM'
                        )
-                     .bind( 'enterframe'
-                          , function (e) {})
+               .bind( 'enterframe'
+                    , function (e) {})
 
   //test c39
   // the function body should be intended past 'function' keyword
@@ -420,10 +420,13 @@ function commaFirstStyle () {
 
   //test c40
   // the function bodies should be indented consistently
+  // and .bind should be indented equivalent to this
+  //issue #43
+  //issue #44
   this.bind('enterframe', function () {
     return 1;
   })
-      .bind('keydown', function (e) {
+  .bind('keydown', function (e) {
     return 2;
   })
 

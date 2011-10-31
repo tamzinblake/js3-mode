@@ -24,7 +24,7 @@ Right now, all commits are the 'current development build' - so far, nothing tha
 
 If your JS is in error, the indentation might look wrong.  I tend to regard this as a feature.
 
-I use the default settings, plus the following which are turned off by default for historical reasons:
+I use the default settings, plus the following which are turned off by default for historical reasons: (note that they might be annoying if js3-mode doesn't *quite* line up where you want it to)
 
 ```elisp
  '(js3-auto-indent-p t)         ; it's nice for commas to right themselves.

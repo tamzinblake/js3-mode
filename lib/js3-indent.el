@@ -408,6 +408,11 @@ nil."
 	   ;;inside a string - indent to 0 since you can't do that.
 	   ((nth 8 parse-status) 0)
 
+	   ((and (not js3-indent-dots)
+		 (= (following-char) ?\.))
+	    (goto-char abs)
+	    (current-column))
+
 	   ;;comma-first and operator-first
 	   ((or
 	     (and (not js3-lazy-commas)
@@ -415,7 +420,8 @@ nil."
 	     (and (not js3-lazy-operators)
 		  (looking-at js3-indent-operator-first-re)
 		  (or (not (= (following-char) ?\.))
-		      (not js3-lazy-dots))))
+		      (and js3-indent-dots
+			   (not js3-lazy-dots)))))
 	    (cond
 	     ;;bare statements
 	     ((= type js3-VAR)
@@ -510,7 +516,8 @@ nil."
 	      (+ js3-indent-level js3-expr-indent-offset))))
 
 	   ;;lazy dot-first
-	   ((and js3-lazy-dots
+	   ((and js3-indent-dots
+		 js3-lazy-dots
 		 (= (following-char) ?\.))
 	    (save-excursion
 	      (js3-backward-sexp)
