@@ -6,6 +6,8 @@ The goal of this project was to get a javascript mode working that supports [npm
 
 Notably, js3-mode does not support js2-mode's bounce-indent, though it does support several popular indentation styles.
 
+Documentation is on the [wiki](https://github.com/thomblake/js3-mode/wiki/).
+
 ## Credits ##
 
 Created by [Thom Blake](https://github.com/thomblake).
