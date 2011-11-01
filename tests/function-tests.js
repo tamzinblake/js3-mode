@@ -65,6 +65,18 @@ function functionTests () {
        var b = 2
      })()
 
+  //test f8
+  // = function special case
+  // function body should be indented one step from the start of the expression
+  // this case is defined where a function is simply assigned -
+  // the function body should be indented one step from the
+  //  beginning of the assignment expression.
+  //Issue #45
+  window.onload = function () {
+    Crafty.keys.RA = Crafty.keys.RIGHT_ARROW
+    Crafty.keys.LA = Crafty.keys.LEFT_ARROW
+  }
+
   //end function tests
 
   return 1;
