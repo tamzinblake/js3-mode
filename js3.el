@@ -7888,6 +7888,17 @@ Scanner should be initialized."
     (let ((js3-additional-externs js3-additional-externs))
       (dolist (callback js3-post-parse-callbacks)
 	(funcall callback))
+      (let ((btext
+	     (replace-regexp-in-string
+	      "[\n\t ]+" " "
+	      (buffer-substring-no-properties
+	       1 (buffer-size)) t t)))
+	(setq js3-additional-externs
+	      (split-string
+	       (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
+		   (match-string-no-properties 1 btext)
+		 "")
+	       "[ ,]+" t)))
       (js3-highlight-undeclared-vars))
     root))
 

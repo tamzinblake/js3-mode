@@ -1,3 +1,5 @@
+/* global Crafty */
+
 function functionTests () {
   /* cases for function indentation */
 
