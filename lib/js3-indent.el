@@ -597,6 +597,7 @@ nil."
 				 (fptype (js3-node-type fparent)))
 			    (cond
 			     ((or (eq fptype js3-VAR)
+				  (eq fptype js3-RETURN)
 				  (eq fptype js3-COLON)
 				  (and (<= fptype js3-ASSIGN_URSH)
 				       (>= fptype js3-ASSIGN)))
