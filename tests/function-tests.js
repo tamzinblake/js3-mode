@@ -79,7 +79,17 @@ function functionTests () {
     Crafty.keys.LA = Crafty.keys.LEFT_ARROW
   }
 
+  //test f9
+  //return function special case
+  // body of function should be indented one step,
+  // not lined up with function keyword
+  function foo () {
+    return function () {
+      return 1
+    }
+  }
+
   //end function tests
 
-  return 1;
+  return 1
 }
