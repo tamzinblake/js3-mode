@@ -3317,7 +3317,7 @@ the correct number of ARGS must be provided."
 
 ;;; Code:
 
-(eval-and-compile
+(eval-when-compile
   (require 'cl))
 
 
@@ -7585,7 +7585,7 @@ i.e. one or more nodes, and an integer position as the list tail."
 
 ;;; Code
 
-(eval-and-compile
+(eval-when-compile
   (require 'cl))  ; for delete-if
 
 

@@ -53,7 +53,7 @@
 
 ;;; Code
 
-(eval-and-compile
+(eval-when-compile
   (require 'cl))  ; for delete-if
 
 

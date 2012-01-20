@@ -2,7 +2,7 @@
 
 ;;; Code:
 
-(eval-and-compile
+(eval-when-compile
   (require 'cl))
 
 
