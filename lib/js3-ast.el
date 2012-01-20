@@ -2590,9 +2590,10 @@ Function also calls `js3-node-add-children' to add the parent link."
     (unless buf
       (error "No buffer available for node %s" node))
     (save-excursion
-      (set-buffer buf)
-      (buffer-substring-no-properties (setq pos (js3-node-abs-pos node))
-                                      (+ pos (js3-node-len node))))))
+      (let ()
+	(set-buffer buf)
+	(buffer-substring-no-properties (setq pos (js3-node-abs-pos node))
+					(+ pos (js3-node-len node)))))))
 
 ;; Container for storing the node we're looking for in a traversal.
 (defvar js3-discovered-node nil)

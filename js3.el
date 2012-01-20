@@ -5905,9 +5905,10 @@ Function also calls `js3-node-add-children' to add the parent link."
     (unless buf
       (error "No buffer available for node %s" node))
     (save-excursion
-      (set-buffer buf)
-      (buffer-substring-no-properties (setq pos (js3-node-abs-pos node))
-                                      (+ pos (js3-node-len node))))))
+      (let ()
+	(set-buffer buf)
+	(buffer-substring-no-properties (setq pos (js3-node-abs-pos node))
+					(+ pos (js3-node-len node)))))))
 
 ;; Container for storing the node we're looking for in a traversal.
 (defvar js3-discovered-node nil)
@@ -7828,26 +7829,27 @@ leaving a statement, an expression, or a function definition."
     (or buf (setq buf (current-buffer)))
     (message nil)  ; clear any error message from previous parse
     (save-excursion
-      (set-buffer buf)
-      (setq js3-scanned-comments nil
-            js3-parsed-errors nil
-            js3-parsed-warnings nil
-            js3-imenu-recorder nil
-            js3-imenu-function-map nil
-            js3-label-set nil)
-      (js3-init-scanner)
-      (setq ast (js3-with-unmodifying-text-property-changes
-                 (js3-do-parse)))
-      (unless js3-ts-hit-eof
-        (js3-report-error "msg.got.syntax.errors" (length js3-parsed-errors)))
-      (setf (js3-ast-root-errors ast) js3-parsed-errors
-            (js3-ast-root-warnings ast) js3-parsed-warnings)
-      ;; if we didn't find any declarations, put a dummy in this list so we
-      ;; don't end up re-parsing the buffer in `js3-mode-create-imenu-index'
-      (unless js3-imenu-recorder
-        (setq js3-imenu-recorder 'empty))
-      (run-hooks 'js3-parse-finished-hook)
-      ast)))
+      (let ()
+	(set-buffer buf)
+	(setq js3-scanned-comments nil
+	      js3-parsed-errors nil
+	      js3-parsed-warnings nil
+	      js3-imenu-recorder nil
+	      js3-imenu-function-map nil
+	      js3-label-set nil)
+	(js3-init-scanner)
+	(setq ast (js3-with-unmodifying-text-property-changes
+		   (js3-do-parse)))
+	(unless js3-ts-hit-eof
+	  (js3-report-error "msg.got.syntax.errors" (length js3-parsed-errors)))
+	(setf (js3-ast-root-errors ast) js3-parsed-errors
+	      (js3-ast-root-warnings ast) js3-parsed-warnings)
+	;; if we didn't find any declarations, put a dummy in this list so we
+	;; don't end up re-parsing the buffer in `js3-mode-create-imenu-index'
+	(unless js3-imenu-recorder
+	  (setq js3-imenu-recorder 'empty))
+	(run-hooks 'js3-parse-finished-hook)
+	ast))))
 
 ;; Corresponds to Rhino's Parser.parse() method.
 (defun js3-do-parse ()
