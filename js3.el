@@ -10438,15 +10438,6 @@ nil."
 	      (js3-re-search-backward "\\<var\\>" (point-min) t)
 	      (+ (current-column) 4)))
 
-	   ;;indent control statement body without braces, if applicable
-	   ((js3-ctrl-statement-indentation))
-
-	   ;;c preprocessor - indent to 0
-	   ((eq (char-after) ?#) 0)
-
-	   ;;we're in a cpp macro - indent to 4 why not
-	   ((save-excursion (js3-beginning-of-macro)) 4)
-
 	   ;;inside a parenthetical grouping
 	   ((nth 1 parse-status)
 	    ;; A single closing paren/bracket should be indented at the
@@ -10514,6 +10505,15 @@ nil."
 	    	  (forward-char)
 	    	  (skip-chars-forward " \t"))
 	    	(current-column))))
+
+	   ;;indent control statement body without braces, if applicable
+	   ((js3-ctrl-statement-indentation))
+
+	   ;;c preprocessor - indent to 0
+	   ((eq (char-after) ?#) 0)
+
+	   ;;we're in a cpp macro - indent to 4 why not
+	   ((save-excursion (js3-beginning-of-macro)) 4)
 
 	   ;;in a continued expression not handled by earlier cases
 	   ((js3-continued-expression-p)
