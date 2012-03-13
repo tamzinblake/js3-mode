@@ -1375,6 +1375,12 @@ rather than trying to line up to dots."
   :group 'js3-mode)
 (js3-mark-safe-local 'js3-indent-dots 'booleanp)
 
+(defcustom js3-dont-rebind-backtick nil
+  "Whether `js3-mode' should bind C-c C-` to js3-next-error"
+  :type 'boolean
+  :group 'js3-mode)
+(js3-mark-safe-local 'js3-dont-rebind-backtick 'booleanp)
+
 (defvar js3-mode-map
   (let ((map (make-sparse-keymap))
         keys)
@@ -1390,7 +1396,8 @@ rather than trying to line up to dots."
     (define-key map (kbd "C-c C-t") #'js3-mode-toggle-hide-comments)
     (define-key map (kbd "C-c C-o") #'js3-mode-toggle-element)
     (define-key map (kbd "C-c C-w") #'js3-mode-toggle-warnings-and-errors)
-    (define-key map (kbd "C-c C-`") #'js3-next-error)
+    (when (not js3-dont-rebind-backtick)
+      (define-key map (kbd "C-c C-`") #'js3-next-error))
     ;; also define user's preference for next-error, if available
     (if (setq keys (where-is-internal #'next-error))
         (define-key map (car keys) #'js3-next-error))
