@@ -101,3 +101,14 @@ function lazyDotFirst () {
           .beep()
     }
 }
+
+function lazySemicolonFirst () {
+
+    //test ls1
+    //should indent line beginning with semicolon 2 back from previous line
+    for (
+        var i = 0
+      ; i < 5
+      ; i++
+    ) foo()
+}

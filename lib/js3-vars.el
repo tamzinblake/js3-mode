@@ -1027,6 +1027,13 @@ rather than trying to line up to braces."
   :group 'js3-mode)
 (js3-mark-safe-local 'js3-lazy-commas 'booleanp)
 
+(defcustom js3-lazy-semicolons nil
+  "Whether `js3-mode' should line up semicolons to the indent-minus-2,
+rather than trying to line up to braces, in for loop defs."
+  :type 'boolean
+  :group 'js3-mode)
+(js3-mark-safe-local 'js3-lazy-semicolons 'booleanp)
+
 (defcustom js3-lazy-operators nil
   "Whether `js3-mode' should line up operators to the indent-minus-2,
 rather than trying to line up to braces."

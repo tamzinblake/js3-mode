@@ -413,6 +413,12 @@ nil."
 	    (goto-char abs)
 	    (current-column))
 
+	   ;;semicolon-first in for loop def
+	   ((and (not js3-lazy-semicolons)
+		 (= (following-char) ?\;)
+		 (= type js3-FOR))
+	    (js3-back-offset-re abs "("))
+
 	   ;;comma-first and operator-first
 	   ((or
 	     (and (not js3-lazy-commas)
@@ -487,6 +493,35 @@ nil."
 	     (t
 	      (goto-char abs)
 	      (+ (current-column) js3-indent-level js3-expr-indent-offset))))
+
+	   ;;lazy semicolon-first in for loop def
+	   ((and js3-lazy-semicolons
+		 (= (following-char) ?\;)
+		 (= type js3-FOR))
+	    (js3-backward-sexp)
+	    (cond
+
+	     ((js3-looking-back (concat "^[ \t]*;.*"
+					js3-skip-newlines-re))
+	      (js3-re-search-backward (concat "^[ \t]*;.*"
+					      js3-skip-newlines-re)
+				      (point-min) t)
+	      (back-to-indentation)
+	      (current-column))
+
+	     ((looking-back (concat "^[ \t]*[^ \t\n].*"
+				    js3-skip-newlines-re))
+	      (re-search-backward (concat "^[ \t]*[^ \t\n].*"
+					  js3-skip-newlines-re)
+				  (point-min) t)
+	      (back-to-indentation)
+	      (if (< (current-column) 2)
+		  (current-column)
+		(- (current-column) 2)))
+
+	     (t
+	      (+ js3-indent-level js3-expr-indent-offset))))
+
 
 	   ;;lazy comma-first
 	   ((and js3-lazy-commas
