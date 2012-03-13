@@ -430,6 +430,14 @@ function commaFirstStyle () {
     return 2;
   })
 
+  //test c41
+  // line up leading semicolons properly in a continued for loop def
+  // the semicolons should line up with the parens
+  for ( i = 0
+        ; i < 5
+        ; i ++
+      ) foo()
+
   //end comma-first tests
 
   return 1
