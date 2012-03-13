@@ -7442,7 +7442,7 @@ For instance, following a 'this' reference requires a parent function node."
 ;; a nested sub-alist element looks like (INDEX-NAME SUB-ALIST).
 ;; The sub-alist entries immediately follow INDEX-NAME, the head of the list.
 
-(defsubst js3-treeify (lst)
+(defun js3-treeify (lst)
   "Convert (a b c d) to (a ((b ((c d)))))"
   (if (null (cddr lst))  ; list length <= 2
       lst
