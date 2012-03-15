@@ -10642,7 +10642,7 @@ nil."
   ;; with our binding of the RET key inside comments:  short lines stay short.
   (set (make-local-variable 'fill-paragraph-function) #'c-fill-paragraph)
 
-  (set (make-local-variable 'before-save-hook) #'js3-before-save)
+  (add-hook 'before-save-hook #'js3-before-save nil t)
   (set (make-local-variable 'next-error-function) #'js3-next-error)
   (set (make-local-variable 'beginning-of-defun-function) #'js3-beginning-of-defun)
   (set (make-local-variable 'end-of-defun-function) #'js3-end-of-defun)
