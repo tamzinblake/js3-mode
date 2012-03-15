@@ -2987,7 +2987,10 @@ You should use `js3-print-tree' instead of this function."
        ;; I'll wait for people to notice incorrect warnings.
        ((and (= tt js3-EXPR_VOID)
              (js3-expr-stmt-node-p node)) ; but not if EXPR_RESULT
-        (js3-node-has-side-effects (js3-expr-stmt-node-expr node)))
+	(let ((expr (js3-expr-stmt-node-expr node)))
+	  (or (js3-node-has-side-effects expr)
+	      (when (js3-string-node-p expr)
+		(string= "use strict" (js3-string-node-value expr))))))
        ((= tt js3-COMMA)
         (js3-node-has-side-effects (js3-infix-node-right node)))
        ((or (= tt js3-AND)
