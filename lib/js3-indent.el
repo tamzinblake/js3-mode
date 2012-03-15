@@ -529,6 +529,15 @@ nil."
 	    (js3-backward-sexp)
 	    (cond
 
+	     ((and js3-pretty-lazy-vars
+		   (js3-node-at-point)
+		   (js3-node-type (js3-node-at-point))
+		   (= js3-VAR
+		      (js3-node-type (js3-node-at-point))))
+	      (save-excursion
+		(js3-re-search-backward "\\<var\\>" (point-min) t)
+		(+ (current-column) 2)))
+
 	     ((js3-looking-back (concat "^[ \t]*,.*"
 					js3-skip-newlines-re))
 	      (js3-re-search-backward (concat "^[ \t]*,.*"

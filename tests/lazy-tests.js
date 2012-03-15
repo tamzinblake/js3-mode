@@ -53,7 +53,16 @@ function lazyCommaFirst () {
     var logStream = fs.createWriteStream(argv.log, {
         flags: 'a'
       , mode: 0644
-    })}
+    })
+
+    // test lc5
+    // when `js3-pretty-lazy-vars' is t, should indent commas one step
+    // issue #53
+    var a = b
+      , c = d
+      , e = f;
+
+}
 
 function lazyOperatorFirst () {
 

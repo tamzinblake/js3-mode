@@ -431,6 +431,13 @@ Note that this forces a reparse so should be turned off if not being used"
   :type 'boolean)
 (js3-mark-safe-local 'js3-pretty-vars 'booleanp)
 
+(defcustom js3-pretty-lazy-vars t
+  "Non-nil to try to indent comma-first continued var statements correctly
+when `js3-lazy-commas' is t"
+  :group 'js3-mode
+  :type 'boolean)
+(js3-mark-safe-local 'js3-pretty-lazy-vars 'booleanp)
+
 (defcustom js3-cleanup-whitespace t
   "Non-nil to invoke `delete-trailing-whitespace' before saves."
   :type 'boolean
@@ -10418,6 +10425,15 @@ nil."
 		 (= (following-char) ?\,))
 	    (js3-backward-sexp)
 	    (cond
+
+	     ((and js3-pretty-lazy-vars
+		   (js3-node-at-point)
+		   (js3-node-type (js3-node-at-point))
+		   (= js3-VAR
+		      (js3-node-type (js3-node-at-point))))
+	      (save-excursion
+		(js3-re-search-backward "\\<var\\>" (point-min) t)
+		(+ (current-column) 2)))
 
 	     ((js3-looking-back (concat "^[ \t]*,.*"
 					js3-skip-newlines-re))
