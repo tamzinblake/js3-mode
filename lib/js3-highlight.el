@@ -12,7 +12,7 @@
           end (max (point-min) end))
     (if record
         (push (list beg end face) js3-mode-fontifications)
-      (put-text-property beg end 'face face))))
+      (put-text-property beg end 'font-lock-face face))))
 
 (defsubst js3-set-kid-face (pos kid len face)
   "Set-face on a child node.
@@ -28,7 +28,7 @@ FACE is the face to fontify with."
   (js3-set-face start (+ start length) 'font-lock-keyword-face))
 
 (defsubst js3-clear-face (beg end)
-  (remove-text-properties beg end '(face nil
+  (remove-text-properties beg end '(font-lock-face nil
                                          help-echo nil
                                          point-entered nil
                                          c-in-sws nil)))

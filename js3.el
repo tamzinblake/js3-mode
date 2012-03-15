@@ -6709,7 +6709,7 @@ nor always false."
           end (max (point-min) end))
     (if record
         (push (list beg end face) js3-mode-fontifications)
-      (put-text-property beg end 'face face))))
+      (put-text-property beg end 'font-lock-face face))))
 
 (defsubst js3-set-kid-face (pos kid len face)
   "Set-face on a child node.
@@ -6725,7 +6725,7 @@ FACE is the face to fontify with."
   (js3-set-face start (+ start length) 'font-lock-keyword-face))
 
 (defsubst js3-clear-face (beg end)
-  (remove-text-properties beg end '(face nil
+  (remove-text-properties beg end '(font-lock-face nil
                                          help-echo nil
                                          point-entered nil
                                          c-in-sws nil)))
@@ -10678,17 +10678,9 @@ nil."
 
   ;; We do our own syntax highlighting based on the parse tree.
   ;; However, we want minor modes that add keywords to highlight properly
-  ;; (examples:  doxymacs, column-marker).  We do this by not letting
-  ;; font-lock unfontify anything, and telling it to fontify after we
-  ;; re-parse and re-highlight the buffer.  (We currently don't do any
-  ;; work with regions other than the whole buffer.)
-  (dolist (var '(font-lock-unfontify-buffer-function
-                 font-lock-unfontify-region-function))
-    (set (make-local-variable var) (lambda (&rest args) t)))
-
-  ;; Don't let font-lock do syntactic (string/comment) fontification.
-  (set (make-local-variable #'font-lock-syntactic-face-function)
-       (lambda (state) nil))
+  ;; (examples:  doxymacs, column-marker).
+  ;; To customize highlighted keywords, use `font-lock-add-keywords'.
+  (setq font-lock-defaults '(nil t))
 
   ;; Experiment:  make reparse-delay longer for longer files.
   (if (plusp js3-dynamic-idle-timer-adjust)
@@ -10771,23 +10763,6 @@ if the edit occurred on a line different from the magic paren."
   (js3-mode-hide-overlay)
   (js3-mode-reset-timer))
 
-(defun js3-mode-run-font-lock ()
-  "Run `font-lock-fontify-buffer' after parsing/highlighting.
-This is intended to allow modes that install their own font-lock keywords
-to work with js3-mode.  In practice it never seems to work for long.
-Hopefully the Emacs maintainers can help figure out a way to make it work."
-  (when (and (boundp 'font-lock-keywords)
-             font-lock-keywords
-             (boundp 'font-lock-mode)
-             font-lock-mode)
-    ;; TODO:  font-lock and jit-lock really really REALLY don't want to
-    ;; play nicely with js3-mode.  They go out of their way to fail to
-    ;; provide any option for saying "look, fontify the goddamn buffer
-    ;; with just the keywords already".  Argh.
-    (setq font-lock-defaults (list font-lock-keywords 'keywords-only))
-    (let (font-lock-verbose)
-      (font-lock-default-fontify-buffer))))
-
 (defun js3-reparse (&optional force)
   "Re-parse current buffer after user finishes some data entry.
 If we get any user input while parsing, including cursor motion,
@@ -10820,7 +10795,6 @@ buffer will only rebuild its `js3-mode-ast' if the buffer is dirty."
                             (js3-mode-remove-suppressed-warnings)
                             (js3-mode-show-warnings)
                             (js3-mode-show-errors)
-                            (js3-mode-run-font-lock)  ; note:  doesn't work
                             (js3-mode-highlight-magic-parens)
                             (if (>= js3-highlight-level 1)
                                 (js3-highlight-jsdoc js3-mode-ast))
@@ -10851,7 +10825,7 @@ buffer will only rebuild its `js3-mode-ast' if the buffer is dirty."
         (if js3-mode-node-overlay
             (move-overlay js3-mode-node-overlay beg end)
           (setq js3-mode-node-overlay (make-overlay beg end))
-          (overlay-put js3-mode-node-overlay 'face 'highlight))
+          (overlay-put js3-mode-node-overlay 'font-lock-face 'highlight))
         (js3-with-unmodifying-text-property-changes
          (put-text-property beg end 'point-left #'js3-mode-hide-overlay))
         (message "%s, parent: %s"
@@ -10891,7 +10865,7 @@ E is a list of ((MSG-KEY MSG-ARG) BEG END)."
          (end (max (point-min) (min end (point-max))))
          (js3-highlight-level 3)    ; so js3-set-face is sure to fire
          (ovl (make-overlay beg end)))
-    (overlay-put ovl 'face face)
+    (overlay-put ovl 'font-lock-face face)
     (overlay-put ovl 'js3-error t)
     (put-text-property beg end 'help-echo (js3-get-msg key))
     (put-text-property beg end 'point-entered #'js3-echo-error)))
@@ -10920,7 +10894,7 @@ Defaults to point."
     ;; Have to reverse the recorded fontifications list so that errors
     ;; and warnings overwrite the normal fontifications.
     (dolist (f (nreverse js3-mode-fontifications))
-      (put-text-property (first f) (second f) 'face (third f)))
+      (put-text-property (first f) (second f) 'font-lock-face (third f)))
     (setq js3-mode-fontifications nil))
   (dolist (p js3-mode-deferred-properties)
     (apply #'put-text-property p))
@@ -11216,7 +11190,7 @@ Actually returns the quote character that begins the string."
 Sets value of `js3-magic' text property to line number at POS."
   (propertize delim
               'js3-magic (line-number-at-pos pos)
-              'face 'js3-magic-paren-face))
+              'font-lock-face 'js3-magic-paren-face))
 
 (defun js3-mode-match-delimiter (open close)
   "Insert OPEN (a string) and possibly matching delimiter CLOSE.
@@ -11314,7 +11288,7 @@ already have been inserted."
       (if (get-text-property beg 'js3-magic)
           (js3-with-unmodifying-text-property-changes
            (put-text-property beg (or end (1+ beg))
-                              'face 'js3-magic-paren-face))))))
+                              'font-lock-face 'js3-magic-paren-face))))))
 
 (defun js3-mode-mundanify-parens ()
   "Clear all magic parens and brackets."
