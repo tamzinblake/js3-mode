@@ -62,6 +62,31 @@ function lazyCommaFirst () {
       , c = d
       , e = f;
 
+    // test lc6
+    // should work as advertised
+    // issue #54
+    module.exports = express.createServer(
+        express.logger()
+      , express.cookieParser()
+      , express.bodyParser()
+      , stylus.middleware(
+          {
+              src: __dirname + '/public'
+            , compile: compileStylus
+          })
+      , express.static(__dirname + '/public')
+      , express.session(
+          {
+              secret: process.env.SESSION_SECRET
+            , store: new MongoStore(
+                {
+                    url: process.env.MONGODB_URL
+                  , clear_interval: 3600
+                })
+          })
+      , express.methodOverride()
+      , i18next.handle
+    );
 }
 
 function lazyOperatorFirst () {
