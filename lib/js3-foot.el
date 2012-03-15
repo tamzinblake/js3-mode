@@ -31,9 +31,8 @@
   (set (make-local-variable 'indent-tabs-mode) js3-indent-tabs-mode)
 
   ;; I tried an "improvement" to `c-fill-paragraph' that worked out badly
-  ;; on most platforms other than the one I originally wrote it on.  So it's
-  ;; back to `c-fill-paragraph'.  Still not perfect, though -- something to do
-  ;; with our binding of the RET key inside comments:  short lines stay short.
+  ;; on most platforms other than the one I originally wrote it on.
+  ;; So it's back to `c-fill-paragraph'.
   (set (make-local-variable 'fill-paragraph-function) #'c-fill-paragraph)
 
   (add-hook 'before-save-hook #'js3-before-save nil t)
@@ -49,17 +48,25 @@
   (put 'js3-mode 'find-tag-default-function #'js3-mode-find-tag)
 
   ;; some variables needed by cc-engine for paragraph-fill, etc.
-  (setq c-buffer-is-cc-mode t
-        c-comment-prefix-regexp js3-comment-prefix-regexp
+  (setq c-comment-prefix-regexp js3-comment-prefix-regexp
         c-comment-start-regexp "/[*/]\\|\\s|"
+	c-line-comment-starter "//"
         c-paragraph-start js3-paragraph-start
         c-paragraph-separate "$"
         comment-start-skip js3-comment-start-skip
         c-syntactic-ws-start js3-syntactic-ws-start
         c-syntactic-ws-end js3-syntactic-ws-end
         c-syntactic-eol js3-syntactic-eol)
+
   (if js3-emacs22
-      (c-setup-paragraph-variables))
+      (let ((c-buffer-is-cc-mode t))
+	;; Copied from `js-mode'.  Also see Bug#6071.
+	(make-local-variable 'paragraph-start)
+	(make-local-variable 'paragraph-separate)
+	(make-local-variable 'paragraph-ignore-fill-prefix)
+	(make-local-variable 'adaptive-fill-mode)
+	(make-local-variable 'adaptive-fill-regexp)
+	(c-setup-paragraph-variables)))
 
   (setq js3-default-externs
         (append js3-ecma-262-externs
