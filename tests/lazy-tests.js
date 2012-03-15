@@ -100,6 +100,16 @@ function lazyDotFirst () {
         bar.baz
           .beep()
     }
+
+  // test ld4
+  // issue #52
+  // should indent then line up dots
+  function compileStylus(str, path) {
+    return stylus(str)
+      .set('filename', path)
+      .set('compress', true)
+      .use(nib());
+  }
 }
 
 function lazySemicolonFirst () {
