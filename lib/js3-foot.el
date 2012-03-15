@@ -99,14 +99,16 @@
   (add-to-invisibility-spec '(js3-outline . t))
   (set (make-local-variable 'line-move-ignore-invisible) t)
   (set (make-local-variable 'forward-sexp-function) #'js3-mode-forward-sexp)
+
+  (if (fboundp 'run-mode-hooks)
+      (run-mode-hooks 'js3-mode-hook)
+    (run-hooks 'js3-mode-hook))
+
   (setq js3-mode-functions-hidden nil
         js3-mode-comments-hidden nil
         js3-mode-buffer-dirty-p t
         js3-mode-parsing nil)
-  (js3-reparse)
-  (if (fboundp 'run-mode-hooks)
-      (run-mode-hooks 'js3-mode-hook)
-    (run-hooks 'js3-mode-hook)))
+  (js3-reparse))
 
 (defun js3-mode-check-compat ()
   "Signal an error if we can't run with this version of Emacs."
