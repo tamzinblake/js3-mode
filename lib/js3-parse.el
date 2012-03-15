@@ -293,11 +293,10 @@ leaving a statement, an expression, or a function definition."
         (max-specpdl-size (max max-specpdl-size 3000))
         (case-fold-search nil)
         ast)
-    (or buf (setq buf (current-buffer)))
     (message nil)  ; clear any error message from previous parse
     (save-excursion
       (let ()
-	(set-buffer buf)
+	(when buf (set-buffer buf))
 	(setq js3-scanned-comments nil
 	      js3-parsed-errors nil
 	      js3-parsed-warnings nil
