@@ -10968,7 +10968,8 @@ This ensures that the counts and `next-error' are correct."
       (js3-mode-extend-comment))
      (t
       ;; should probably figure out what the mode-map says we should do
-      (if js3-indent-on-enter-key
+      (if (and js3-indent-on-enter-key
+	       (not (zerop (buffer-size))))
           (let ((js3-bounce-indent-p nil))
             (js3-indent-line)))
       (insert "\n")
