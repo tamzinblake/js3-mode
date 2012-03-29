@@ -10710,7 +10710,8 @@ nil."
         js3-mode-comments-hidden nil
         js3-mode-buffer-dirty-p t
         js3-mode-parsing nil)
-  (js3-reparse))
+  (if (not (zerop (buffer-size)))
+      (js3-reparse)))
 
 (defun js3-mode-check-compat ()
   "Signal an error if we can't run with this version of Emacs."
