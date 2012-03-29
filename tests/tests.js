@@ -576,3 +576,16 @@ function otherTests () {
 ( 1
 + 2
 )
+
+//test z4
+//both for loop bodies should be indented one step from the for loop start
+//Issue #58
+var i,j
+
+for (i = 0; i < 10; i++)
+  alert('hi')
+
+function () {
+  for (j = 0; j < 10; j++)
+    alert('hi')
+}
