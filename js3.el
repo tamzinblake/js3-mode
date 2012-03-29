@@ -10429,10 +10429,7 @@ nil."
 	    (cond
 
 	     ((and js3-pretty-lazy-vars
-		   (js3-node-at-point)
-		   (js3-node-type (js3-node-at-point))
-		   (= js3-VAR
-		      (js3-node-type (js3-node-at-point))))
+		   (= js3-VAR type))
 	      (save-excursion
 		(js3-re-search-backward "\\<var\\>" (point-min) t)
 		(+ (current-column) 2)))

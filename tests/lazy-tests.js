@@ -87,6 +87,24 @@ function lazyCommaFirst () {
       , express.methodOverride()
       , i18next.handle
     );
+
+    // test lc7
+    // when `js3-pretty-lazy-vars' is t, should indent commas one step
+    // issue #55
+    var a = b()
+      , c = d();
+
+    // test lc8
+    // when `js3-pretty-lazy-vars' is t, should indent commas one step
+    // issue #55
+    var a = {foo: "bar"}
+      , b = 10;
+
+    // test lc9
+    // when `js3-pretty-lazy-vars' is t, should indent commas one step
+    // issue #55
+    var a = [1, 2, 3]
+      , b = 42;
 }
 
 function lazyOperatorFirst () {
