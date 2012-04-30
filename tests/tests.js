@@ -554,6 +554,81 @@ function otherTests () {
   return 1;
 }
 
+function hybridLazyTests () {
+  /* Cases that work with the new auto-detect lazy commas mode */
+
+  //test h1
+  // Object literals
+  // The first line starting with `, bar` should be indented
+  //  back two spaces from `foo`.
+  // The second line starting with ', bar' should be indented so that
+  //  the comma lines up with the opening brace on the previous line
+  // Issue #60
+  Foo = Backbone.View.extend({
+    foo: function(){
+      var a = { foo: 1
+              , bar: 2
+              }
+    }
+  , bar: function(){
+      var a = { foo: 1
+              , bar: 2
+              }
+    }
+  })
+
+  //test h2
+  // Array literals
+  // Without extra space given by js3-square-indent-offset,
+  //  both closing square braces should line up.
+  //  3 is indented one step from the opening brace, and
+  //  `, 4` is indented back two spaces from 3.
+  var a = [ 1
+          , 2
+          , [
+            3
+          , 4
+          , 5
+          ]
+          ]
+
+  //test h3
+  // function args
+  // for function b, the commas should line up under the parens.
+  // for function d, `e` should be indented one step
+  //  and `, f` should be indented back two spaces from `e`.
+  function b ( a
+             , b
+             , c
+             ) {
+    function d (
+      e
+    , f
+    , g
+    ) {}
+  }
+
+  //test h4
+  // function call
+  // Without extra space given by js3-paren-indent-offset,
+  //  both closing parens should line up.
+  //  3 is indented one step from the opening paren, and
+  //  `, 4` is indented back two spaces from 3.
+  var c = b( 1
+           , 2
+           , b(
+             3
+           , 4
+           , 5
+           )
+           )
+
+  //end hybrid tests
+
+  return 1;
+
+}
+
 //test z1
 //operator should be indented to column 0 - emacs should not throw an error
 //possibly related to Issue #28

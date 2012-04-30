@@ -379,6 +379,20 @@ nil."
   (backward-char)
   (current-column))
 
+(defmacro lazy-detect (elems-func fallback)
+  `(let* (sibcol
+	  (sibabs (js3-node-abs-pos
+		   (car (,elems-func node))))
+	  (lazy-mode
+	   (save-excursion
+	     (goto-char sibabs)
+	     (setq sibcol (current-column))
+	     (back-to-indentation)
+	     (= (point) sibabs))))
+     (if lazy-mode
+	 (max 0 (- sibcol 2))
+       ,fallback)))
+
 (defun js3-proper-indentation (parse-status)
   "Return the proper indentation for the current line."
   (save-excursion
@@ -439,14 +453,18 @@ nil."
 
 	     ;;lists
 	     ((= type js3-ARRAYLIT)
-	      (js3-back-offset-re abs "[[]"))
+	      (lazy-detect js3-array-node-elems
+			   (js3-back-offset-re abs "[[]")))
 	     ((= type js3-OBJECTLIT)
-	      (js3-back-offset-re abs "{"))
+	      (lazy-detect js3-object-node-elems
+			   (js3-back-offset-re abs "{")))
 	     ((= type js3-FUNCTION)
-	      (js3-back-offset-re abs "("))
+	      (lazy-detect js3-function-node-params
+			   (js3-back-offset-re abs "(")))
 	     ((= type js3-CALL)
-	      (goto-char (+ abs (js3-call-node-lp node)))
-	      (current-column))
+	      (lazy-detect js3-call-node-args
+			   (progn (goto-char (+ abs (js3-call-node-lp node)))
+				  (current-column))))
 
 	     ;;operators
 	     ((and (>= type 9)
