@@ -655,6 +655,16 @@ nil."
 				     (fpabs (js3-node-abs-pos fparent))
 				     (fptype (js3-node-type fparent)))
 				(cond
+				 ((and (eq fptype js3-VAR)
+				       (eq js3-VAR (js3-node-type
+						    (js3-node-parent fparent))))
+				  (let* ((vnode (js3-node-parent fparent))
+					 (vabs (js3-node-abs-pos vnode))
+					 (vkids (js3-var-decl-node-kids vnode)))
+				    (if (eq 1 (length vkids))
+					(goto-char vabs)
+				      (goto-char fpabs))))
+
 				 ((or (eq fptype js3-VAR)
 				      (eq fptype js3-RETURN)
 				      (eq fptype js3-COLON)
