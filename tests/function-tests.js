@@ -49,7 +49,6 @@ function functionTests () {
   //test f6
   //var keyword special case
   //compromise: function body is indented one step past function name
-  // FIXME: if you are only declaring one variable, indent function body once.
   var function_name = function () {
         return 1
       }
@@ -61,10 +60,11 @@ function functionTests () {
   //function expression
   //In pretty much all other cases, function expressions should indent
   // one step from the beginning of the 'function' keyword
-  // FIXME: consider ;(function to be the function keyword for indentation
+  // except in the special case of ;( starting the line, in which case
+  // ;( is effectively considered part of the function keyword.
   ;(function () {
-      var a = 1
-    })()
+    var a = 1
+  })()
   , (function () {
        var b = 2
      })()

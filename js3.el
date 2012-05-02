@@ -10571,6 +10571,9 @@ nil."
 					   (>= fptype js3-ASSIGN)))
 				  (goto-char fpabs))
 
+				 ((looking-back "\n[ \t]*;?[ \t]*(?[ \t]*")
+				  (back-to-indentation))
+
 				 ((eq fptype js3-CALL)
 				  (let* ((target (js3-call-node-target fparent))
 					 (ttype (js3-node-type target)))
