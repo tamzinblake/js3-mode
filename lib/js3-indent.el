@@ -672,7 +672,8 @@ nil."
 					   (>= fptype js3-ASSIGN)))
 				  (goto-char fpabs))
 
-				 ((looking-back "\n[ \t]*;?[ \t]*(?[ \t]*")
+				 ((looking-back
+				   "\\(\n\\|\\`\\)[ \t]*;?[ \t]*(?[ \t]*")
 				  (back-to-indentation))
 
 				 ((eq fptype js3-CALL)
