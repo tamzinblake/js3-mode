@@ -100,7 +100,7 @@ function functionTests () {
     , f2 = function () {
         foo()
       }
-  var f3 = function() {
+  var f3 = function () {
     foo()
   }
 
