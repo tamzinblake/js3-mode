@@ -660,7 +660,7 @@ var i,j
 for (i = 0; i < 10; i++)
   alert('hi')
 
-function () {
+function foo () {
   for (j = 0; j < 10; j++)
     alert('hi')
 }
