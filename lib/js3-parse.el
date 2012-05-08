@@ -353,21 +353,22 @@ Scanner should be initialized."
         (js3-node-add-children root comment)))
     (setf (js3-node-len root) (- end pos))
     ;; Give extensions a chance to muck with things before highlighting starts.
-    (let ((js3-additional-externs js3-additional-externs))
-      (dolist (callback js3-post-parse-callbacks)
-	(funcall callback))
-      (let ((btext
-	     (replace-regexp-in-string
-	      "[\n\t ]+" " "
-	      (buffer-substring-no-properties
-	       1 (buffer-size)) t t)))
-	(setq js3-additional-externs
-	      (split-string
-	       (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
-		   (match-string-no-properties 1 btext)
-		 "")
-	       "[ ,]+" t)))
-      (js3-highlight-undeclared-vars))
+    (dolist (callback js3-post-parse-callbacks)
+      (funcall callback))
+    (let ((btext
+	   (replace-regexp-in-string
+	    "[\n\t ]+" " "
+	    (buffer-substring-no-properties
+	     1 (buffer-size)) t t)))
+      (setq js3-additional-externs
+	    (nconc js3-additional-externs
+		   (split-string
+		    (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
+			(match-string-no-properties 1 btext)
+		      "")
+		    "[ ,]+" t))))
+    (delete-dups js3-additional-externs)
+    (js3-highlight-undeclared-vars)
     root))
 
 (defun js3-function-parser ()

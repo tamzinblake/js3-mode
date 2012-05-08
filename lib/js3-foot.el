@@ -1291,6 +1291,24 @@ it marks the next defun after the ones already marked."
     (unless (js3-ast-root-p fn)
       (narrow-to-region beg (+ beg (js3-node-len fn))))))
 
+(defun js3-add-to-globals ()
+  (interactive)
+  (let ((var (word-at-point)))
+    (when (not (member var js3-additional-externs))
+      (save-excursion
+	(goto-char 0)
+	(when (not (looking-at "^/\\* global "))
+	  (newline 1)
+	  (forward-line -1)
+	  (insert "/* global */")
+	  (goto-char 0))
+	(if (not (re-search-forward "[*]/" nil t))
+	    (message "Invalid global declaration")
+	  (delete-char -2)
+	  (when (not (looking-back " "))
+	    (insert " "))
+	  (insert (concat var " */")))))))
+
 (defalias 'js3r 'js3-mode-reset)
 
 (provide 'js3-mode)

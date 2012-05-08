@@ -7910,21 +7910,22 @@ Scanner should be initialized."
         (js3-node-add-children root comment)))
     (setf (js3-node-len root) (- end pos))
     ;; Give extensions a chance to muck with things before highlighting starts.
-    (let ((js3-additional-externs js3-additional-externs))
-      (dolist (callback js3-post-parse-callbacks)
-	(funcall callback))
-      (let ((btext
-	     (replace-regexp-in-string
-	      "[\n\t ]+" " "
-	      (buffer-substring-no-properties
-	       1 (buffer-size)) t t)))
-	(setq js3-additional-externs
-	      (split-string
-	       (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
-		   (match-string-no-properties 1 btext)
-		 "")
-	       "[ ,]+" t)))
-      (js3-highlight-undeclared-vars))
+    (dolist (callback js3-post-parse-callbacks)
+      (funcall callback))
+    (let ((btext
+	   (replace-regexp-in-string
+	    "[\n\t ]+" " "
+	    (buffer-substring-no-properties
+	     1 (buffer-size)) t t)))
+      (setq js3-additional-externs
+	    (nconc js3-additional-externs
+		   (split-string
+		    (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
+			(match-string-no-properties 1 btext)
+		      "")
+		    "[ ,]+" t))))
+    (delete-dups js3-additional-externs)
+    (js3-highlight-undeclared-vars)
     root))
 
 (defun js3-function-parser ()
@@ -11934,6 +11935,24 @@ it marks the next defun after the ones already marked."
          (beg (js3-node-abs-pos fn)))
     (unless (js3-ast-root-p fn)
       (narrow-to-region beg (+ beg (js3-node-len fn))))))
+
+(defun js3-add-to-globals ()
+  (interactive)
+  (let ((var (word-at-point)))
+    (when (not (member var js3-additional-externs))
+      (save-excursion
+	(goto-char 0)
+	(when (not (looking-at "^/\\* global "))
+	  (newline 1)
+	  (forward-line -1)
+	  (insert "/* global */")
+	  (goto-char 0))
+	(if (not (re-search-forward "[*]/" nil t))
+	    (message "Invalid global declaration")
+	  (delete-char -2)
+	  (when (not (looking-back " "))
+	    (insert " "))
+	  (insert (concat var " */")))))))
 
 (defalias 'js3r 'js3-mode-reset)
 
