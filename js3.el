@@ -414,7 +414,7 @@ If set to t, try to shorten case statements onto one line."
   "Printing variable.
 Max number of columns per line."
   :group 'js3-mode
-  :type 'boolean)
+  :type 'integer)
 
 (defcustom js3-indent-tabs-mode nil
   "Default setting for indent-tabs-mode for js3-mode."
