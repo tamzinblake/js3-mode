@@ -11014,6 +11014,7 @@ This ensures that the counts and `next-error' are correct."
 	       (not (zerop (buffer-size))))
           (let ((js3-bounce-indent-p nil))
             (js3-indent-line)))
+      (delete-horizontal-space t)
       (insert "\n")
       (if js3-enter-indents-newline
           (let ((js3-bounce-indent-p nil))
