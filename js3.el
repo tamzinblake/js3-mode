@@ -10656,7 +10656,7 @@ nil."
 
 ;;;###autoload
 (defun js3-mode ()
-  "Major mode for editing JavaScript code."
+  "Major mode for editing JavaScript code.\n\n\\{js3-mode-map}"
   (interactive)
   (js3-mode-check-compat)
   (kill-all-local-variables)
