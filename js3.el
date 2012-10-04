@@ -11943,10 +11943,10 @@ it marks the next defun after the ones already marked."
     (when (not (member var js3-additional-externs))
       (save-excursion
 	(goto-char 0)
-	(when (not (looking-at "^/\\* global "))
+	(when (not (looking-at "^/\\*global "))
 	  (newline 1)
 	  (forward-line -1)
-	  (insert "/* global */")
+	  (insert "/*global*/")
 	  (goto-char 0))
 	(if (not (re-search-forward "[*]/" nil t))
 	    (message "Invalid global declaration")
