@@ -366,7 +366,7 @@ Scanner should be initialized."
 		    (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
 			(match-string-no-properties 1 btext)
 		      "")
-		    "[ ,]+" t))))
+		    "\\(:true\\|:false\\)?[ ,]+" t))))
     (delete-dups js3-additional-externs)
     (js3-highlight-undeclared-vars)
     root))
