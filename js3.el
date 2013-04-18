@@ -94,6 +94,7 @@
             EvalError
             Function
             Infinity
+	    JSON
             Math
             NaN
             Number
