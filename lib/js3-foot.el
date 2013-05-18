@@ -357,9 +357,11 @@ This ensures that the counts and `next-error' are correct."
   (let ((parse-status (save-excursion
                         (parse-partial-sexp (point-min) (point)))))
     (cond
-     ;; check if we're inside a string
+     ;; check if inside a string
      ((nth 3 parse-status)
-      (js3-mode-split-string parse-status))
+      (if (nth 5 parse-status)
+          (js3-mode-split-string-with-backslash)
+        (js3-mode-split-string parse-status)))
      ;; check if inside a block comment
      ((nth 4 parse-status)
       (js3-mode-extend-comment))
@@ -372,6 +374,23 @@ This ensures that the counts and `next-error' are correct."
       (insert "\n")
       (if js3-enter-indents-newline
           (js3-indent-line))))))
+
+(defun js3-mode-split-string-with-backslash ()
+  "Turn a newline after backslash in mid-string into backslash-newline-separated multiline string."
+  (insert "\n")
+  (js3-mode-force-backslash))
+
+(defun js3-mode-force-backslash ()
+  "Force backslash character after a line of non-terminated string."
+  (let* ((parse-status
+          (save-excursion
+            (parse-partial-sexp (point-min) (line-end-position)))))
+    (when (and
+           (not (nth 5 parse-status))
+           (nth 3 parse-status))
+      (save-excursion
+        (end-of-line)
+        (insert "\\")))))
 
 (defun js3-mode-split-string (parse-status)
   "Turn a newline in mid-string into a string concatenation."
