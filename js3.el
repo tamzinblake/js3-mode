@@ -486,6 +486,12 @@ regardless of the beginning bracket position."
   :type 'boolean)
 (js3-mark-safe-local 'js3-boring-indentation 'booleanp)
 
+(defcustom js3-manual-indentation nil
+  "Non-nil to override all other indentation behavior and indent manually."
+  :group 'js3-mode
+  :type 'boolean)
+(js3-mark-safe-local 'js3-manual-indentation 'booleanp)
+
 (defcustom js3-indent-on-enter-key nil
   "Non-nil to have Enter/Return key indent the line.
 This is unusual for Emacs modes but common in IDEs like Eclipse."
@@ -10650,14 +10656,18 @@ nil."
 (defun js3-indent-line ()
   "Indent the current line as JavaScript."
   (interactive)
-  (when js3-reparse-on-indent (js3-reparse))
-  (save-restriction
-    (widen)
-    (let* ((parse-status
-            (save-excursion (syntax-ppss (point-at-bol))))
-           (offset (- (current-column) (current-indentation))))
-      (indent-line-to (js3-proper-indentation parse-status))
-      (when (> offset 0) (forward-char offset)))))
+  (if js3-manual-indentation
+      (if js3-indent-tabs-mode
+	  (insert "\t")
+	(insert-char ?\  js3-indent-level))
+    (when js3-reparse-on-indent (js3-reparse))
+    (save-restriction
+      (widen)
+      (let* ((parse-status
+	      (save-excursion (syntax-ppss (point-at-bol))))
+	     (offset (- (current-column) (current-indentation))))
+	(indent-line-to (js3-proper-indentation parse-status))
+	(when (> offset 0) (forward-char offset))))))
 
 ;;; js3-indent.el ends here
 ;;; js3-foot.el

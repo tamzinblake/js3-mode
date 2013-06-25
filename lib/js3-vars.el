@@ -164,6 +164,12 @@ regardless of the beginning bracket position."
   :type 'boolean)
 (js3-mark-safe-local 'js3-boring-indentation 'booleanp)
 
+(defcustom js3-manual-indentation nil
+  "Non-nil to override all other indentation behavior and indent manually."
+  :group 'js3-mode
+  :type 'boolean)
+(js3-mark-safe-local 'js3-manual-indentation 'booleanp)
+
 (defcustom js3-indent-on-enter-key nil
   "Non-nil to have Enter/Return key indent the line.
 This is unusual for Emacs modes but common in IDEs like Eclipse."
