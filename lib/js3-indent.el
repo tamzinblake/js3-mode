@@ -701,7 +701,8 @@ nil."
                         (cond (same-indent-p
                                (current-column))
                               (continued-expr-p
-                               (+ (current-column) (* 2 js3-indent-level)
+                               (+ (current-column) (* js3-continued-expr-mult
+						      js3-indent-level)
                                   js3-expr-indent-offset))
                               (t
                                (+ (current-column) js3-indent-level

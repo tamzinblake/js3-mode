@@ -423,6 +423,11 @@ Max number of columns per line."
   :type 'boolean)
 (js3-mark-safe-local 'js3-indent-tabs-mode 'booleanp)
 
+(defcustom js3-continued-expr-mult 2
+  "Number of tabs to indent continued expressions."
+  :group 'js3-mode
+  :type 'integer)
+
 (defcustom js3-pretty-vars t
   "Non-nil to try to indent comma-last continued var statements in a pretty way.
 Does not affect comma-first continued var statements.
@@ -10602,7 +10607,8 @@ nil."
                         (cond (same-indent-p
                                (current-column))
                               (continued-expr-p
-                               (+ (current-column) (* 2 js3-indent-level)
+                               (+ (current-column) (* js3-continued-expr-mult
+						      js3-indent-level)
                                   js3-expr-indent-offset))
                               (t
                                (+ (current-column) js3-indent-level
