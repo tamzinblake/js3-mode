@@ -154,6 +154,7 @@ macro as normal text."
 (defun js3-re-search-backward-inner (regexp &optional bound count)
   "Auxiliary function for `js3-re-search-backward'."
   (let ((parse)
+        (last-point (point))
         str-terminator
         (orig-macro-start
          (save-excursion
@@ -182,7 +183,10 @@ macro as normal text."
                             (>= (point) orig-macro-start)))
                   (js3-beginning-of-macro)))
             (t
-             (setq count (1- count))))))
+             (setq count (1- count))))
+      (when (= (point) last-point)
+        (setq count 0))
+      (setq last-point (point))))
   (point))
 
 
