@@ -92,8 +92,7 @@ bound to KEY in the global keymap and indents the current line."
         (call-interactively cmd)))
   ;; don't do the electric keys inside comments or strings,
   ;; and don't do bounce-indent with them.
-  (let ((parse-state (parse-partial-sexp (point-min) (point)))
-        (js3-bounce-indent-p (js3-code-at-bol-p)))
+  (let ((parse-state (parse-partial-sexp (point-min) (point))))
     (unless (or (nth 3 parse-state)
                 (nth 4 parse-state))
       (indent-according-to-mode))))

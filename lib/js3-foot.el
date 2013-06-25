@@ -367,13 +367,11 @@ This ensures that the counts and `next-error' are correct."
       ;; should probably figure out what the mode-map says we should do
       (if (and js3-indent-on-enter-key
 	       (not (zerop (buffer-size))))
-          (let ((js3-bounce-indent-p nil))
-            (js3-indent-line)))
+          (js3-indent-line))
       (delete-horizontal-space t)
       (insert "\n")
       (if js3-enter-indents-newline
-          (let ((js3-bounce-indent-p nil))
-            (js3-indent-line)))))))
+          (js3-indent-line))))))
 
 (defun js3-mode-split-string (parse-status)
   "Turn a newline in mid-string into a string concatenation."
@@ -608,8 +606,7 @@ occurs on another line."
     (save-excursion
       (insert (js3-make-magic-delimiter close)))
     (when js3-auto-indent-p
-      (let ((js3-bounce-indent-p (js3-code-at-bol-p)))
-        (js3-indent-line)))))
+      (js3-indent-line))))
 
 (defun js3-mode-match-bracket ()
   "Insert matching bracket."
@@ -659,8 +656,7 @@ is simply inserted directly at the point."
         (js3-indent-line)
         (save-excursion
           (insert "\n}")
-          (let ((js3-bounce-indent-p (js3-code-at-bol-p)))
-            (js3-indent-line))))))))
+          (js3-indent-line)))))))
 
 (defun js3-insert-catch-skel (try-pos)
   "Complete a try/catch block after inserting a { following a try keyword.
