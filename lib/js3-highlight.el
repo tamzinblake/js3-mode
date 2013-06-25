@@ -29,9 +29,9 @@ FACE is the face to fontify with."
 
 (defsubst js3-clear-face (beg end)
   (remove-text-properties beg end '(font-lock-face nil
-                                         help-echo nil
-                                         point-entered nil
-                                         c-in-sws nil)))
+						   help-echo nil
+						   point-entered nil
+						   c-in-sws nil)))
 
 (defconst js3-ecma-global-props
   (concat "^"

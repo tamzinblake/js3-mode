@@ -296,26 +296,26 @@ leaving a statement, an expression, or a function definition."
     (message nil)  ; clear any error message from previous parse
     (save-excursion
       (let ()
-	(when buf (set-buffer buf))
-	(setq js3-scanned-comments nil
-	      js3-parsed-errors nil
-	      js3-parsed-warnings nil
-	      js3-imenu-recorder nil
-	      js3-imenu-function-map nil
-	      js3-label-set nil)
-	(js3-init-scanner)
-	(setq ast (js3-with-unmodifying-text-property-changes
-		   (js3-do-parse)))
-	(unless js3-ts-hit-eof
-	  (js3-report-error "msg.got.syntax.errors" (length js3-parsed-errors)))
-	(setf (js3-ast-root-errors ast) js3-parsed-errors
-	      (js3-ast-root-warnings ast) js3-parsed-warnings)
-	;; if we didn't find any declarations, put a dummy in this list so we
-	;; don't end up re-parsing the buffer in `js3-mode-create-imenu-index'
-	(unless js3-imenu-recorder
-	  (setq js3-imenu-recorder 'empty))
-	(run-hooks 'js3-parse-finished-hook)
-	ast))))
+        (when buf (set-buffer buf))
+        (setq js3-scanned-comments nil
+              js3-parsed-errors nil
+              js3-parsed-warnings nil
+              js3-imenu-recorder nil
+              js3-imenu-function-map nil
+              js3-label-set nil)
+        (js3-init-scanner)
+        (setq ast (js3-with-unmodifying-text-property-changes
+                   (js3-do-parse)))
+        (unless js3-ts-hit-eof
+          (js3-report-error "msg.got.syntax.errors" (length js3-parsed-errors)))
+        (setf (js3-ast-root-errors ast) js3-parsed-errors
+              (js3-ast-root-warnings ast) js3-parsed-warnings)
+        ;; if we didn't find any declarations, put a dummy in this list so we
+        ;; don't end up re-parsing the buffer in `js3-mode-create-imenu-index'
+        (unless js3-imenu-recorder
+          (setq js3-imenu-recorder 'empty))
+        (run-hooks 'js3-parse-finished-hook)
+        ast))))
 
 ;; Corresponds to Rhino's Parser.parse() method.
 (defun js3-do-parse ()
@@ -356,17 +356,17 @@ Scanner should be initialized."
     (dolist (callback js3-post-parse-callbacks)
       (funcall callback))
     (let ((btext
-	   (replace-regexp-in-string
-	    "[\n\t ]+" " "
-	    (buffer-substring-no-properties
-	     1 (buffer-size)) t t)))
+           (replace-regexp-in-string
+            "[\n\t ]+" " "
+            (buffer-substring-no-properties
+             1 (buffer-size)) t t)))
       (setq js3-additional-externs
-	    (nconc js3-additional-externs
-		   (split-string
-		    (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
-			(match-string-no-properties 1 btext)
-		      "")
-		    "\\(:true\\|:false\\)?[ ,]+" t))))
+            (nconc js3-additional-externs
+                   (split-string
+                    (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
+                        (match-string-no-properties 1 btext)
+                      "")
+                    "\\(:true\\|:false\\)?[ ,]+" t))))
     (delete-dups js3-additional-externs)
     (js3-highlight-undeclared-vars)
     root))
@@ -982,9 +982,9 @@ Parses for, for-in, and for each-in statements."
         (if (js3-must-match js3-LP "msg.no.paren.catch")
             (setq lp (- js3-token-beg catch-pos)))
         (js3-must-match js3-NAME "msg.bad.catchcond")
-	(js3-push-scope (make-js3-scope))
+        (js3-push-scope (make-js3-scope))
         (setq var-name (js3-create-name-node))
-	(js3-define-symbol js3-LET (js3-name-node-name var-name) var-name t)
+        (js3-define-symbol js3-LET (js3-name-node-name var-name) var-name t)
         (if (js3-match-token js3-IF)
             (setq guard-kwd (- js3-token-beg catch-pos)
                   catch-cond (js3-parse-expr))
@@ -1001,7 +1001,7 @@ Parses for, for-in, and for each-in statements."
                                               :block block
                                               :lp lp
                                               :rp rp))
-	(js3-pop-scope)
+        (js3-pop-scope)
         (if (js3-must-match js3-RC "msg.no.brace.after.body")
             (setq try-end js3-token-beg))
         (setf (js3-node-len block) (- try-end (js3-node-pos block))
@@ -1265,7 +1265,7 @@ but not BEFORE."
   "Parser for a curly-delimited statement block.
 Last token matched must be js3-LC."
   (let* ((pos js3-token-beg)
-	 (pn (make-js3-block-node :pos pos)))
+         (pn (make-js3-block-node :pos pos)))
     (js3-consume-token)
     (js3-push-scope (make-js3-scope))
     (unwind-protect
@@ -1498,7 +1498,7 @@ If NODE is non-nil, it is the AST node associated with the symbol."
                    (js3-loop-node-p js3-current-scope)))
           (js3-report-error "msg.let.decl.not.in.block")
         (js3-define-new-symbol decl-type name node
-			       js3-current-script-or-fn)))
+                               js3-current-script-or-fn)))
      ((or (= decl-type js3-VAR)
           (= decl-type js3-CONST)
           (= decl-type js3-FUNCTION))
@@ -1932,19 +1932,19 @@ Last token parsed must be `js3-RB'."
 (defun js3-parse-property-access (tt pn)
   "Parse a property access."
   (let (name
-	(pos (js3-node-pos pn))
-	end
+        (pos (js3-node-pos pn))
+        end
         ref  ; right side of . operator
         result)
     (js3-consume-token)
     (js3-must-match-prop-name "msg.no.name.after.dot")
     (setq name (js3-create-name-node t js3-GETPROP)
-	  end (js3-node-end name)
-	  result (make-js3-prop-get-node :left pn
-					 :pos pos
-					 :right name
-					 :len (- end
-						 pos)))
+          end (js3-node-end name)
+          result (make-js3-prop-get-node :left pn
+                                         :pos pos
+                                         :right name
+                                         :len (- end
+                                                 pos)))
     (js3-node-add-children result pn name)
     result))
 
@@ -2023,7 +2023,7 @@ array-literals, array comprehensions and regular expressions."
 (defun js3-parse-name (tt-flagged tt)
   (let ((name js3-ts-string)
         (name-pos js3-token-beg)
-	node)
+        node)
     (if (and (js3-flag-set-p tt-flagged js3-ti-check-label)
              (= (js3-peek-token) js3-COLON))
         (prog1
@@ -2042,7 +2042,7 @@ array-literals, array comprehensions and regular expressions."
       (js3-save-name-token-data name-pos name)
       (setq node (js3-create-name-node 'check-activation))
       (if js3-highlight-external-variables
-	  (js3-record-name-node node))
+          (js3-record-name-node node))
       node)))
 
 (defsubst js3-parse-warn-trailing-comma (msg pos elems comma-pos)

@@ -9,7 +9,7 @@
             EvalError
             Function
             Infinity
-	    JSON
+            JSON
             Math
             NaN
             Number
@@ -130,7 +130,7 @@
             UserDataHandler
 
             ;; Window
-	    window
+            window
             alert
             confirm
             document

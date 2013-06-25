@@ -195,9 +195,9 @@ variable `js3-imenu-recorder'."
 ;;; foo: {object-literal} -- add foo to qname, offset position, and recurse
          ((js3-object-node-p right)
           (js3-record-object-literal
-	   right
-	   (append qname (list (js3-infix-node-left e)))
-	   (+ pos (js3-node-pos right)))))))))
+           right
+           (append qname (list (js3-infix-node-left e)))
+           (+ pos (js3-node-pos right)))))))))
 
 (defsubst js3-node-top-level-decl-p (node)
   "Return t if NODE's name is defined in the top-level scope.
@@ -233,7 +233,7 @@ NODE must be `js3-function-node'."
 Some of the information is only available after the parse tree is complete.
 For instance, following a 'this' reference requires a parent function node."
   (let ((js3-imenu-fn-type-map (make-hash-table :test 'eq))
-	result head fn fn-type parent-chain p elem parent)
+        result head fn fn-type parent-chain p elem parent)
     (dolist (chain chains)
       ;; examine the head of each node to get its defining scope
       (setq head (car chain))
@@ -241,16 +241,16 @@ For instance, following a 'this' reference requires a parent function node."
       (if (js3-node-top-level-decl-p head)
           (push chain result)
         (cond
-	 ((js3-this-node-p head)
+         ((js3-this-node-p head)
           (setq fn (js3-node-parent-script-or-fn head)
                 chain (cdr chain))) ; discard this-node
-	 ;; nested named function
-	 ((js3-function-node-p (setq parent (js3-node-parent head)))
-	  (setq fn (js3-node-parent-script-or-fn parent)))
-	 ;; variable assigned a function expression
-	 (t (setq fn (js3-node-parent-script-or-fn head))))
+         ;; nested named function
+         ((js3-function-node-p (setq parent (js3-node-parent head)))
+          (setq fn (js3-node-parent-script-or-fn parent)))
+         ;; variable assigned a function expression
+         (t (setq fn (js3-node-parent-script-or-fn head))))
         (when fn
-	  (setq fn-type (gethash fn js3-imenu-fn-type-map))
+          (setq fn-type (gethash fn js3-imenu-fn-type-map))
           (unless fn-type
             (setq fn-type
                   (cond ((js3-nested-function-p fn) 'skip)
@@ -261,18 +261,18 @@ For instance, following a 'this' reference requires a parent function node."
                         (t 'skip)))
             (puthash fn fn-type js3-imenu-fn-type-map))
           (case fn-type
-		('anon (push chain result)) ; anonymous top-level wrapper
-		('named                     ; top-level named function
-		 ;; prefix parent fn qname, which is
-		 ;; parent-chain sans last elem, to this chain.
-		 (push (append (butlast parent-chain) chain) result))))))
+                ('anon (push chain result)) ; anonymous top-level wrapper
+                ('named                     ; top-level named function
+                 ;; prefix parent fn qname, which is
+                 ;; parent-chain sans last elem, to this chain.
+                 (push (append (butlast parent-chain) chain) result))))))
     ;; finally replace each node in each chain with its name.
     (dolist (chain result)
       (setq p chain)
       (while p
-	(if (js3-node-p (setq elem (car p)))
-	    (setcar p (js3-node-qname-component elem)))
-	(setq p (cdr p))))
+        (if (js3-node-p (setq elem (car p)))
+            (setcar p (js3-node-qname-component elem)))
+        (setq p (cdr p))))
     result))
 
 ;; Merge name chains into a trie-like tree structure of nested lists.

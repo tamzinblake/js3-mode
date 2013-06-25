@@ -642,9 +642,9 @@ corresponding number.  Otherwise return -1."
               (??
                (throw 'return js3-HOOK))
               (?:
-	       (throw 'return js3-COLON))
+               (throw 'return js3-COLON))
               (?.
-	       (throw 'return js3-DOT))
+               (throw 'return js3-DOT))
               (?|
                (if (js3-match-char ?|)
                    (throw 'return js3-OR)

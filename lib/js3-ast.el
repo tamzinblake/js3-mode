@@ -28,18 +28,18 @@ are currently no guarantees around this."
     (let ((vfunc (get (aref node 0) 'js3-visitor)))
       ;; visit the node
       (when  (funcall callback node nil)
-	;; visit the kids
-	(cond
-	 ((eq vfunc 'js3-visit-none)
-	  nil)                            ; don't even bother calling it
-	 ;; Each AST node type has to define a `js3-visitor' function
-	 ;; that takes a node and a callback, and calls `js3-visit-ast'
-	 ;; on each child of the node.
-	 (vfunc
-	  (funcall vfunc node callback))
-	 (t
-	  (error "%s does not define a visitor-traversal function"
-		 (aref node 0)))))
+        ;; visit the kids
+        (cond
+         ((eq vfunc 'js3-visit-none)
+          nil)                            ; don't even bother calling it
+         ;; Each AST node type has to define a `js3-visitor' function
+         ;; that takes a node and a callback, and calls `js3-visit-ast'
+         ;; on each child of the node.
+         (vfunc
+          (funcall vfunc node callback))
+         (t
+          (error "%s does not define a visitor-traversal function"
+                 (aref node 0)))))
       ;; call the end-visit
       (funcall callback node t))))
 
@@ -97,7 +97,7 @@ If any given node in NODES is nil, doesn't record that link."
     (setq js3-pos-for-update p)
     (setq js3-node-for-update n)
     (js3-visit-ast (js3-node-parent n)
-		   #'js3-node-update-sibling-pos)
+                   #'js3-node-update-sibling-pos)
     (setf (js3-node-len n) (+ (js3-node-len n) p))))
 
 (defun js3-node-update-pos (n p)
@@ -115,7 +115,7 @@ If any given node in NODES is nil, doesn't record that link."
     (setq js3-pos-for-update p)
     (setq js3-node-for-update n)
     (js3-visit-ast (js3-node-parent n)
-		   #'js3-node-update-sibling-pos)
+                   #'js3-node-update-sibling-pos)
     (setf (js3-node-len n) (+ (js3-node-len n) p)))
   t)
 
@@ -123,14 +123,14 @@ If any given node in NODES is nil, doesn't record that link."
   (if end-p
       nil
     (if js3-looking-at-parent-for-update
-	(progn
-	  (setq js3-looking-at-parent-for-update nil)
-	  t)
+        (progn
+          (setq js3-looking-at-parent-for-update nil)
+          t)
       (if (eq n js3-node-for-update)
-	  (setq js3-node-found-for-update t)
-	(when js3-node-found-for-update
-	  (setf (js3-node-pos n) (+ (js3-node-pos n)
-				    js3-pos-for-update))))
+          (setq js3-node-found-for-update t)
+        (when js3-node-found-for-update
+          (setf (js3-node-pos n) (+ (js3-node-pos n)
+                                    js3-pos-for-update))))
       nil)))
 
 ;; It's important to make sure block nodes have a lisp list for the
@@ -142,11 +142,11 @@ If any given node in NODES is nil, doesn't record that link."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-block-node
-			  (&key (type js3-BLOCK)
-				(pos js3-token-beg)
-				len
-				props
-				kids)))
+                          (&key (type js3-BLOCK)
+                                (pos js3-token-beg)
+                                len
+                                props
+                                kids)))
   "A block of statements."
   kids)  ; a lisp list of the child statement nodes
 
@@ -172,10 +172,10 @@ If any given node in NODES is nil, doesn't record that link."
             (:include js3-block-node)
             (:constructor nil)
             (:constructor make-js3-scope
-			  (&key (type js3-BLOCK)
-				(pos js3-token-beg)
-				len
-				kids)))
+                          (&key (type js3-BLOCK)
+                                (pos js3-token-beg)
+                                len
+                                kids)))
   ;; The symbol-table is a LinkedHashMap<String,Symbol> in Rhino.
   ;; I don't have one of those handy, so I'll use an alist for now.
   ;; It's as fast as an emacs hashtable for up to about 50 elements,
@@ -255,9 +255,9 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil) ; silence emacs21 byte-compiler
             (:constructor make-js3-error-node
-			  (&key (type js3-ERROR)
-				(pos js3-token-beg)
-				len)))
+                          (&key (type js3-ERROR)
+                                (pos js3-token-beg)
+                                len)))
   "AST node representing a parse error.")
 
 (put 'cl-struct-js3-error-node 'js3-visitor 'js3-visit-none)
@@ -268,11 +268,11 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-scope)
             (:constructor nil)
             (:constructor make-js3-script-node
-			  (&key (type js3-SCRIPT)
-				(pos js3-token-beg)
-				len
-				var-decls
-				fun-decls)))
+                          (&key (type js3-SCRIPT)
+                                (pos js3-token-beg)
+                                len
+                                var-decls
+                                fun-decls)))
   functions   ; lisp list of nested functions
   regexps     ; lisp list of (string . flags)
   symbols     ; alist (every symbol gets unique index)
@@ -297,10 +297,10 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-script-node)
             (:constructor nil)
             (:constructor make-js3-ast-root
-			  (&key (type js3-SCRIPT)
-				(pos js3-token-beg)
-				len
-				buffer)))
+                          (&key (type js3-SCRIPT)
+                                (pos js3-token-beg)
+                                len
+                                buffer)))
   "The root node of a js3 AST."
   buffer         ; the source buffer from which the code was parsed
   comments       ; a lisp list of comments, ordered by start position
@@ -322,10 +322,10 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-comment-node
-			  (&key (type js3-COMMENT)
-				(pos js3-token-beg)
-				len
-				(format js3-ts-comment-type))))
+                          (&key (type js3-COMMENT)
+                                (pos js3-token-beg)
+                                len
+                                (format js3-ts-comment-type))))
   format)  ; 'line, 'block, 'jsdoc or 'html
 
 (put 'cl-struct-js3-comment-node 'js3-visitor 'js3-visit-none)
@@ -344,10 +344,10 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-expr-stmt-node
-			  (&key (type js3-EXPR_VOID)
-				(pos js3-ts-cursor)
-				len
-				expr)))
+                          (&key (type js3-EXPR_VOID)
+                                (pos js3-ts-cursor)
+                                len
+                                expr)))
   "An expression statement."
   expr)
 
@@ -364,8 +364,8 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
 
 (defun js3-print-expr-stmt-node (n indent)
   (let* ((expr (js3-expr-stmt-node-expr n))
-	 (type (js3-node-type expr))
-	 (target expr))
+         (type (js3-node-type expr))
+         (target expr))
     (when (= js3-CALL type)
       (setq target (js3-call-node-target expr))
       (setq type (js3-node-type target)))
@@ -373,25 +373,25 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
       (setq target (js3-prop-get-node-left target))
       (setq type (js3-node-type target)))
     (when (or (= js3-ARRAYLIT type)
-	      (= js3-LP type)
-	      (= js3-POS type)
-	      (= js3-NEG type))
+              (= js3-LP type)
+              (= js3-POS type)
+              (= js3-NEG type))
       (js3-print ";")))
   (js3-print-ast (js3-expr-stmt-node-expr n) indent)
   (if (and (not js3-multiln-case)
-	   (= js3-CASE
-	      (js3-node-type (js3-node-parent n))))
+           (= js3-CASE
+              (js3-node-type (js3-node-parent n))))
       (js3-print "; ")
     (js3-print "\n")
     (if (= js3-VAR
-	   (js3-node-type (js3-expr-stmt-node-expr n)))
-	(js3-print "\n"))))
+           (js3-node-type (js3-expr-stmt-node-expr n)))
+        (js3-print "\n"))))
 
 (defun js3-print-expr-stmt-node-test (n indent)
   (concat
    (let* ((expr (js3-expr-stmt-node-expr n))
-	  (type (js3-node-type expr))
-	  (target expr))
+          (type (js3-node-type expr))
+          (target expr))
      (when (= js3-CALL type)
        (setq target (js3-call-node-target expr))
        (setq type (js3-node-type target)))
@@ -399,19 +399,19 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
        (setq target (js3-prop-get-node-left target))
        (setq type (js3-node-type target)))
      (when (or (= js3-ARRAYLIT type)
-	       (= js3-LP type)
-	       (= js3-POS type)
-	       (= js3-NEG type))
+               (= js3-LP type)
+               (= js3-POS type)
+               (= js3-NEG type))
        (js3-print-test ";")))
    (js3-print-ast-test (js3-expr-stmt-node-expr n) indent)
    (if (and (not js3-multiln-case)
-	    (= js3-CASE
-	       (js3-node-type (js3-node-parent n))))
+            (= js3-CASE
+               (js3-node-type (js3-node-parent n))))
        (js3-print-test "; ")
      (js3-print-test "\n")
      (if (= js3-VAR
-	    (js3-node-type (js3-expr-stmt-node-expr n)))
-	 (js3-print-test "\n")))))
+            (js3-node-type (js3-expr-stmt-node-expr n)))
+         (js3-print-test "\n")))))
 
 (defstruct (js3-loop-node
             (:include js3-scope)
@@ -425,14 +425,14 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-loop-node)
             (:constructor nil)
             (:constructor make-js3-do-node
-			  (&key (type js3-DO)
-				(pos js3-token-beg)
-				len
-				body
-				condition
-				while-pos
-				lp
-				rp)))
+                          (&key (type js3-DO)
+                                (pos js3-token-beg)
+                                len
+                                body
+                                condition
+                                while-pos
+                                lp
+                                rp)))
   "AST node for do-loop."
   condition  ; while (expression)
   while-pos) ; buffer position of 'while' keyword
@@ -460,13 +460,13 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-loop-node)
             (:constructor nil)
             (:constructor make-js3-while-node
-			  (&key (type js3-WHILE)
-				(pos js3-token-beg)
-				len
-				body
-				condition
-				lp
-				rp)))
+                          (&key (type js3-WHILE)
+                                (pos js3-token-beg)
+                                len
+                                body
+                                condition
+                                lp
+                                rp)))
   "AST node for while-loop."
   condition)    ; while-condition
 
@@ -480,15 +480,15 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
 
 (defun js3-print-while-node (n i)
   (if (or (not (or js3-compact js3-compact-while))
-	  (and (js3-block-node-p (js3-while-node-body n))
-	       (> (length (js3-block-node-kids
-			   (js3-while-node-body n)))
-		  1)))
+          (and (js3-block-node-p (js3-while-node-body n))
+               (> (length (js3-block-node-kids
+                           (js3-while-node-body n)))
+                  1)))
       (js3-print-while-node-long n i)
     (let ((temp (js3-print-while-node-test n i)))
       (if (or (> (length temp) js3-max-columns)
-	      (string-match "\n\\(.\\|\n\\)" temp))
-	  (js3-print-while-node-long n i))
+              (string-match "\n\\(.\\|\n\\)" temp))
+          (js3-print-while-node-long n i))
       (js3-print-while-node-compact n i))))
 
 (defun js3-print-while-node-long (n i)
@@ -515,15 +515,15 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-loop-node)
             (:constructor nil)
             (:constructor make-js3-for-node
-			  (&key (type js3-FOR)
-				(pos js3-ts-cursor)
-				len
-				body
-				init
-				condition
-				update
-				lp
-				rp)))
+                          (&key (type js3-FOR)
+                                (pos js3-ts-cursor)
+                                len
+                                body
+                                init
+                                condition
+                                update
+                                lp
+                                rp)))
   "AST node for a C-style for-loop."
   init       ; initialization expression
   condition  ; loop condition
@@ -541,16 +541,16 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
 
 (defun js3-print-for-node (n i)
   (if (or (not (or js3-compact js3-compact-for))
-	  (and (js3-block-node-p (js3-for-node-body n))
-	       (> (length (js3-block-node-kids
-			   (js3-for-node-body n)))
-		  1)))
+          (and (js3-block-node-p (js3-for-node-body n))
+               (> (length (js3-block-node-kids
+                           (js3-for-node-body n)))
+                  1)))
       (js3-print-for-node-long n i)
     (let ((temp (js3-print-for-node-test n i)))
       (if (or (> (length temp) js3-max-columns)
-	      (string-match "\n\\(.\\|\n\\)" temp))
-	  (js3-print-for-node-long n i)
-	(js3-print-for-node-compact n i)))))
+              (string-match "\n\\(.\\|\n\\)" temp))
+          (js3-print-for-node-long n i)
+        (js3-print-for-node-compact n i)))))
 
 (defun js3-print-for-node-long (n i)
   (js3-print "for (")
@@ -588,17 +588,17 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-loop-node)
             (:constructor nil)
             (:constructor make-js3-for-in-node
-			  (&key (type js3-FOR)
-				(pos js3-ts-cursor)
-				len
-				body
-				iterator
-				object
-				in-pos
-				each-pos
-				foreach-p
-				lp
-				rp)))
+                          (&key (type js3-FOR)
+                                (pos js3-ts-cursor)
+                                len
+                                body
+                                iterator
+                                object
+                                in-pos
+                                each-pos
+                                foreach-p
+                                lp
+                                rp)))
   "AST node for a for..in loop."
   iterator  ; [var] foo in ...
   object    ; object over which we're iterating
@@ -634,10 +634,10 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-return-node
-			  (&key (type js3-RETURN)
-				(pos js3-ts-cursor)
-				len
-				retval)))
+                          (&key (type js3-RETURN)
+                                (pos js3-ts-cursor)
+                                len
+                                retval)))
   "AST node for a return statement."
   retval)  ; expression to return, or 'undefined
 
@@ -661,15 +661,15 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-if-node
-			  (&key (type js3-IF)
-				(pos js3-ts-cursor)
-				len
-				condition
-				then-part
-				else-pos
-				else-part
-				lp
-				rp)))
+                          (&key (type js3-IF)
+                                (pos js3-ts-cursor)
+                                len
+                                condition
+                                then-part
+                                else-pos
+                                else-part
+                                lp
+                                rp)))
   "AST node for an if-statement."
   condition   ; expression
   then-part   ; statement or block
@@ -689,17 +689,17 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
 
 (defun js3-print-if-node (n i)
   (if (or (not (or js3-compact js3-compact-if))
-	  (js3-if-node-else-part n)
-	  (and (js3-block-node-p (js3-if-node-then-part n))
-	       (> (length (js3-block-node-kids
-			   (js3-if-node-then-part n)))
-		  1)))
+          (js3-if-node-else-part n)
+          (and (js3-block-node-p (js3-if-node-then-part n))
+               (> (length (js3-block-node-kids
+                           (js3-if-node-then-part n)))
+                  1)))
       (js3-print-if-node-long n i)
     (let ((temp (js3-print-if-node-test n i)))
       (if (or (> (length temp) js3-max-columns)
-	      (string-match "\n\\(.\\|\n\\)" temp))
-	  (js3-print-if-node-long n i)
-	(js3-print-if-node-compact n i)))))
+              (string-match "\n\\(.\\|\n\\)" temp))
+          (js3-print-if-node-long n i)
+        (js3-print-if-node-compact n i)))))
 
 (defun js3-print-if-node-long (n i)
   (js3-print "if (")
@@ -735,12 +735,12 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-try-node
-			  (&key (type js3-TRY)
-				(pos js3-ts-cursor)
-				len
-				try-block
-				catch-clauses
-				finally-block)))
+                          (&key (type js3-TRY)
+                                (pos js3-ts-cursor)
+                                len
+                                try-block
+                                catch-clauses
+                                finally-block)))
   "AST node for a try-statement."
   try-block
   catch-clauses  ; a lisp list of `js3-catch-node'
@@ -776,15 +776,15 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-catch-node
-			  (&key (type js3-CATCH)
-				(pos js3-ts-cursor)
-				len
-				var-name
-				guard-kwd
-				guard-expr
-				block
-				lp
-				rp)))
+                          (&key (type js3-CATCH)
+                                (pos js3-ts-cursor)
+                                len
+                                var-name
+                                guard-kwd
+                                guard-expr
+                                block
+                                lp
+                                rp)))
   "AST node for a catch clause."
   var-name    ; a `js3-name-node'
   guard-kwd   ; relative buffer position of "if" in "catch (x if ...)"
@@ -820,10 +820,10 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-finally-node
-			  (&key (type js3-FINALLY)
-				(pos js3-ts-cursor)
-				len
-				body)))
+                          (&key (type js3-FINALLY)
+                                (pos js3-ts-cursor)
+                                len
+                                body)))
   "AST node for a finally clause."
   body)  ; a `js3-node', often but not always a block node
 
@@ -846,13 +846,13 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-switch-node
-			  (&key (type js3-SWITCH)
-				(pos js3-ts-cursor)
-				len
-				discriminant
-				cases
-				lp
-				rp)))
+                          (&key (type js3-SWITCH)
+                                (pos js3-ts-cursor)
+                                len
+                                discriminant
+                                cases
+                                lp
+                                rp)))
   "AST node for a switch statement."
   discriminant  ; a `js3-node' (switch expression)
   cases  ; a lisp list of `js3-case-node'
@@ -883,11 +883,11 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-block-node)
             (:constructor nil)
             (:constructor make-js3-case-node
-			  (&key (type js3-CASE)
-				(pos js3-ts-cursor)
-				len
-				kids
-				expr)))
+                          (&key (type js3-CASE)
+                                (pos js3-ts-cursor)
+                                len
+                                kids
+                                expr)))
   "AST node for a case clause of a switch statement."
   expr)   ; the case expression (nil for default)
 
@@ -901,16 +901,16 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
 
 (defun js3-print-case-node (n i)
   (if (or (not (or js3-compact js3-compact-case))
-	  js3-multiln-case)
+          js3-multiln-case)
       (js3-print-case-node-long n i)
     (let ((temp (js3-print-case-node-test n i)))
       (if (or (> (length temp) js3-max-columns)
-	      (string-match "\n" temp))
-	  (progn
-	    (setq js3-multiln-case t)
-	    (js3-print-case-node-long n i)
-	    (setq js3-multiln-case nil))
-	(js3-print-case-node-compact n i)))))
+              (string-match "\n" temp))
+          (progn
+            (setq js3-multiln-case t)
+            (js3-print-case-node-long n i)
+            (setq js3-multiln-case nil))
+        (js3-print-case-node-compact n i)))))
 
 (defun js3-print-case-node-long (n i)
   (if (null (js3-case-node-expr n))
@@ -952,10 +952,10 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-throw-node
-			  (&key (type js3-THROW)
-				(pos js3-ts-cursor)
-				len
-				expr)))
+                          (&key (type js3-THROW)
+                                (pos js3-ts-cursor)
+                                len
+                                expr)))
   "AST node for a throw statement."
   expr)   ; the expression to throw
 
@@ -981,13 +981,13 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-with-node
-			  (&key (type js3-WITH)
-				(pos js3-ts-cursor)
-				len
-				object
-				body
-				lp
-				rp)))
+                          (&key (type js3-WITH)
+                                (pos js3-ts-cursor)
+                                len
+                                object
+                                body
+                                lp
+                                rp)))
   "AST node for a with-statement."
   object
   body
@@ -1016,10 +1016,10 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-label-node
-			  (&key (type js3-LABEL)
-				(pos js3-ts-cursor)
-				len
-				name)))
+                          (&key (type js3-LABEL)
+                                (pos js3-ts-cursor)
+                                len
+                                name)))
   "AST node for a statement label or case label."
   name   ; a string
   loop)  ; for validating and code-generating continue-to-label
@@ -1040,11 +1040,11 @@ NAME can be a lisp symbol or string.  SYMBOL is a `js3-symbol'."
             ;; type needs to be in `js3-side-effecting-tokens' to avoid spurious
             ;; no-side-effects warnings, hence js3-EXPR_RESULT.
             (:constructor make-js3-labeled-stmt-node
-			  (&key (type js3-EXPR_RESULT)
-				(pos js3-ts-cursor)
-				len
-				labels
-				stmt)))
+                          (&key (type js3-EXPR_RESULT)
+                                (pos js3-ts-cursor)
+                                len
+                                labels
+                                stmt)))
   "AST node for a statement with one or more labels.
 Multiple labels for a statement are collapsed into the labels field."
   labels  ; lisp list of `js3-label-node'
@@ -1110,11 +1110,11 @@ NODE is a `js3-labels-node'.  LABEL is an identifier."
             (:include js3-jump-node)
             (:constructor nil)
             (:constructor make-js3-break-node
-			  (&key (type js3-BREAK)
-				(pos js3-ts-cursor)
-				len
-				label
-				target)))
+                          (&key (type js3-BREAK)
+                                (pos js3-ts-cursor)
+                                len
+                                label
+                                target)))
   "AST node for a break statement.
 The label field is a `js3-name-node', possibly nil, for the named label
 if provided.  E.g. in 'break foo', it represents 'foo'.  The target field
@@ -1130,8 +1130,8 @@ is the target of the break - a label node or enclosing loop/switch statement.")
     (js3-print " ")
     (js3-print-ast (js3-break-node-label n) 0))
   (if (and (not js3-multiln-case)
-	   (= js3-CASE
-	      (js3-node-type (js3-node-parent n))))
+           (= js3-CASE
+              (js3-node-type (js3-node-parent n))))
       (js3-print "; ")
     (js3-print "\n")))
 
@@ -1143,8 +1143,8 @@ is the target of the break - a label node or enclosing loop/switch statement.")
       (js3-print-test " ")
       (js3-print-ast-test (js3-break-node-label n) 0)))
    (if (and (not js3-multiln-case)
-	    (= js3-CASE
-	       (js3-node-type (js3-node-parent n))))
+            (= js3-CASE
+               (js3-node-type (js3-node-parent n))))
        (js3-print-test "; ")
      (js3-print-test "\n"))))
 
@@ -1152,11 +1152,11 @@ is the target of the break - a label node or enclosing loop/switch statement.")
             (:include js3-jump-node)
             (:constructor nil)
             (:constructor make-js3-continue-node
-			  (&key (type js3-CONTINUE)
-				(pos js3-ts-cursor)
-				len
-				label
-				target)))
+                          (&key (type js3-CONTINUE)
+                                (pos js3-ts-cursor)
+                                len
+                                label
+                                target)))
   "AST node for a continue statement.
 The label field is the user-supplied enclosing label name, a `js3-name-node'.
 It is nil if continue specifies no label.  The target field is the jump target:
@@ -1172,8 +1172,8 @@ a `js3-label-node' or the innermost enclosing loop.")
     (js3-print " ")
     (js3-print-ast (js3-continue-node-label n) 0))
   (if (and (not js3-multiln-case)
-	   (= js3-CASE
-	      (js3-node-type (js3-node-parent n))))
+           (= js3-CASE
+              (js3-node-type (js3-node-parent n))))
       (js3-print "; ")
     (js3-print "\n")))
 
@@ -1185,8 +1185,8 @@ a `js3-label-node' or the innermost enclosing loop.")
       (js3-print-test " ")
       (js3-print-ast-test (js3-continue-node-label n) 0)))
    (if (and (not js3-multiln-case)
-	    (= js3-CASE
-	       (js3-node-type (js3-node-parent n))))
+            (= js3-CASE
+               (js3-node-type (js3-node-parent n))))
        (js3-print-test "; ")
      (js3-print-test "\n"))))
 
@@ -1194,16 +1194,16 @@ a `js3-label-node' or the innermost enclosing loop.")
             (:include js3-script-node)
             (:constructor nil)
             (:constructor make-js3-function-node
-			  (&key (type js3-FUNCTION)
-				(pos js3-ts-cursor)
-				len
-				(ftype 'FUNCTION)
-				(form 'FUNCTION_STATEMENT)
-				(name "")
-				params
-				body
-				lp
-				rp)))
+                          (&key (type js3-FUNCTION)
+                                (pos js3-ts-cursor)
+                                len
+                                (ftype 'FUNCTION)
+                                (form 'FUNCTION_STATEMENT)
+                                (name "")
+                                params
+                                body
+                                lp
+                                rp)))
   "AST node for a function declaration.
 The `params' field is a lisp list of nodes.  Each node is either a simple
 `js3-name-node', or if it's a destructuring-assignment parameter, a
@@ -1274,11 +1274,11 @@ The `params' field is a lisp list of nodes.  Each node is either a simple
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-var-decl-node
-			  (&key (type js3-VAR)
-				(pos js3-token-beg)
-				len
-				kids
-				decl-type)))
+                          (&key (type js3-VAR)
+                                (pos js3-token-beg)
+                                len
+                                kids
+                                decl-type)))
   "AST node for a variable declaration list (VAR, CONST or LET).
 The node bounds differ depending on the declaration type.  For VAR or
 CONST declarations, the bounds include the var/const keyword.  For LET
@@ -1321,30 +1321,30 @@ declarations, the node begins at the position of the first child."
        ((= tt js3-LET) "")  ; handled by parent let-{expr/stmt}
        ((= tt js3-CONST) "const ")
        (t
-	(error "malformed var-decl node"))))
+        (error "malformed var-decl node"))))
      (let ((temp ""))
        (loop with kids = (js3-var-decl-node-kids n)
-	     with len = (length kids)
-	     for kid in kids
-	     for count from 1
-	     do
-	     (setq temp
-		   (concat
-		    temp
-		    (js3-print-ast-test kid 0)
-		    (if (< count len)
-			(js3-print-test "\n, ")))))
+             with len = (length kids)
+             for kid in kids
+             for count from 1
+             do
+             (setq temp
+                   (concat
+                    temp
+                    (js3-print-ast-test kid 0)
+                    (if (< count len)
+                        (js3-print-test "\n, ")))))
        temp))))
 
 (defstruct (js3-var-init-node
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-var-init-node
-			  (&key (type js3-VAR)
-				(pos js3-ts-cursor)
-				len
-				target
-				initializer)))
+                          (&key (type js3-VAR)
+                                (pos js3-ts-cursor)
+                                len
+                                target
+                                initializer)))
   "AST node for a variable declaration.
 The type field will be js3-CONST for a const decl."
   target        ; `js3-name-node', `js3-object-node', or `js3-array-node'
@@ -1376,14 +1376,14 @@ The type field will be js3-CONST for a const decl."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-cond-node
-			  (&key (type js3-HOOK)
-				(pos js3-ts-cursor)
-				len
-				test-expr
-				true-expr
-				false-expr
-				q-pos
-				c-pos)))
+                          (&key (type js3-HOOK)
+                                (pos js3-ts-cursor)
+                                len
+                                test-expr
+                                true-expr
+                                false-expr
+                                q-pos
+                                c-pos)))
   "AST node for the ternary operator"
   test-expr
   true-expr
@@ -1402,13 +1402,13 @@ The type field will be js3-CONST for a const decl."
 
 (defun js3-print-cond-node (n i)
   (if (or (not (or js3-compact js3-compact-infix))
-	  js3-multiln)
+          js3-multiln)
       (js3-print-cond-node-long n i)
     (let ((temp (js3-print-cond-node-test n i)))
       (if (or (> (length temp) js3-max-columns)
-	      (string-match "\n" temp))
-	  (js3-print-cond-node-long n i)
-	(js3-print-cond-node-compact n i)))))
+              (string-match "\n" temp))
+          (js3-print-cond-node-long n i)
+        (js3-print-cond-node-compact n i)))))
 
 (defun js3-print-cond-node-long (n i)
   (js3-print-ast (js3-cond-node-test-expr n) 0)
@@ -1436,12 +1436,12 @@ The type field will be js3-CONST for a const decl."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-infix-node
-			  (&key type
-				(pos js3-ts-cursor)
-				len
-				op-pos
-				left
-				right)))
+                          (&key type
+                                (pos js3-ts-cursor)
+                                len
+                                op-pos
+                                left
+                                right)))
   "Represents infix expressions.
 Includes assignment ops like `|=', and the comma operator.
 The type field inherited from `js3-node' holds the operator."
@@ -1511,13 +1511,13 @@ The type field inherited from `js3-node' holds the operator."
 
 (defun js3-print-infix-node (args &optional delimiter)
   (if (or (not (or js3-compact js3-compact-infix))
-	  js3-multiln)
+          js3-multiln)
       (js3-print-infix-node-long args delimiter)
     (let ((temp (js3-print-infix-node-test args delimiter)))
       (if (or (> (length temp) js3-max-columns)
-	      (string-match "\n" temp))
-	  (js3-print-infix-node-long args delimiter)
-	(js3-print-infix-node-compact args delimiter)))))
+              (string-match "\n" temp))
+          (js3-print-infix-node-long args delimiter)
+        (js3-print-infix-node-compact args delimiter)))))
 
 (defun js3-print-infix-node-long (n i)
   (let* ((tt (js3-node-type n))
@@ -1526,18 +1526,18 @@ The type field inherited from `js3-node' holds the operator."
       (error "unrecognized infix operator %s" (js3-node-type n)))
     (js3-print-ast (js3-infix-node-left n) 0)
     (if (and (/= tt js3-ASSIGN)
-	     (/= tt js3-ASSIGN_BITOR)
-	     (/= tt js3-ASSIGN_BITXOR)
-	     (/= tt js3-ASSIGN_BITAND)
-	     (/= tt js3-ASSIGN_LSH)
-	     (/= tt js3-ASSIGN_RSH)
-	     (/= tt js3-ASSIGN_URSH)
-	     (/= tt js3-ASSIGN_ADD)
-	     (/= tt js3-ASSIGN_SUB)
-	     (/= tt js3-ASSIGN_MUL)
-	     (/= tt js3-ASSIGN_DIV)
-	     (/= tt js3-ASSIGN_MOD))
-	(js3-print "\n")
+             (/= tt js3-ASSIGN_BITOR)
+             (/= tt js3-ASSIGN_BITXOR)
+             (/= tt js3-ASSIGN_BITAND)
+             (/= tt js3-ASSIGN_LSH)
+             (/= tt js3-ASSIGN_RSH)
+             (/= tt js3-ASSIGN_URSH)
+             (/= tt js3-ASSIGN_ADD)
+             (/= tt js3-ASSIGN_SUB)
+             (/= tt js3-ASSIGN_MUL)
+             (/= tt js3-ASSIGN_DIV)
+             (/= tt js3-ASSIGN_MOD))
+        (js3-print "\n")
       (js3-print " "))
     (js3-print op)
     (js3-print " ")
@@ -1572,12 +1572,12 @@ The type field inherited from `js3-node' holds the operator."
             (:include js3-infix-node)
             (:constructor nil)
             (:constructor make-js3-assign-node
-			  (&key type
-				(pos js3-ts-cursor)
-				len
-				op-pos
-				left
-				right)))
+                          (&key type
+                                (pos js3-ts-cursor)
+                                len
+                                op-pos
+                                left
+                                right)))
   "Represents any assignment.
 The type field holds the actual assignment operator.")
 
@@ -1589,10 +1589,10 @@ The type field holds the actual assignment operator.")
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-unary-node
-			  (&key type ; required
-				(pos js3-ts-cursor)
-				len
-				operand)))
+                          (&key type ; required
+                                (pos js3-ts-cursor)
+                                len
+                                operand)))
   "AST node type for unary operator nodes.
 The type field can be NOT, BITNOT, POS, NEG, INC, DEC,
 TYPEOF, or DELPROP.  For INC or DEC, a 'postfix node
@@ -1631,8 +1631,8 @@ property is added if the operator follows the operand."
      (unless postfix
        (js3-print-test op))
      (if (or (= tt js3-TYPEOF)
-	     (= tt js3-DELPROP))
-	 (js3-print-test " "))
+             (= tt js3-DELPROP))
+         (js3-print-test " "))
      (js3-print-ast-test (js3-unary-node-operand n) 0)
      (when postfix
        (js3-print-test op)))))
@@ -1641,13 +1641,13 @@ property is added if the operator follows the operand."
             (:include js3-scope)
             (:constructor nil)
             (:constructor make-js3-let-node
-			  (&key (type js3-LETEXPR)
-				(pos js3-token-beg)
-				len
-				vars
-				body
-				lp
-				rp)))
+                          (&key (type js3-LETEXPR)
+                                (pos js3-token-beg)
+                                len
+                                vars
+                                body
+                                lp
+                                rp)))
   "AST node for a let expression or a let statement.
 Note that a let declaration such as let x=6, y=7 is a `js3-var-decl-node'."
   vars   ; a `js3-var-decl-node'
@@ -1680,9 +1680,9 @@ Note that a let declaration such as let x=6, y=7 is a `js3-var-decl-node'."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-keyword-node
-			  (&key type
-				(pos js3-token-beg)
-				(len (- js3-ts-cursor pos)))))
+                          (&key type
+                                (pos js3-token-beg)
+                                (len (- js3-ts-cursor pos)))))
   "AST node representing a literal keyword such as `null'.
 Used for `null', `this', `true', `false' and `debugger'.
 The node type is set to js3-NULL, js3-THIS, etc.")
@@ -1721,14 +1721,14 @@ The node type is set to js3-NULL, js3-THIS, etc.")
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-new-node
-			  (&key (type js3-NEW)
-				(pos js3-token-beg)
-				len
-				target
-				args
-				initializer
-				lp
-				rp)))
+                          (&key (type js3-NEW)
+                                (pos js3-token-beg)
+                                len
+                                target
+                                args
+                                initializer
+                                lp
+                                rp)))
   "AST node for new-expression such as new Foo()."
   target  ; an identifier or reference
   args    ; a lisp list of argument nodes
@@ -1772,11 +1772,11 @@ The node type is set to js3-NULL, js3-THIS, etc.")
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-name-node
-			  (&key (type js3-NAME)
-				(pos js3-token-beg)
-				(len (- js3-ts-cursor
-					js3-token-beg))
-				(name js3-ts-string))))
+                          (&key (type js3-NAME)
+                                (pos js3-token-beg)
+                                (len (- js3-ts-cursor
+                                        js3-token-beg))
+                                (name js3-ts-string))))
   "AST node for a JavaScript identifier"
   name   ; a string
   scope) ; a `js3-scope' (optional, used for codegen)
@@ -1802,12 +1802,12 @@ Returns 0 if NODE is nil or its identifier field is nil."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-number-node
-			  (&key (type js3-NUMBER)
-				(pos js3-token-beg)
-				(len (- js3-ts-cursor
-					js3-token-beg))
-				(value js3-ts-string)
-				(num-value js3-ts-number))))
+                          (&key (type js3-NUMBER)
+                                (pos js3-token-beg)
+                                (len (- js3-ts-cursor
+                                        js3-token-beg))
+                                (value js3-ts-string)
+                                (num-value js3-ts-number))))
   "AST node for a number literal."
   value      ; the original string, e.g. "6.02e23"
   num-value) ; the parsed number value
@@ -1828,12 +1828,12 @@ Returns 0 if NODE is nil or its identifier field is nil."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-regexp-node
-			  (&key (type js3-REGEXP)
-				(pos js3-token-beg)
-				(len (- js3-ts-cursor
-					js3-token-beg))
-				value
-				flags)))
+                          (&key (type js3-REGEXP)
+                                (pos js3-token-beg)
+                                (len (- js3-ts-cursor
+                                        js3-token-beg))
+                                value
+                                flags)))
   "AST node for a regular expression literal."
   value  ; the regexp string, without // delimiters
   flags) ; a string of flags, e.g. `mi'.
@@ -1865,11 +1865,11 @@ Returns 0 if NODE is nil or its identifier field is nil."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-string-node
-			  (&key (type js3-STRING)
-				(pos js3-token-beg)
-				(len (- js3-ts-cursor
-					js3-token-beg))
-				(value js3-ts-string))))
+                          (&key (type js3-STRING)
+                                (pos js3-token-beg)
+                                (len (- js3-ts-cursor
+                                        js3-token-beg))
+                                (value js3-ts-string))))
   "String literal.
 Escape characters are not evaluated; e.g. \n is 2 chars in value field.
 You can tell the quote type by looking at the first character."
@@ -1889,10 +1889,10 @@ You can tell the quote type by looking at the first character."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-array-node
-			  (&key (type js3-ARRAYLIT)
-				(pos js3-ts-cursor)
-				len
-				elems)))
+                          (&key (type js3-ARRAYLIT)
+                                (pos js3-ts-cursor)
+                                len
+                                elems)))
   "AST node for an array literal."
   elems)  ; list of expressions.  [foo,,bar] yields a nil middle element.
 
@@ -1919,10 +1919,10 @@ You can tell the quote type by looking at the first character."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-object-node
-			  (&key (type js3-OBJECTLIT)
-				(pos js3-ts-cursor)
-				len
-				elems)))
+                          (&key (type js3-OBJECTLIT)
+                                (pos js3-ts-cursor)
+                                len
+                                elems)))
   "AST node for an object literal expression."
   elems)  ; a lisp list of `js3-object-prop-node'
 
@@ -1949,12 +1949,12 @@ You can tell the quote type by looking at the first character."
             (:include js3-infix-node)
             (:constructor nil)
             (:constructor make-js3-object-prop-node
-			  (&key (type js3-COLON)
-				(pos js3-ts-cursor)
-				len
-				left
-				right
-				op-pos)))
+                          (&key (type js3-COLON)
+                                (pos js3-ts-cursor)
+                                len
+                                left
+                                right
+                                op-pos)))
   "AST node for an object literal prop:value entry.
 The `left' field is the property:  a name node, string node or number node.
 The `right' field is a `js3-node' representing the initializer value.")
@@ -1978,11 +1978,11 @@ The `right' field is a `js3-node' representing the initializer value.")
             (:include js3-infix-node)
             (:constructor nil)
             (:constructor make-js3-getter-setter-node
-			  (&key type ; GET or SET
-				(pos js3-ts-cursor)
-				len
-				left
-				right)))
+                          (&key type ; GET or SET
+                                (pos js3-ts-cursor)
+                                len
+                                left
+                                right)))
   "AST node for a getter/setter property in an object literal.
 The `left' field is the `js3-name-node' naming the getter/setter prop.
 The `right' field is always an anonymous `js3-function-node' with a node
@@ -2007,11 +2007,11 @@ property `GETTER_SETTER' set to js3-GET or js3-SET. ")
             (:include js3-infix-node)
             (:constructor nil)
             (:constructor make-js3-prop-get-node
-			  (&key (type js3-GETPROP)
-				(pos js3-ts-cursor)
-				len
-				left
-				right)))
+                          (&key (type js3-GETPROP)
+                                (pos js3-ts-cursor)
+                                len
+                                left
+                                right)))
   "AST node for a dotted property reference, e.g. foo.bar or foo().bar")
 
 (put 'cl-struct-js3-prop-get-node 'js3-visitor 'js3-visit-prop-get-node)
@@ -2037,13 +2037,13 @@ property `GETTER_SETTER' set to js3-GET or js3-SET. ")
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-elem-get-node
-			  (&key (type js3-GETELEM)
-				(pos js3-ts-cursor)
-				len
-				target
-				element
-				lb
-				rb)))
+                          (&key (type js3-GETELEM)
+                                (pos js3-ts-cursor)
+                                len
+                                target
+                                element
+                                lb
+                                rb)))
   "AST node for an array index expression such as foo[bar]."
   target  ; a `js3-node' - the expression preceding the "."
   element ; a `js3-node' - the expression in brackets
@@ -2077,13 +2077,13 @@ property `GETTER_SETTER' set to js3-GET or js3-SET. ")
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-call-node
-			  (&key (type js3-CALL)
-				(pos js3-ts-cursor)
-				len
-				target
-				args
-				lp
-				rp)))
+                          (&key (type js3-CALL)
+                                (pos js3-ts-cursor)
+                                len
+                                target
+                                args
+                                lp
+                                rp)))
   "AST node for a JavaScript function call."
   target  ; a `js3-node' evaluating to the function to call
   args  ; a lisp list of `js3-node' arguments
@@ -2116,10 +2116,10 @@ property `GETTER_SETTER' set to js3-GET or js3-SET. ")
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-yield-node
-			  (&key (type js3-YIELD)
-				(pos js3-ts-cursor)
-				len
-				value)))
+                          (&key (type js3-YIELD)
+                                (pos js3-ts-cursor)
+                                len
+                                value)))
   "AST node for yield statement or expression."
   value) ; optional:  value to be yielded
 
@@ -2148,10 +2148,10 @@ property `GETTER_SETTER' set to js3-GET or js3-SET. ")
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-paren-node
-			  (&key (type js3-LP)
-				(pos js3-ts-cursor)
-				len
-				expr)))
+                          (&key (type js3-LP)
+                                (pos js3-ts-cursor)
+                                len
+                                expr)))
   "AST node for a parenthesized expression.
 In particular, used when the parens are syntactically optional,
 as opposed to required parens such as those enclosing an if-conditional."
@@ -2180,12 +2180,12 @@ as opposed to required parens such as those enclosing an if-conditional."
       (js3-print-ast n i)
     (let ((temp (js3-print-expr-test n i)))
       (if (or (> (length temp) js3-max-columns)
-	      (string-match "\n" temp))
-	  (progn
-	    (js3-print " ")
-	    (js3-print-ast n i)
-	    (js3-print "\n"))
-	(js3-print-expr-compact n i)))))
+              (string-match "\n" temp))
+          (progn
+            (js3-print " ")
+            (js3-print-ast n i)
+            (js3-print "\n"))
+        (js3-print-expr-compact n i)))))
 
 (defun js3-print-expr-compact (n i)
   (js3-print-ast n i))
@@ -2197,15 +2197,15 @@ as opposed to required parens such as those enclosing an if-conditional."
             (:include js3-scope)
             (:constructor nil)
             (:constructor make-js3-array-comp-node
-			  (&key (type js3-ARRAYCOMP)
-				(pos js3-ts-cursor)
-				len
-				result
-				loops
-				filter
-				if-pos
-				lp
-				rp)))
+                          (&key (type js3-ARRAYCOMP)
+                                (pos js3-ts-cursor)
+                                len
+                                result
+                                loops
+                                filter
+                                if-pos
+                                lp
+                                rp)))
   "AST node for an Array comprehension such as [[x,y] for (x in foo) for (y in bar)]."
   result  ; result expression (just after left-bracket)
   loops   ; a lisp list of `js3-array-comp-loop-node'
@@ -2242,31 +2242,31 @@ as opposed to required parens such as those enclosing an if-conditional."
    (let ((temp ""))
      (dolist (l (js3-array-comp-node-loops n))
        (setq temp
-	     (concat
-	      temp
-	      (js3-print-test " ")
-	      (js3-print-ast-test l 0))))
+             (concat
+              temp
+              (js3-print-test " ")
+              (js3-print-ast-test l 0))))
      temp)
-  (when (js3-array-comp-node-filter n)
-    (concat
-     (js3-print-test " if (")
-     (js3-print-ast-test (js3-array-comp-node-filter n) 0)))
-  (js3-print-test ")]")))
+   (when (js3-array-comp-node-filter n)
+     (concat
+      (js3-print-test " if (")
+      (js3-print-ast-test (js3-array-comp-node-filter n) 0)))
+   (js3-print-test ")]")))
 
 (defstruct (js3-array-comp-loop-node
             (:include js3-for-in-node)
             (:constructor nil)
             (:constructor make-js3-array-comp-loop-node
-			  (&key (type js3-FOR)
-				(pos js3-ts-cursor)
-				len
-				iterator
-				object
-				in-pos
-				foreach-p
-				each-pos
-				lp
-				rp)))
+                          (&key (type js3-FOR)
+                                (pos js3-ts-cursor)
+                                len
+                                iterator
+                                object
+                                in-pos
+                                foreach-p
+                                each-pos
+                                lp
+                                rp)))
   "AST subtree for each 'for (foo in bar)' loop in an array comprehension.")
 
 (put 'cl-struct-js3-array-comp-loop-node 'js3-visitor 'js3-visit-array-comp-loop)
@@ -2296,9 +2296,9 @@ as opposed to required parens such as those enclosing an if-conditional."
             (:include js3-node)
             (:constructor nil)
             (:constructor make-js3-empty-expr-node
-			  (&key (type js3-EMPTY)
-				(pos js3-token-beg)
-				len)))
+                          (&key (type js3-EMPTY)
+                                (pos js3-token-beg)
+                                len)))
   "AST node for an empty expression.")
 
 (put 'cl-struct-js3-empty-expr-node 'js3-visitor 'js3-visit-none)
@@ -2591,9 +2591,9 @@ Function also calls `js3-node-add-children' to add the parent link."
       (error "No buffer available for node %s" node))
     (save-excursion
       (let ()
-	(set-buffer buf)
-	(buffer-substring-no-properties (setq pos (js3-node-abs-pos node))
-					(+ pos (js3-node-len node)))))))
+        (set-buffer buf)
+        (buffer-substring-no-properties (setq pos (js3-node-abs-pos node))
+                                        (+ pos (js3-node-len node)))))))
 
 ;; Container for storing the node we're looking for in a traversal.
 (defvar js3-discovered-node nil)
@@ -2802,9 +2802,9 @@ If NODE is the ast-root, returns nil."
   "Print a statement, or a block without braces."
   (if (js3-block-node-p node)
       (let ((temp ""))
-	(dolist (kid (js3-block-node-kids node))
-	  (setq temp (concat temp (js3-print-ast-test kid indent))))
-	temp)
+        (dolist (kid (js3-block-node-kids node))
+          (setq temp (concat temp (js3-print-ast-test kid indent))))
+        temp)
     (js3-print-ast-test node indent)))
 
 (defun js3-print-list (args &optional delimiter)
@@ -2812,9 +2812,9 @@ If NODE is the ast-root, returns nil."
       (js3-print-list-long args delimiter)
     (let ((temp (js3-print-list-test args delimiter)))
       (if (or (> (length temp) js3-max-columns)
-	      (string-match "\n" temp))
-	  (js3-print-list-long args delimiter)
-	(js3-print-list-compact args delimiter)))))
+              (string-match "\n" temp))
+          (js3-print-list-long args delimiter)
+        (js3-print-list-compact args delimiter)))))
 
 (defun js3-print-list-long (args &optional delimiter)
   (loop with len = (length args)
@@ -2822,12 +2822,12 @@ If NODE is the ast-root, returns nil."
         for count from 1
         do
         (if (and (= count 1) (> len 1))
-	    (js3-print " "))
+            (js3-print " "))
         (js3-print-ast arg 0)
         (if (< count len)
             (js3-print (or delimiter "\n, "))
-	  (when (> len 1)
-	    (js3-print "\n")))))
+          (when (> len 1)
+            (js3-print "\n")))))
 
 (defun js3-print-list-compact (args &optional delimiter)
   (loop with len = (length args)
@@ -2835,29 +2835,29 @@ If NODE is the ast-root, returns nil."
         for count from 1
         do
         (if (and (= count 1) (> len 1))
-	    (js3-print ""))
+            (js3-print ""))
         (js3-print-ast arg 0)
         (if (< count len)
             (js3-print (or delimiter ", "))
-	  (when (> len 1)
-	    (js3-print "")))))
+          (when (> len 1)
+            (js3-print "")))))
 
 (defun js3-print-list-test (args &optional delimiter)
   (let ((temp ""))
     (loop with len = (length args)
-	  for arg in args
-	  for count from 1
-	  do
-	  (setq temp
-		(concat
-		 temp
-		 (if (and (= count 1) (> len 1))
-		     (js3-print-test "")
-		   (js3-print-test ""))
-		 (js3-print-ast-test arg 0)
-		 (if (< count len)
-		     (js3-print-test (or delimiter ", "))
-		   (js3-print-test "")))))
+          for arg in args
+          for count from 1
+          do
+          (setq temp
+                (concat
+                 temp
+                 (if (and (= count 1) (> len 1))
+                     (js3-print-test "")
+                   (js3-print-test ""))
+                 (js3-print-ast-test arg 0)
+                 (if (< count len)
+                     (js3-print-test (or delimiter ", "))
+                   (js3-print-test "")))))
     temp))
 
 (defun js3-pretty-print-no-indent ()
@@ -2987,10 +2987,10 @@ You should use `js3-print-tree' instead of this function."
        ;; I'll wait for people to notice incorrect warnings.
        ((and (= tt js3-EXPR_VOID)
              (js3-expr-stmt-node-p node)) ; but not if EXPR_RESULT
-	(let ((expr (js3-expr-stmt-node-expr node)))
-	  (or (js3-node-has-side-effects expr)
-	      (when (js3-string-node-p expr)
-		(string= "use strict" (js3-string-node-value expr))))))
+        (let ((expr (js3-expr-stmt-node-expr node)))
+          (or (js3-node-has-side-effects expr)
+              (when (js3-string-node-p expr)
+                (string= "use strict" (js3-string-node-value expr))))))
        ((= tt js3-COMMA)
         (js3-node-has-side-effects (js3-infix-node-right node)))
        ((or (= tt js3-AND)

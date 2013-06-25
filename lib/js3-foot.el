@@ -50,7 +50,7 @@
   ;; some variables needed by cc-engine for paragraph-fill, etc.
   (setq c-comment-prefix-regexp js3-comment-prefix-regexp
         c-comment-start-regexp "/[*/]\\|\\s|"
-	c-line-comment-starter "//"
+        c-line-comment-starter "//"
         c-paragraph-start js3-paragraph-start
         c-paragraph-separate "$"
         comment-start-skip js3-comment-start-skip
@@ -60,13 +60,13 @@
 
   (if js3-emacs22
       (let ((c-buffer-is-cc-mode t))
-	;; Copied from `js-mode'.  Also see Bug#6071.
-	(make-local-variable 'paragraph-start)
-	(make-local-variable 'paragraph-separate)
-	(make-local-variable 'paragraph-ignore-fill-prefix)
-	(make-local-variable 'adaptive-fill-mode)
-	(make-local-variable 'adaptive-fill-regexp)
-	(c-setup-paragraph-variables)))
+        ;; Copied from `js-mode'.  Also see Bug#6071.
+        (make-local-variable 'paragraph-start)
+        (make-local-variable 'paragraph-separate)
+        (make-local-variable 'paragraph-ignore-fill-prefix)
+        (make-local-variable 'adaptive-fill-mode)
+        (make-local-variable 'adaptive-fill-regexp)
+        (c-setup-paragraph-variables)))
 
   (setq js3-default-externs
         (append js3-ecma-262-externs
@@ -189,11 +189,11 @@ buffer will only rebuild its `js3-mode-ast' if the buffer is dirty."
                     (setq interrupted-p
                           (catch 'interrupted
                             (setq js3-mode-ast (js3-parse))
-			    ;; if parsing is interrupted, comments and regex
-			    ;; literals stay ignored by `parse-partial-sexp'
-			    (remove-text-properties (point-min) (point-max)
-						    '(syntax-table))
-			    (js3-mode-apply-deferred-properties)
+                            ;; if parsing is interrupted, comments and regex
+                            ;; literals stay ignored by `parse-partial-sexp'
+                            (remove-text-properties (point-min) (point-max)
+                                                    '(syntax-table))
+                            (js3-mode-apply-deferred-properties)
                             (js3-mode-remove-suppressed-warnings)
                             (js3-mode-show-warnings)
                             (js3-mode-show-errors)
@@ -346,7 +346,7 @@ This ensures that the counts and `next-error' are correct."
   "Called by point-motion hooks."
   (let ((msg (get-text-property new-point 'help-echo)))
     (if (and msg (or (not (current-message))
-		     (string= (current-message) "Quit")))
+                     (string= (current-message) "Quit")))
         (message msg))))
 
 (defalias #'js3-echo-help #'js3-echo-error)
@@ -366,7 +366,7 @@ This ensures that the counts and `next-error' are correct."
      (t
       ;; should probably figure out what the mode-map says we should do
       (if (and js3-indent-on-enter-key
-	       (not (zerop (buffer-size))))
+               (not (zerop (buffer-size))))
           (js3-indent-line))
       (delete-horizontal-space t)
       (insert "\n")
@@ -441,9 +441,9 @@ This ensures that the counts and `next-error' are correct."
             (indent-to col)
             (insert "*/"))))
      ((and single
-	   (save-excursion
-	     (and (zerop (forward-line 1))
-		  (looking-at "\\s-*//"))))
+           (save-excursion
+             (and (zerop (forward-line 1))
+                  (looking-at "\\s-*//"))))
       (indent-to col)
       (insert "// "))
      (js3-enter-indents-newline
@@ -1293,18 +1293,18 @@ it marks the next defun after the ones already marked."
   (let ((var (word-at-point)))
     (when (not (member var js3-additional-externs))
       (save-excursion
-	(goto-char 0)
-	(when (not (looking-at "^/\\*global "))
-	  (newline 1)
-	  (forward-line -1)
-	  (insert "/*global*/")
-	  (goto-char 0))
-	(if (not (re-search-forward "[*]/" nil t))
-	    (message "Invalid global declaration")
-	  (delete-char -2)
-	  (when (not (looking-back " "))
-	    (insert " "))
-	  (insert (concat var " */")))))))
+        (goto-char 0)
+        (when (not (looking-at "^/\\*global "))
+          (newline 1)
+          (forward-line -1)
+          (insert "/*global*/")
+          (goto-char 0))
+        (if (not (re-search-forward "[*]/" nil t))
+            (message "Invalid global declaration")
+          (delete-char -2)
+          (when (not (looking-back " "))
+            (insert " "))
+          (insert (concat var " */")))))))
 
 (defalias 'js3r 'js3-mode-reset)
 
