@@ -638,7 +638,8 @@ nil."
                   ctrl-statement-indentation
                 (progn
                   (goto-char (nth 1 parse-status)) ; go to the opening char
-                  (if (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)")
+                  (if (or js3-boring-indentation
+			  (looking-at "[({[]\\s-*\\(/[/*]\\|$\\)"))
                       (progn ; nothing following the opening paren/bracket
                         (skip-syntax-backward " ")
                         ;;skip arg list

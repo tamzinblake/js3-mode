@@ -158,6 +158,12 @@ regardless of the beginning bracket position."
   :type 'boolean)
 (js3-mark-safe-local 'js3-consistent-level-indent-inner-bracket 'booleanp)
 
+(defcustom js3-boring-indentation nil
+  "Non-nil to indent various sorts of continued expressions standardly."
+  :group 'js3-mode
+  :type 'boolean)
+(js3-mark-safe-local 'js3-boring-indentation 'booleanp)
+
 (defcustom js3-indent-on-enter-key nil
   "Non-nil to have Enter/Return key indent the line.
 This is unusual for Emacs modes but common in IDEs like Eclipse."
