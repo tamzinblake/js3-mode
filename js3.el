@@ -10338,7 +10338,9 @@ nil."
                   (current-column)
                 (forward-char 2)
                 (re-search-forward "\\S-" nil t)
-                (1- (current-column))))))
+                (if (= 0 (current-column))
+		    0
+		  (1- (current-column)))))))
 
            ;;inside a string - indent to 0 since you can't do that.
            ((nth 8 parse-status) 0)
