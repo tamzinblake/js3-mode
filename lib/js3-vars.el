@@ -1004,7 +1004,7 @@ another file, or you've got a potential bug."
   "Number of additional spaces for indenting continued expressions.
 The value must be no less than minus `js3-indent-level'."
   :type 'integer
-  :group 'js-mode)
+  :group 'js3-mode)
 (js3-mark-safe-local 'js3-expr-indent-offset 'integerp)
 
 (defcustom js3-paren-indent-offset 0
