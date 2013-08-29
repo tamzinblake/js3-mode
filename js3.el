@@ -7938,7 +7938,7 @@ Scanner should be initialized."
       (setq js3-additional-externs
             (nconc js3-additional-externs
                    (split-string
-                    (if (string-match "/\\* *global \\(.*?\\)\\*/" btext)
+                    (if (string-match "/\\* *globals? \\(.*?\\)\\*/" btext)
                         (match-string-no-properties 1 btext)
                       "")
                     "\\(:true\\|:false\\)?[ ,]+" t))))
