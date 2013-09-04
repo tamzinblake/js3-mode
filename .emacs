@@ -13,5 +13,5 @@
  '(js3-curly-indent-offset 2)
 )
 
-(autoload 'js3-mode "js3" nil t)
+(autoload 'js3-mode "js3-mode" nil t)
 (add-to-list 'auto-mode-alist '("\\.js$" . js3-mode))
