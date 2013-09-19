@@ -1353,6 +1353,14 @@ The value must be no less than minus `js3-indent-level'."
   :version "24.1")
 (js3-mark-safe-local 'js3-curly-indent-offset 'integerp)
 
+(defcustom js3-label-indent-offset 0
+  "Number of additional spaces for indenting labels.
+The value must be no less than minus `js3-indent-level'."
+  :type 'integer
+  :group 'js3-mode
+  :version "24.1")
+(js3-mark-safe-local 'js3-label-indent-offset 'integerp)
+
 (defcustom js3-comment-lineup-func #'c-lineup-C-comments
   "Lineup function for `cc-mode-style', for C comments in `js3-mode'."
   :type 'function
@@ -10545,6 +10553,11 @@ nil."
             (save-excursion
               (js3-re-search-backward "\\<var\\>" (point-min) t)
               (+ (current-column) 4)))
+
+           ;;label
+           ((or (= type js3-CASE)
+                (= type js3-LABEL))
+            (+ js3-indent-level js3-label-indent-offset))
 
            ;;inside a parenthetical grouping
            ((nth 1 parse-status)
