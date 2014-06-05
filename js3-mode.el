@@ -1353,6 +1353,14 @@ The value must be no less than minus `js3-indent-level'."
   :version "24.1")
 (js3-mark-safe-local 'js3-curly-indent-offset 'integerp)
 
+(defcustom js3-label-indent-offset 0
+  "Number of additional spaces for indenting labels.
+The value must be no less than minus `js3-indent-level'."
+  :type 'integer
+  :group 'js3-mode
+  :version "24.1")
+(js3-mark-safe-local 'js3-label-indent-offset 'integerp)
+
 (defcustom js3-comment-lineup-func #'c-lineup-C-comments
   "Lineup function for `cc-mode-style', for C comments in `js3-mode'."
   :type 'function
@@ -8311,7 +8319,7 @@ Return value is a list (EXPR LP RP), with absolute paren positions."
     pn))
 
 (defun js3-parse-switch ()
-  "Parser for if-statement.  Last matched token must be js3-SWITCH."
+  "Parser for switch-statement.  Last matched token must be js3-SWITCH."
   (let ((pos js3-token-beg)
         tt
         pn
@@ -10346,23 +10354,23 @@ nil."
            ((nth 8 parse-status) 0)
 
            ((and (not js3-indent-dots)
-                 (= (following-char) ?\.))
+                 (= char ?\.))
             (goto-char abs)
             (current-column))
 
            ;;semicolon-first in for loop def
            ((and (not js3-lazy-semicolons)
-                 (= (following-char) ?\;)
+                 (= char ?\;)
                  (= type js3-FOR))
             (js3-back-offset-re abs "("))
 
            ;;comma-first and operator-first
            ((or
              (and (not js3-lazy-commas)
-                  (= (following-char) ?\,))
+                  (= char ?\,))
              (and (not js3-lazy-operators)
                   (looking-at js3-indent-operator-first-re)
-                  (or (not (= (following-char) ?\.))
+                  (or (not (= char ?\.))
                       (and js3-indent-dots
                            (not js3-lazy-dots)))))
             (cond
@@ -10437,7 +10445,7 @@ nil."
 
            ;;lazy semicolon-first in for loop def
            ((and js3-lazy-semicolons
-                 (= (following-char) ?\;)
+                 (= char ?\;)
                  (= type js3-FOR))
             (js3-backward-sexp)
             (cond
@@ -10466,7 +10474,7 @@ nil."
 
            ;;lazy comma-first
            ((and js3-lazy-commas
-                 (= (following-char) ?\,))
+                 (= char ?\,))
             (js3-backward-sexp)
             (cond
 
@@ -10500,7 +10508,7 @@ nil."
            ;;lazy dot-first
            ((and js3-indent-dots
                  js3-lazy-dots
-                 (= (following-char) ?\.))
+                 (= char ?\.))
             (save-excursion
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
@@ -10545,6 +10553,11 @@ nil."
             (save-excursion
               (js3-re-search-backward "\\<var\\>" (point-min) t)
               (+ (current-column) 4)))
+
+           ;;label
+           ((or (= type js3-CASE)
+                (= type js3-LABEL))
+            (+ js3-indent-level js3-label-indent-offset))
 
            ;;inside a parenthetical grouping
            ((nth 1 parse-status)
