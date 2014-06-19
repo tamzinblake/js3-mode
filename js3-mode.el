@@ -10518,7 +10518,7 @@ nil."
                                                 js3-skip-newlines-re)
                                         (point-min) t)
                     (back-to-indentation)
-                    (if (= (following-char) ?\.)
+                    (if (= char ?\.)
                         (current-column)
                       (+ (current-column) js3-indent-level)))
                 (+ js3-indent-level js3-expr-indent-offset))))

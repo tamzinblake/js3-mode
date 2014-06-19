@@ -736,7 +736,7 @@ Return value is a list (EXPR LP RP), with absolute paren positions."
     pn))
 
 (defun js3-parse-switch ()
-  "Parser for if-statement.  Last matched token must be js3-SWITCH."
+  "Parser for switch-statement.  Last matched token must be js3-SWITCH."
   (let ((pos js3-token-beg)
         tt
         pn

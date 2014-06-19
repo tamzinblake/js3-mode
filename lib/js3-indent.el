@@ -428,23 +428,23 @@ nil."
            ((nth 8 parse-status) 0)
 
            ((and (not js3-indent-dots)
-                 (= (following-char) ?\.))
+                 (= char ?\.))
             (goto-char abs)
             (current-column))
 
            ;;semicolon-first in for loop def
            ((and (not js3-lazy-semicolons)
-                 (= (following-char) ?\;)
+                 (= char ?\;)
                  (= type js3-FOR))
             (js3-back-offset-re abs "("))
 
            ;;comma-first and operator-first
            ((or
              (and (not js3-lazy-commas)
-                  (= (following-char) ?\,))
+                  (= char ?\,))
              (and (not js3-lazy-operators)
                   (looking-at js3-indent-operator-first-re)
-                  (or (not (= (following-char) ?\.))
+                  (or (not (= char ?\.))
                       (and js3-indent-dots
                            (not js3-lazy-dots)))))
             (cond
@@ -519,7 +519,7 @@ nil."
 
            ;;lazy semicolon-first in for loop def
            ((and js3-lazy-semicolons
-                 (= (following-char) ?\;)
+                 (= char ?\;)
                  (= type js3-FOR))
             (js3-backward-sexp)
             (cond
@@ -548,7 +548,7 @@ nil."
 
            ;;lazy comma-first
            ((and js3-lazy-commas
-                 (= (following-char) ?\,))
+                 (= char ?\,))
             (js3-backward-sexp)
             (cond
 
@@ -582,7 +582,7 @@ nil."
            ;;lazy dot-first
            ((and js3-indent-dots
                  js3-lazy-dots
-                 (= (following-char) ?\.))
+                 (= char ?\.))
             (save-excursion
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
@@ -592,7 +592,7 @@ nil."
                                                 js3-skip-newlines-re)
                                         (point-min) t)
                     (back-to-indentation)
-                    (if (= (following-char) ?\.)
+                    (if (= char ?\.)
                         (current-column)
                       (+ (current-column) js3-indent-level)))
                 (+ js3-indent-level js3-expr-indent-offset))))
@@ -627,6 +627,11 @@ nil."
             (save-excursion
               (js3-re-search-backward "\\<var\\>" (point-min) t)
               (+ (current-column) 4)))
+
+           ;;label
+           ((or (= type js3-CASE)
+                (= type js3-LABEL))
+            (+ js3-indent-level js3-label-indent-offset))
 
            ;;inside a parenthetical grouping
            ((nth 1 parse-status)
