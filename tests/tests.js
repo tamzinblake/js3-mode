@@ -542,12 +542,12 @@ function otherTests () {
   /* Cases that affect all style types */
 
   //test t1
-  //the function body should be indented one step from function name
-  //and the closing brace should be on the same level as function name
+  //the function body should be indented one step from beginning of line
+  //and the closing brace should be on the same level as beginning of line
   //Issue #26
   var function_name = function () {
-        return 1
-      }
+    return 1
+  }
 
   //end other tests
 
