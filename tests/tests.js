@@ -549,6 +549,20 @@ function otherTests () {
     return 1
   }
 
+  //test t2
+  //the case statements should be indented one indent from the
+  //beginning of the switch statement, + js3-label-indent-offset
+  //(default 0)
+  //Issue #99
+  function qux () {
+    function_name(function(bar) {
+      switch (bar) {
+        case "1":
+        case "2":
+      }
+    });
+  }
+
   //end other tests
 
   return 1;

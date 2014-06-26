@@ -396,6 +396,14 @@ nil."
          (max 0 (- sibcol 2))
        ,fallback)))
 
+(defun js3-special-case-offset (type)
+  "Add an offset for certain special cases"
+  (cond
+   ((or (= type js3-CASE)
+	(= type js3-LABEL))
+    js3-label-indent-offset)
+   (t 0)))
+
 (defun js3-proper-indentation (parse-status)
   "Return the proper indentation for the current line."
   (save-excursion
@@ -628,11 +636,6 @@ nil."
               (js3-re-search-backward "\\<var\\>" (point-min) t)
               (+ (current-column) 4)))
 
-           ;;label
-           ((or (= type js3-CASE)
-                (= type js3-LABEL))
-            (+ js3-indent-level js3-label-indent-offset))
-
            ;;inside a parenthetical grouping
            ((nth 1 parse-status)
             ;; A single closing paren/bracket should be indented at the
@@ -640,7 +643,7 @@ nil."
             (let ((same-indent-p (looking-at "[]})]"))
                   (continued-expr-p (js3-continued-expression-p))
                   (ctrl-statement-indentation (js3-ctrl-statement-indentation)))
-              (if (and (not same-indent-p) ctrl-statement-indentation)
+              (+ (js3-special-case-offset type) (if (and (not same-indent-p) ctrl-statement-indentation)
                   ;;indent control statement body without braces, if applicable
                   ctrl-statement-indentation
                 (progn
@@ -724,7 +727,7 @@ nil."
                     (unless same-indent-p
                       (forward-char)
                       (skip-chars-forward " \t"))
-                    (current-column))))))
+                    (current-column)))))))
 
            ;;indent control statement body without braces, if applicable
            ((js3-ctrl-statement-indentation))
