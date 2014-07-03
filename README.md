@@ -2,7 +2,7 @@
 
 A chimeric fork of js-mode (included with emacs 24) and [js2-mode](http://code.google.com/p/js2-mode/) that supports comma-first style and other quirks.
 
-The goal of this project was to get a javascript mode working that supports [npm style](https://github.com/isaacs/npm/blob/master/doc/coding-style.md), but it turns out this mode is compatible with other styles as well.
+The goal of this project was to get a javascript mode working that supports [npm style](https://www.npmjs.org/doc/coding-style.html), but it turns out this mode is compatible with other styles as well.
 
 Notably, js3-mode does not support js2-mode's bounce-indent, though it does support several popular indentation styles.
 
