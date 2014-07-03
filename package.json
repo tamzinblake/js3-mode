@@ -1,6 +1,6 @@
 {
   "name": "js3-mode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Javascript editing mode for emacs",
   "main": "index.js",
   "directories": {
