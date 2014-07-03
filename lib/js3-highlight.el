@@ -443,6 +443,7 @@ it is considered declared."
                           (unless (or (member name js3-global-externs)
                                       (member name js3-default-externs)
                                       (member name js3-additional-externs)
+				      (member name js3-declared-globals)
                                       (js3-get-defining-scope scope name))
                             (js3-set-face pos end 'js3-external-variable-face 'record)
                             (js3-record-text-property pos end 'help-echo "Undeclared variable")

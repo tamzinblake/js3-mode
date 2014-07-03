@@ -1098,6 +1098,9 @@ Your post-parse callback may of course also use the simpler and
 faster (but perhaps less robust) approach of simply scanning the
 buffer text for your imports, using regular expressions.")
 
+(deflocal js3-declared-globals nil
+  "A buffer-local list of globals declared at the top of the file.")
+
 ;; SKIP:  decompiler
 ;; SKIP:  encoded-source
 
@@ -1429,6 +1432,7 @@ rather than trying to line up to dots."
     (define-key map (kbd "C-c C-t") #'js3-mode-toggle-hide-comments)
     (define-key map (kbd "C-c C-o") #'js3-mode-toggle-element)
     (define-key map (kbd "C-c C-w") #'js3-mode-toggle-warnings-and-errors)
+    (define-key map (kbd "C-c C-g") #'js3-add-to-globals)
     (when (not js3-dont-rebind-backtick)
       (define-key map (kbd "C-c C-`") #'js3-next-error))
     ;; also define user's preference for next-error, if available
@@ -7166,6 +7170,7 @@ it is considered declared."
                           (unless (or (member name js3-global-externs)
                                       (member name js3-default-externs)
                                       (member name js3-additional-externs)
+				      (member name js3-declared-globals)
                                       (js3-get-defining-scope scope name))
                             (js3-set-face pos end 'js3-external-variable-face 'record)
                             (js3-record-text-property pos end 'help-echo "Undeclared variable")
@@ -7943,14 +7948,14 @@ Scanner should be initialized."
             "[\n\t ]+" " "
             (buffer-substring-no-properties
              1 (buffer-size)) t t)))
-      (setq js3-additional-externs
-            (nconc js3-additional-externs
+      (setq js3-declared-globals
+            (nconc js3-declared-globals
                    (split-string
                     (if (string-match "/\\* *globals? \\(.*?\\)\\*/" btext)
                         (match-string-no-properties 1 btext)
                       "")
                     "\\(:true\\|:false\\)?[ ,]+" t))))
-    (delete-dups js3-additional-externs)
+    (delete-dups js3-declared-globals)
     (js3-highlight-undeclared-vars)
     root))
 
@@ -12000,10 +12005,10 @@ it marks the next defun after the ones already marked."
 (defun js3-add-to-globals ()
   (interactive)
   (let ((var (word-at-point)))
-    (when (not (member var js3-additional-externs))
+    (when (not (member var js3-declared-globals))
       (save-excursion
         (goto-char 0)
-        (when (not (looking-at "^/\\*global "))
+        (when (not (looking-at "^/\\*\\s-*globals? "))
           (newline 1)
           (forward-line -1)
           (insert "/*global*/")

@@ -776,6 +776,9 @@ Your post-parse callback may of course also use the simpler and
 faster (but perhaps less robust) approach of simply scanning the
 buffer text for your imports, using regular expressions.")
 
+(deflocal js3-declared-globals nil
+  "A buffer-local list of globals declared at the top of the file.")
+
 ;; SKIP:  decompiler
 ;; SKIP:  encoded-source
 
@@ -1107,6 +1110,7 @@ rather than trying to line up to dots."
     (define-key map (kbd "C-c C-t") #'js3-mode-toggle-hide-comments)
     (define-key map (kbd "C-c C-o") #'js3-mode-toggle-element)
     (define-key map (kbd "C-c C-w") #'js3-mode-toggle-warnings-and-errors)
+    (define-key map (kbd "C-c C-g") #'js3-add-to-globals)
     (when (not js3-dont-rebind-backtick)
       (define-key map (kbd "C-c C-`") #'js3-next-error))
     ;; also define user's preference for next-error, if available

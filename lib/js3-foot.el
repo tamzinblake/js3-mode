@@ -1310,10 +1310,10 @@ it marks the next defun after the ones already marked."
 (defun js3-add-to-globals ()
   (interactive)
   (let ((var (word-at-point)))
-    (when (not (member var js3-additional-externs))
+    (when (not (member var js3-declared-globals))
       (save-excursion
         (goto-char 0)
-        (when (not (looking-at "^/\\*global "))
+        (when (not (looking-at "^/\\*\\s-*globals? "))
           (newline 1)
           (forward-line -1)
           (insert "/*global*/")

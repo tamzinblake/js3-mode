@@ -360,14 +360,14 @@ Scanner should be initialized."
             "[\n\t ]+" " "
             (buffer-substring-no-properties
              1 (buffer-size)) t t)))
-      (setq js3-additional-externs
-            (nconc js3-additional-externs
+      (setq js3-declared-globals
+            (nconc js3-declared-globals
                    (split-string
                     (if (string-match "/\\* *globals? \\(.*?\\)\\*/" btext)
                         (match-string-no-properties 1 btext)
                       "")
                     "\\(:true\\|:false\\)?[ ,]+" t))))
-    (delete-dups js3-additional-externs)
+    (delete-dups js3-declared-globals)
     (js3-highlight-undeclared-vars)
     root))
 
