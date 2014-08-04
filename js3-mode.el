@@ -6711,7 +6711,7 @@ nor always false."
   "backspace over semicolons in the output buffer"
   (set-buffer (get-buffer-create js3-temp-buffer))
   (while (looking-back "\\(;\\|\\s-\\|\n\\)+")
-    (delete-backward-char 1))
+    (delete-char -1))
   (set-buffer js3-current-buffer))
 
 (defun js3-print-test (str)
@@ -11759,7 +11759,7 @@ Some users don't like having warnings/errors reported while they type."
   (interactive)
   (setq js3-mode-show-parse-errors (not js3-mode-show-parse-errors)
         js3-mode-show-strict-warnings (not js3-mode-show-strict-warnings))
-  (if (interactive-p)
+  (if (called-interactively-p interactive)
       (message "warnings and errors %s"
                (if js3-mode-show-parse-errors
                    "enabled"

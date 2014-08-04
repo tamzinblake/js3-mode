@@ -3350,7 +3350,7 @@ nor always false."
   "backspace over semicolons in the output buffer"
   (set-buffer (get-buffer-create js3-temp-buffer))
   (while (looking-back "\\(;\\|\\s-\\|\n\\)+")
-    (delete-backward-char 1))
+    (delete-char -1))
   (set-buffer js3-current-buffer))
 
 (defun js3-print-test (str)
