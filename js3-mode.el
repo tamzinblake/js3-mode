@@ -444,11 +444,6 @@ when `js3-lazy-commas' is t"
   :type 'boolean)
 (js3-mark-safe-local 'js3-pretty-lazy-vars 'booleanp)
 
-(defcustom js3-cleanup-whitespace t
-  "Non-nil to invoke `delete-trailing-whitespace' before saves."
-  :type 'boolean
-  :group 'js3-mode)
-
 (defcustom js3-move-point-on-right-click t
   "Non-nil to move insertion point when you right-click.
 This makes right-click context menu behavior a bit more intuitive,
@@ -10730,7 +10725,6 @@ nil."
   ;; So it's back to `c-fill-paragraph'.
   (set (make-local-variable 'fill-paragraph-function) #'c-fill-paragraph)
 
-  (add-hook 'before-save-hook #'js3-before-save nil t)
   (set (make-local-variable 'next-error-function) #'js3-next-error)
   (set (make-local-variable 'beginning-of-defun-function) #'js3-beginning-of-defun)
   (set (make-local-variable 'end-of-defun-function) #'js3-end-of-defun)
@@ -10827,16 +10821,6 @@ nil."
   (js3-mode-show-all)
   (js3-with-unmodifying-text-property-changes
    (js3-clear-face (point-min) (point-max))))
-
-(defun js3-before-save ()
-  "Clean up whitespace before saving file.
-You can disable this by customizing `js3-cleanup-whitespace'."
-  (when js3-cleanup-whitespace
-    (let ((col (current-column)))
-      (delete-trailing-whitespace)
-      ;; don't change trailing whitespace on current line
-      (unless (eq (current-column) col)
-        (indent-to col)))))
 
 (defsubst js3-mode-reset-timer ()
   (if js3-mode-parse-timer

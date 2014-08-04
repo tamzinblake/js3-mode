@@ -35,7 +35,6 @@
   ;; So it's back to `c-fill-paragraph'.
   (set (make-local-variable 'fill-paragraph-function) #'c-fill-paragraph)
 
-  (add-hook 'before-save-hook #'js3-before-save nil t)
   (set (make-local-variable 'next-error-function) #'js3-next-error)
   (set (make-local-variable 'beginning-of-defun-function) #'js3-beginning-of-defun)
   (set (make-local-variable 'end-of-defun-function) #'js3-end-of-defun)
@@ -132,16 +131,6 @@
   (js3-mode-show-all)
   (js3-with-unmodifying-text-property-changes
    (js3-clear-face (point-min) (point-max))))
-
-(defun js3-before-save ()
-  "Clean up whitespace before saving file.
-You can disable this by customizing `js3-cleanup-whitespace'."
-  (when js3-cleanup-whitespace
-    (let ((col (current-column)))
-      (delete-trailing-whitespace)
-      ;; don't change trailing whitespace on current line
-      (unless (eq (current-column) col)
-        (indent-to col)))))
 
 (defsubst js3-mode-reset-timer ()
   (if js3-mode-parse-timer
