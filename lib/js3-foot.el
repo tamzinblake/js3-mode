@@ -334,9 +334,10 @@ This ensures that the counts and `next-error' are correct."
 (defun js3-echo-error (old-point new-point)
   "Called by point-motion hooks."
   (let ((msg (get-text-property new-point 'help-echo)))
-    (if (and msg (or (not (current-message))
-                     (string= (current-message) "Quit")))
-        (message msg))))
+    (when (and (stringp msg)
+               (not (active-minibuffer-window))
+               (not (current-message)))
+      (message msg))))
 
 (defalias #'js3-echo-help #'js3-echo-error)
 
