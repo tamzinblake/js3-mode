@@ -122,11 +122,6 @@ when `js3-lazy-commas' is t"
   :type 'boolean)
 (js3-mark-safe-local 'js3-pretty-lazy-vars 'booleanp)
 
-(defcustom js3-cleanup-whitespace t
-  "Non-nil to invoke `delete-trailing-whitespace' before saves."
-  :type 'boolean
-  :group 'js3-mode)
-
 (defcustom js3-move-point-on-right-click t
   "Non-nil to move insertion point when you right-click.
 This makes right-click context menu behavior a bit more intuitive,
