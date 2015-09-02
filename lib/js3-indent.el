@@ -634,7 +634,7 @@ nil."
                     (js3-node-type (js3-node-parent (js3-node-at-point)))))
             (save-excursion
               (js3-re-search-backward "\\<var\\>" (point-min) t)
-              (+ (current-column) 4)))
+              (+ (current-column) js3-pretty-vars-spaces)))
 
            ;;inside a parenthetical grouping
            ((nth 1 parse-status)
