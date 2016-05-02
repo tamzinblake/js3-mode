@@ -339,7 +339,7 @@ This ensures that the counts and `next-error' are correct."
                (not (current-message)))
       (message msg))))
 
-(defalias #'js3-echo-help #'js3-echo-error)
+(defalias 'js3-echo-help #'js3-echo-error)
 
 (defun js3-enter-key ()
   "Handle user pressing the Enter key."
