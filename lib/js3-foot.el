@@ -1317,8 +1317,9 @@ it marks the next defun after the ones already marked."
 
 (defalias 'js3r 'js3-mode-reset)
 
+(provide 'js3)
 (provide 'js3-mode)
 
 ;;; js3-foot.el ends here
 
-;;; js3.el ends here
+;;; js3-mode.el ends here

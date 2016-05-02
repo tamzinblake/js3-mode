@@ -1,4 +1,4 @@
-;;; js3.el --- An improved JavaScript editing mode
+;;; js3-mode.el --- An improved JavaScript editing mode
 ;;;
 
 ;;; js3-head.el
