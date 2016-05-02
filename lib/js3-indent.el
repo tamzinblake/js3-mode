@@ -541,7 +541,8 @@ nil."
               (current-column))
 
              ((looking-back (concat "^[ \t]*[^ \t\n].*"
-                                    js3-skip-newlines-re))
+                                    js3-skip-newlines-re)
+			    nil)
               (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                           js3-skip-newlines-re)
                                   (point-min) t)
@@ -575,7 +576,8 @@ nil."
               (current-column))
 
              ((looking-back (concat "^[ \t]*[^ \t\n].*"
-                                    js3-skip-newlines-re))
+                                    js3-skip-newlines-re)
+			    nil)
               (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                           js3-skip-newlines-re)
                                   (point-min) t)
@@ -594,7 +596,8 @@ nil."
             (save-excursion
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
-                                        js3-skip-newlines-re))
+                                        js3-skip-newlines-re)
+				nil)
                   (progn
                     (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                                 js3-skip-newlines-re)
@@ -611,7 +614,8 @@ nil."
             (save-excursion
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
-                                        js3-skip-newlines-re))
+                                        js3-skip-newlines-re)
+				nil)
                   (progn
                     (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                                 js3-skip-newlines-re)
@@ -687,7 +691,7 @@ nil."
                                   (goto-char fpabs))
 
                                  ((looking-back
-                                   "\\(\n\\|\\`\\)[ \t]*;?[ \t]*(?[ \t]*")
+                                   "\\(\n\\|\\`\\)[ \t]*;?[ \t]*(?[ \t]*" nil)
                                   (back-to-indentation))
 
                                  ((eq fptype js3-CALL)
