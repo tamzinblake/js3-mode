@@ -11771,7 +11771,7 @@ Some users don't like having warnings/errors reported while they type."
   (interactive)
   (setq js3-mode-show-parse-errors (not js3-mode-show-parse-errors)
         js3-mode-show-strict-warnings (not js3-mode-show-strict-warnings))
-  (if (called-interactively-p interactive)
+  (if (called-interactively-p 'interactive)
       (message "warnings and errors %s"
                (if js3-mode-show-parse-errors
                    "enabled"
