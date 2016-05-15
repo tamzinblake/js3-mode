@@ -1,4 +1,4 @@
-;;; js3.el --- An improved JavaScript editing mode
+;;; js3-mode.el --- An improved JavaScript editing mode
 ;;;
 
 ;;; js3-head.el
@@ -6717,7 +6717,7 @@ nor always false."
 (defun js3-delete-semicolons ()
   "backspace over semicolons in the output buffer"
   (set-buffer (get-buffer-create js3-temp-buffer))
-  (while (looking-back "\\(;\\|\\s-\\|\n\\)+")
+  (while (looking-back "\\(;\\|\\s-\\|\n\\)+" nil)
     (delete-char -1))
   (set-buffer js3-current-buffer))
 
@@ -7176,7 +7176,7 @@ it is considered declared."
                                       (js3-get-defining-scope scope name))
                             (js3-set-face pos end 'js3-external-variable-face 'record)
                             (js3-record-text-property pos end 'help-echo "Undeclared variable")
-                            (js3-record-text-property pos end 'point-entered #'js3-echo-help))))
+                            (js3-record-text-property pos end 'point-entered 'js3-echo-help))))
     (setq js3-recorded-identifiers nil)))
 
 (provide 'js3-highlight)
@@ -10474,7 +10474,8 @@ nil."
               (current-column))
 
              ((looking-back (concat "^[ \t]*[^ \t\n].*"
-                                    js3-skip-newlines-re))
+                                    js3-skip-newlines-re)
+			    nil)
               (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                           js3-skip-newlines-re)
                                   (point-min) t)
@@ -10508,7 +10509,8 @@ nil."
               (current-column))
 
              ((looking-back (concat "^[ \t]*[^ \t\n].*"
-                                    js3-skip-newlines-re))
+                                    js3-skip-newlines-re)
+			    nil)
               (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                           js3-skip-newlines-re)
                                   (point-min) t)
@@ -10527,7 +10529,8 @@ nil."
             (save-excursion
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
-                                        js3-skip-newlines-re))
+                                        js3-skip-newlines-re)
+				nil)
                   (progn
                     (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                                 js3-skip-newlines-re)
@@ -10544,7 +10547,8 @@ nil."
             (save-excursion
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
-                                        js3-skip-newlines-re))
+                                        js3-skip-newlines-re)
+				nil)
                   (progn
                     (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                                 js3-skip-newlines-re)
@@ -10620,7 +10624,7 @@ nil."
                                   (goto-char fpabs))
 
                                  ((looking-back
-                                   "\\(\n\\|\\`\\)[ \t]*;?[ \t]*(?[ \t]*")
+                                   "\\(\n\\|\\`\\)[ \t]*;?[ \t]*(?[ \t]*" nil)
                                   (back-to-indentation))
 
                                  ((eq fptype js3-CALL)
@@ -11036,7 +11040,7 @@ This ensures that the counts and `next-error' are correct."
                (not (current-message)))
       (message msg))))
 
-(defalias #'js3-echo-help #'js3-echo-error)
+(defalias 'js3-echo-help #'js3-echo-error)
 
 (defun js3-enter-key ()
   "Handle user pressing the Enter key."
@@ -11093,7 +11097,7 @@ This ensures that the counts and `next-error' are correct."
                           (current-column)))
                     (save-excursion
                       (goto-char string-beg)
-                      (if (looking-back "\\+\\s-+")
+                      (if (looking-back "\\+\\s-+" nil)
                           (goto-char (match-beginning 0)))
                       (current-column))))))
     (insert quote-char "\n")
@@ -11420,7 +11424,7 @@ already have been inserted."
         (save-excursion
           (insert quote-string))))
      ((looking-at quote-string)
-      (if (looking-back "[^\\]\\\\")
+      (if (looking-back "[^\\]\\\\" nil)
           (insert quote-string)
         (forward-char 1)))
      ((and js3-mode-escape-quotes
@@ -11428,7 +11432,7 @@ already have been inserted."
              (save-match-data
                (re-search-forward quote-string (point-at-eol) t))))
       ;; inside terminated string, escape quote (unless already escaped)
-      (insert (if (looking-back "[^\\]\\\\")
+      (insert (if (looking-back "[^\\]\\\\" nil)
                   quote-string
                 (concat "\\" quote-string))))
      (t
@@ -11767,7 +11771,7 @@ Some users don't like having warnings/errors reported while they type."
   (interactive)
   (setq js3-mode-show-parse-errors (not js3-mode-show-parse-errors)
         js3-mode-show-strict-warnings (not js3-mode-show-strict-warnings))
-  (if (called-interactively-p interactive)
+  (if (called-interactively-p 'interactive)
       (message "warnings and errors %s"
                (if js3-mode-show-parse-errors
                    "enabled"
@@ -11885,7 +11889,7 @@ destroying the region selection."
     (js3-with-underscore-as-word-syntax
      (save-excursion
        (if (and (not (looking-at "[A-Za-z0-9_$]"))
-                (looking-back "[A-Za-z0-9_$]"))
+                (looking-back "[A-Za-z0-9_$]" nil))
            (setq beg (progn (forward-word -1) (point))
                  end (progn (forward-word 1) (point)))
          (setq beg (progn (forward-word 1) (point))
@@ -12008,14 +12012,15 @@ it marks the next defun after the ones already marked."
         (if (not (re-search-forward "[*]/" nil t))
             (message "Invalid global declaration")
           (delete-char -2)
-          (when (not (looking-back " "))
+          (when (not (looking-back " " nil))
             (insert " "))
           (insert (concat var " */")))))))
 
 (defalias 'js3r 'js3-mode-reset)
 
+(provide 'js3)
 (provide 'js3-mode)
 
 ;;; js3-foot.el ends here
 
-;;; js3.el ends here
+;;; js3-mode.el ends here

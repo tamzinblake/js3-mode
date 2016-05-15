@@ -447,7 +447,7 @@ it is considered declared."
                                       (js3-get-defining-scope scope name))
                             (js3-set-face pos end 'js3-external-variable-face 'record)
                             (js3-record-text-property pos end 'help-echo "Undeclared variable")
-                            (js3-record-text-property pos end 'point-entered #'js3-echo-help))))
+                            (js3-record-text-property pos end 'point-entered 'js3-echo-help))))
     (setq js3-recorded-identifiers nil)))
 
 (provide 'js3-highlight)
