@@ -7949,7 +7949,7 @@ Scanner should be initialized."
            (replace-regexp-in-string
             "[\n\t ]+" " "
             (buffer-substring-no-properties
-             1 (buffer-size)) t t)))
+             (point-min) (point-max)) t t)))
       (setq js3-declared-globals
             (nconc js3-declared-globals
                    (split-string
