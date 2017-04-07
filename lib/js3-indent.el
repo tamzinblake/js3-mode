@@ -542,7 +542,7 @@ nil."
 
              ((looking-back (concat "^[ \t]*[^ \t\n].*"
                                     js3-skip-newlines-re)
-			    nil)
+                            nil)
               (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                           js3-skip-newlines-re)
                                   (point-min) t)
@@ -577,7 +577,7 @@ nil."
 
              ((looking-back (concat "^[ \t]*[^ \t\n].*"
                                     js3-skip-newlines-re)
-			    nil)
+                            nil)
               (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                           js3-skip-newlines-re)
                                   (point-min) t)
@@ -597,7 +597,7 @@ nil."
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
                                         js3-skip-newlines-re)
-				nil)
+                                nil)
                   (progn
                     (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                                 js3-skip-newlines-re)
@@ -615,7 +615,7 @@ nil."
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
                                         js3-skip-newlines-re)
-				nil)
+                                nil)
                   (progn
                     (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                                 js3-skip-newlines-re)

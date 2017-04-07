@@ -1624,7 +1624,7 @@ First match-group is the leading whitespace.")
 ;; Emacs21 compatibility, plus some stuff to avoid runtime dependency on CL
 
 (unless (fboundp #'looking-back)
-  (defun looking-back (regexp &optional limit greedy)
+  (defun looking-back (regexp limit &optional greedy)
     "Return non-nil if text before point matches regular expression REGEXP.
 Like `looking-at' except matches before point, and is slower.
 LIMIT if non-nil speeds up the search by specifying a minimum
@@ -6717,7 +6717,7 @@ nor always false."
 (defun js3-delete-semicolons ()
   "backspace over semicolons in the output buffer"
   (set-buffer (get-buffer-create js3-temp-buffer))
-  (while (looking-back "\\(;\\|\\s-\\|\n\\)+" nil)
+  (while (looking-back "\\(;\\|\\s-\\|\n\\)+" (1- (point)))
     (delete-char -1))
   (set-buffer js3-current-buffer))
 
@@ -10475,7 +10475,7 @@ nil."
 
              ((looking-back (concat "^[ \t]*[^ \t\n].*"
                                     js3-skip-newlines-re)
-			    nil)
+                            nil)
               (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                           js3-skip-newlines-re)
                                   (point-min) t)
@@ -10510,7 +10510,7 @@ nil."
 
              ((looking-back (concat "^[ \t]*[^ \t\n].*"
                                     js3-skip-newlines-re)
-			    nil)
+                            nil)
               (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                           js3-skip-newlines-re)
                                   (point-min) t)
@@ -10530,7 +10530,7 @@ nil."
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
                                         js3-skip-newlines-re)
-				nil)
+                                nil)
                   (progn
                     (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                                 js3-skip-newlines-re)
@@ -10548,7 +10548,7 @@ nil."
               (js3-backward-sexp)
               (if (looking-back (concat "^[ \t]*[^ \t\n].*"
                                         js3-skip-newlines-re)
-				nil)
+                                nil)
                   (progn
                     (re-search-backward (concat "^[ \t]*[^ \t\n].*"
                                                 js3-skip-newlines-re)
