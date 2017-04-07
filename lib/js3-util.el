@@ -9,7 +9,7 @@
 ;; Emacs21 compatibility, plus some stuff to avoid runtime dependency on CL
 
 (unless (fboundp #'looking-back)
-  (defun looking-back (regexp &optional limit greedy)
+  (defun looking-back (regexp limit &optional greedy)
     "Return non-nil if text before point matches regular expression REGEXP.
 Like `looking-at' except matches before point, and is slower.
 LIMIT if non-nil speeds up the search by specifying a minimum

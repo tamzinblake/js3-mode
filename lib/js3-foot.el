@@ -339,7 +339,7 @@ This ensures that the counts and `next-error' are correct."
                (not (current-message)))
       (message msg))))
 
-(defalias #'js3-echo-help #'js3-echo-error)
+(defalias 'js3-echo-help 'js3-echo-error)
 
 (defun js3-enter-key ()
   "Handle user pressing the Enter key."
@@ -396,7 +396,7 @@ This ensures that the counts and `next-error' are correct."
                           (current-column)))
                     (save-excursion
                       (goto-char string-beg)
-                      (if (looking-back "\\+\\s-+")
+                      (if (looking-back "\\+\\s-+" nil)
                           (goto-char (match-beginning 0)))
                       (current-column))))))
     (insert quote-char "\n")
@@ -723,7 +723,7 @@ already have been inserted."
         (save-excursion
           (insert quote-string))))
      ((looking-at quote-string)
-      (if (looking-back "[^\\]\\\\")
+      (if (looking-back "[^\\]\\\\" nil)
           (insert quote-string)
         (forward-char 1)))
      ((and js3-mode-escape-quotes
@@ -731,7 +731,7 @@ already have been inserted."
              (save-match-data
                (re-search-forward quote-string (point-at-eol) t))))
       ;; inside terminated string, escape quote (unless already escaped)
-      (insert (if (looking-back "[^\\]\\\\")
+      (insert (if (looking-back "[^\\]\\\\" nil)
                   quote-string
                 (concat "\\" quote-string))))
      (t
@@ -1070,7 +1070,7 @@ Some users don't like having warnings/errors reported while they type."
   (interactive)
   (setq js3-mode-show-parse-errors (not js3-mode-show-parse-errors)
         js3-mode-show-strict-warnings (not js3-mode-show-strict-warnings))
-  (if (called-interactively-p interactive)
+  (if (called-interactively-p 'interactive)
       (message "warnings and errors %s"
                (if js3-mode-show-parse-errors
                    "enabled"
@@ -1188,7 +1188,7 @@ destroying the region selection."
     (js3-with-underscore-as-word-syntax
      (save-excursion
        (if (and (not (looking-at "[A-Za-z0-9_$]"))
-                (looking-back "[A-Za-z0-9_$]"))
+                (looking-back "[A-Za-z0-9_$]" nil))
            (setq beg (progn (forward-word -1) (point))
                  end (progn (forward-word 1) (point)))
          (setq beg (progn (forward-word 1) (point))
@@ -1311,7 +1311,7 @@ it marks the next defun after the ones already marked."
         (if (not (re-search-forward "[*]/" nil t))
             (message "Invalid global declaration")
           (delete-char -2)
-          (when (not (looking-back " "))
+          (when (not (looking-back " " nil))
             (insert " "))
           (insert (concat var " */")))))))
 
