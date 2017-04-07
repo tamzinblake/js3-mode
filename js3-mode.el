@@ -1,4 +1,4 @@
-;;; js3.el --- An improved JavaScript editing mode
+;;; js3-mode.el --- An improved JavaScript editing mode
 ;;;
 
 ;;; js3-head.el
@@ -7176,7 +7176,7 @@ it is considered declared."
                                       (js3-get-defining-scope scope name))
                             (js3-set-face pos end 'js3-external-variable-face 'record)
                             (js3-record-text-property pos end 'help-echo "Undeclared variable")
-                            (js3-record-text-property pos end 'point-entered #'js3-echo-help))))
+                            (js3-record-text-property pos end 'point-entered 'js3-echo-help))))
     (setq js3-recorded-identifiers nil)))
 
 (provide 'js3-highlight)
@@ -11040,7 +11040,7 @@ This ensures that the counts and `next-error' are correct."
                (not (current-message)))
       (message msg))))
 
-(defalias 'js3-echo-help 'js3-echo-error)
+(defalias 'js3-echo-help #'js3-echo-error)
 
 (defun js3-enter-key ()
   "Handle user pressing the Enter key."
@@ -12018,8 +12018,9 @@ it marks the next defun after the ones already marked."
 
 (defalias 'js3r 'js3-mode-reset)
 
+(provide 'js3)
 (provide 'js3-mode)
 
 ;;; js3-foot.el ends here
 
-;;; js3.el ends here
+;;; js3-mode.el ends here
